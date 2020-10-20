@@ -27,20 +27,37 @@
 #include "err.h"
 #include <curl/curl.h>
 
-/// FILE pointer for writing to files.
+/// CDAV File pointer.
 FILE* file;
 
-/// Defines a structure that is passed into write callbacks.
-typedef struct cdav_write_params_t
+/// Returns the size of the given file.
+long
+file_size(const char* file_path);
+
+/// Defines a structure that is passed into callbacks writing files.
+typedef struct cdav_write_file_params_t
 {
 	const char* save_as;
 	CURL* curl;
 
-} WRITE_PARAMS;
+} CDAV_WRITE_FILE_PARAMS;
 
-/// Write callback for curl.
+/// Defines a structure that is passed into callbacks reading data.
+typedef struct cdav_read_file_params_t
+{
+	const char* file_path;
+	long file_sz;
+	CURL* curl;
+
+} CDAV_READ_FILE_PARAMS;
+
+/// Callback for curl writing to file.
 size_t
-cdav_write(char* data, size_t size, size_t nmemb, void* params);
+cdav_write_file(char* data, size_t size, size_t nmemb, void* params);
+
+/// Read callback for curl.
+size_t
+cdav_read_file(char* buffer, size_t size, size_t nitems, void* params);
 
 /// WebDAV GET - The target can be saved under the path given by "save_as" parameter.
 void
@@ -48,5 +65,12 @@ cdav_get(const char* url,
 	 const char* save_as,
 	 const char* user,
 	 const char* passwd);
+
+/// WebDAV POST - Posts the given file to the given url.
+void
+cdav_post(const char* file,
+	  const char* url,
+	  const char* user,
+	  const char* passwd);
 
 #endif // DAV_H

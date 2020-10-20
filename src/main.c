@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 #ifdef TEST
 	printf("##### Running tests ##### \n");
 
-
 	printf("##### Tests done #####\n");
 #endif
 
