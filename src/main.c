@@ -24,7 +24,15 @@
 
 int main(int argc, char* argv[])
 {
-	curl_global_init(CURL_GLOBAL_ALL);
+	int init = curl_global_init(CURL_GLOBAL_ALL);
+
+	if (init != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(init);
+		fprintf(stderr, "CURL ERR: %d - %s\n", init, err);
+
+		error_exit("CURL ERR: Exiting\n");
+	}
 
 #ifdef TEST
 	printf("##### Running tests ##### \n");
@@ -33,6 +41,8 @@ int main(int argc, char* argv[])
 #endif
 
 	printf("Returned: %d\n", EXIT_SUCCESS);
+
+	curl_global_cleanup();
 
 	return EXIT_SUCCESS;
 }

@@ -82,6 +82,16 @@ cdav_handle_rescode(CURL* curl)
 }
 
 size_t
+cdav_recieve(char* data, size_t size, size_t nmemb, void* params)
+{
+	CURL* curl = (CURL*) params;
+
+	cdav_handle_rescode(curl);
+
+	return nmemb * size;
+}
+
+size_t
 cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 {
 	CDAV_WRITE_FILE_PARAMS* w_params = (CDAV_WRITE_FILE_PARAMS*) params;
@@ -149,7 +159,7 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 		}
 	}
 
-	int bytes_read = fread(buffer, size, nitems, file);
+	int bytes_read = fread(buffer, size, (size * nitems), file);
 
 	if (bytes_read <= 0)
 	{
@@ -162,8 +172,6 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 		fprintf(stderr, "Error reading data: %d - %s\n", err, errstr);
 		error_exit(NULL);
 	}
-
-	// TODO: Read callback
 
 	return bytes_read;
 }
@@ -185,22 +193,21 @@ cdav_get(const char* url,
 	if (curl == NULL)
 		error_exit("Error initializing curl!");
 
+	CDAV_WRITE_FILE_PARAMS params;
+	params.save_as = save_as;
+	params.curl = curl;
+
 #ifdef TEST
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_write_file);
-
-	CDAV_WRITE_FILE_PARAMS params;
-	params.save_as = save_as;
-	params.curl = curl;
-
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
 	if (user != NULL && passwd != NULL)
 	{
-		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 
 		curl_easy_setopt(curl, CURLOPT_USERNAME, user);
 		curl_easy_setopt(curl, CURLOPT_PASSWORD, passwd);
@@ -215,7 +222,7 @@ cdav_get(const char* url,
 		const char* err = curl_easy_strerror(result);
 		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
 
-		error_exit("CURL ERR: Exiting\n");
+		error_exit("CURL ERR: Exiting");
 	}
 
 	fclose(file);
@@ -227,7 +234,7 @@ cdav_get(const char* url,
 }
 
 void
-cdav_post(const char* file_path,
+cdav_put(const char* file_path,
 	  const char* url,
 	  const char* user,
 	  const char* passwd)
@@ -242,12 +249,6 @@ cdav_post(const char* file_path,
 
 	if (curl == NULL)
 		error_exit("Error initializing curl!");
-
-#ifdef TEST
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-#endif
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &cdav_read_file);
 
 	long file_sz = file_size(file_path);
 
@@ -265,20 +266,27 @@ cdav_post(const char* file_path,
 	params.file_sz = file_sz;
 	params.curl = curl;
 
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, params.file_sz);
-	curl_easy_setopt(curl, CURLOPT_POST, 1);
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &cdav_read_file);
 	curl_easy_setopt(curl, CURLOPT_READDATA, (void*) &params);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_recieve);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) curl);
+	curl_easy_setopt(curl, CURLOPT_PUT, 1);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)params.file_sz);
 
 	if (user != NULL && passwd != NULL)
 	{
-		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 
 		curl_easy_setopt(curl, CURLOPT_USERNAME, user);
 		curl_easy_setopt(curl, CURLOPT_PASSWORD, passwd);
 	}
 
-	printf("POST - %s\n", url);
+	printf("PUT - %s\n", url);
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -287,7 +295,7 @@ cdav_post(const char* file_path,
 		const char* err = curl_easy_strerror(result);
 		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
 
-		error_exit("CURL ERR: Exiting\n");
+		error_exit("CURL ERR: Exiting");
 	}
 
 	fclose(file);

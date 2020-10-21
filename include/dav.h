@@ -51,6 +51,10 @@ typedef struct cdav_read_file_params_t
 
 } CDAV_READ_FILE_PARAMS;
 
+/// Basic recieve callback.
+size_t
+cdav_recieve(char* data, size_t size, size_t nmemb, void* params);
+
 /// Callback for curl writing to file.
 size_t
 cdav_write_file(char* data, size_t size, size_t nmemb, void* params);
@@ -66,9 +70,9 @@ cdav_get(const char* url,
 	 const char* user,
 	 const char* passwd);
 
-/// WebDAV POST - Posts the given file to the given url.
+/// WebDAV PUT - Puts the given file to the given url.
 void
-cdav_post(const char* file,
+cdav_put(const char* file,
 	  const char* url,
 	  const char* user,
 	  const char* passwd);
