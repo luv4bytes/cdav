@@ -25,6 +25,7 @@
 
 #include "cdav.h"
 #include "err.h"
+#include "cdav_req_creator.h"
 #include <curl/curl.h>
 
 /// CDAV File pointer.
@@ -59,7 +60,7 @@ cdav_recieve(char* data, size_t size, size_t nmemb, void* params);
 size_t
 cdav_write_file(char* data, size_t size, size_t nmemb, void* params);
 
-/// Read callback for curl.
+/// Read file callback for curl.
 size_t
 cdav_read_file(char* buffer, size_t size, size_t nitems, void* params);
 
