@@ -20,4 +20,9 @@
  *
 */
 
-#include "../include/cdav_parser.h"
+#ifndef PARSER_H
+#define PARSER_H
+
+#include "cdav.h"
+
+#endif // PARSER_H

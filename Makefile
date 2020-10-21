@@ -6,7 +6,7 @@ test=-D TEST
 
 LIBS= -lcurl
 
-all: prep main dav parser req_creator err
+all: prep main dav prop parser requests err
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(test) $(LIBS)
 
 main: prep src/main.c
@@ -15,11 +15,14 @@ main: prep src/main.c
 dav: prep src/dav.c
 	$(CC) -c src/dav.c -o obj/dav.o $(options) $(debug) $(test) $(LIBS)
 
-req_creator: prep src/cdav_req_creator.c
-	$(CC) -c src/cdav_req_creator.c -o obj/cdav_req_creator.o $(options) $(debug) $(test) $(LIBS)
+prop: prep src/prop.c
+	$(CC) -c src/prop.c -o obj/prop.o $(options) $(debug) $(test) $(LIBS)
 
-parser: prep src/cdav_parser.c
-	$(CC) -c src/cdav_parser.c -o obj/cdav_parser.o $(options) $(debug) $(test) $(LIBS)
+requests: prep src/requests.c
+	$(CC) -c src/requests.c -o obj/requests.o $(options) $(debug) $(test) $(LIBS)
+
+parser: prep src/parser.c
+	$(CC) -c src/parser.c -o obj/parser.o $(options) $(debug) $(test) $(LIBS)
 
 err: prep src/err.c
 	$(CC) -c src/err.c -o obj/err.o $(options) $(debug) $(test) $(LIBS)

@@ -1,9 +1,7 @@
-#ifndef CDAV_REQ_CREATOR_H
-#define CDAV_REQ_CREATOR_H
+#ifndef PROP_H
+#define PROP_H
 
-#include "cdav.h"
-
-/// Defines a WebDAV property.
+// Defines a WebDAV property.
 typedef struct cdav_prop_t
 {
 	const char* name;
@@ -26,8 +24,4 @@ cdav_free_prop(CDAV_PROP* prop);
 void
 cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child);
 
-/// Creates a WebDAV PROPFIND request.
-char*
-cdav_req_propfind(CDAV_PROP** properties);
-
-#endif // CDAV_REQ_CREATOR_H
+#endif // PROP_H
