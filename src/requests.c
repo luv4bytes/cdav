@@ -25,6 +25,28 @@
 char*
 cdav_req_propfind(CDAV_PROP** properties)
 {
+	int res;
+	xmlBufferPtr buffer = xmlBufferCreate();
+
+	if (buffer == NULL)
+		error_exit("Error creating xmlBufferPtr! - Exiting");
+
+	xmlTextWriterPtr writer = xmlNewTextWriterMemory(buffer, 0);
+
+	if (writer == NULL)
+		error_exit("Error creating xmlTextWriterPtr! - Exiting");
+
+	char enc[] = "UTF-8";
+	res = xmlTextWriterStartDocument(writer, NULL, enc, NULL);
+
+	if (res < 0)
+		error_exit("Error writing document start! - Exiting");
+
+	res = xmlTextWriterEndDocument(writer);
+
+	if (res < 0)
+		error_exit("Error writing document end! - Exiting");
+
 	// TODO:
 
 	return NULL;

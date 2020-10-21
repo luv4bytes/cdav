@@ -25,6 +25,9 @@
 
 #include "cdav.h"
 #include "prop.h"
+#include "err.h"
+
+#include <libxml/xmlwriter.h>
 
 /// Creates a WebDAV PROPFIND request.
 char*

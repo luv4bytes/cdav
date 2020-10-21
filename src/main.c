@@ -37,6 +37,10 @@ int main(int argc, char* argv[])
 #ifdef TEST
 	printf("##### Running tests ##### \n");
 
+	CDAV_PROP** props = (CDAV_PROP**)malloc(sizeof(CDAV_PROP));
+
+	cdav_req_propfind(props);
+
 	printf("##### Tests done #####\n");
 #endif
 
