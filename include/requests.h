@@ -29,8 +29,12 @@
 
 #include <libxml/xmlwriter.h>
 
+/// Writes 
+void
+cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer);
+
 /// Creates a WebDAV PROPFIND request.
 char*
-cdav_req_propfind(CDAV_PROP** properties);
+cdav_req_propfind(CDAV_PROP** properties, size_t count);
 
 #endif // REQUESTS_H

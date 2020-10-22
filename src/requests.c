@@ -22,9 +22,36 @@
 
 #include "../include/requests.h"
 
-char*
-cdav_req_propfind(CDAV_PROP** properties)
+void
+cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer)
 {
+	if (prop == NULL)
+		return;
+
+	// TODO: Namespace
+
+	int res = xmlTextWriterStartElementNS(writer, NULL, (const xmlChar*)prop->name, NULL);
+
+	if (res < 0)
+		error_exit("Error writing element start! - Exiting");
+
+	for(size_t i = 0; i < prop->children_size; i++)
+	{
+		cdav_write_prop(prop->children[i], writer);
+	}
+
+	res = xmlTextWriterEndElement(writer);
+
+	if (res < 0)
+		error_exit("Error writing element end! - Exiting");
+}
+
+char*
+cdav_req_propfind(CDAV_PROP** properties, size_t count)
+{
+	if (properties == NULL)
+		return NULL;
+
 	int res;
 	xmlBufferPtr buffer = xmlBufferCreate();
 
@@ -36,18 +63,57 @@ cdav_req_propfind(CDAV_PROP** properties)
 	if (writer == NULL)
 		error_exit("Error creating xmlTextWriterPtr! - Exiting");
 
+	res = xmlTextWriterSetIndent(writer, 1);
+
+	if (res < 0)
+		error_exit("Error setting indentation! - Exiting");
+
+	// document start
 	char enc[] = "UTF-8";
 	res = xmlTextWriterStartDocument(writer, NULL, enc, NULL);
 
 	if (res < 0)
 		error_exit("Error writing document start! - Exiting");
 
+	char nsd[] = "D";
+	char name_propfind[] = "propfind";
+	char nsd_uri[] = "DAV";
+
+	// <propfind>
+	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_propfind, (const xmlChar*)nsd_uri);
+
+	if (res < 0)
+		error_exit("Error writing element start! - Exiting");
+
+	// <prop>
+	char name_prop[] = "prop";
+	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
+
+	if (res < 0)
+		error_exit("Error writing element start! - Exiting");
+
+	for(size_t i = 0; i < count; i++)
+	{
+		cdav_write_prop(properties[i], writer);
+	}
+
+	res = xmlTextWriterEndElement(writer);
+
+	// </propfind>
+	res = xmlTextWriterEndElement(writer);
+
+	if (res < 0)
+		error_exit("Error writing element end! - Exiting");
+
+	// document end
 	res = xmlTextWriterEndDocument(writer);
+
+#ifdef DEBUG
+	printf("%s", buffer->content);
+#endif
 
 	if (res < 0)
 		error_exit("Error writing document end! - Exiting");
-
-	// TODO:
 
 	return NULL;
 }

@@ -39,7 +39,19 @@ int main(int argc, char* argv[])
 
 	CDAV_PROP** props = (CDAV_PROP**)malloc(sizeof(CDAV_PROP));
 
-	cdav_req_propfind(props);
+	props[0] = cdav_new_prop();
+	props[0]->name = "Hello";
+	props[0]->text_val = "Textval";
+
+	props[0]->children = (CDAV_PROP**)malloc(sizeof(CDAV_PROP));
+
+	CDAV_PROP* child = cdav_new_prop();
+	child->name = "World!";
+	child->text_val = "0101010";
+
+	cdav_prop_add_child(props[0], child);
+
+	cdav_req_propfind(props, 1);
 
 	printf("##### Tests done #####\n");
 #endif

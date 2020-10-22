@@ -32,7 +32,7 @@ typedef struct cdav_prop_t
 	const char* text_val;
 
 	struct cdav_prop_t** children;
-	int children_size;
+	size_t children_size;
 
 } CDAV_PROP;
 
