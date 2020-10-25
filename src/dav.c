@@ -22,6 +22,12 @@
 
 #include "../include/dav.h"
 
+#define PROVIDE_URL "Please provide a url!"
+#define PROVIDE_PATH "Please provide a path!"
+#define PROVIDE_FILE "Please provide a file!"
+
+#define INIT_ERROR "Error initializing libcurl!"
+
 long
 file_size(const char* file_path)
 {
@@ -183,15 +189,15 @@ cdav_get(const char* url,
 	 const char* passwd)
 {
 	if (url == NULL)
-		error_exit("Please specify a url!");
+		error_exit(PROVIDE_URL);
 
 	if (save_as == NULL)
-		error_exit("Please specify a path!");
+		error_exit(PROVIDE_PATH);
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		error_exit("Error initializing curl!");
+		error_exit(INIT_ERROR);
 
 	CDAV_WRITE_FILE_PARAMS params;
 	params.save_as = save_as;
@@ -240,15 +246,15 @@ cdav_put(const char* file_path,
 	  const char* passwd)
 {
 	if (file_path == NULL)
-		error_exit("Please specify a file!");
+		error_exit(PROVIDE_FILE);
 
 	if (url == NULL)
-		error_exit("Please specify a url!");
+		error_exit(PROVIDE_URL);
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		error_exit("Error initializing curl!");
+		error_exit(INIT_ERROR);
 
 	long file_sz = file_size(file_path);
 
@@ -304,4 +310,14 @@ cdav_put(const char* file_path,
 	printf("Done\n");
 
 	curl_easy_cleanup(curl);
+}
+
+void
+cdav_propfind(const char* url, CDAV_PROP** props)
+{
+	if (url == NULL)
+		error_exit(PROVIDE_URL);
+
+	// TODO: Propfind
+
 }

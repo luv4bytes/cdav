@@ -28,8 +28,6 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer)
 	if (prop == NULL)
 		return;
 
-	// TODO: Namespace
-
 	int res = xmlTextWriterStartElementNS(writer, NULL, (const xmlChar*)prop->name, NULL);
 
 	if (res < 0)

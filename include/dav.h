@@ -79,4 +79,8 @@ cdav_put(const char* file,
 	  const char* user,
 	  const char* passwd);
 
+/// WebDAV PROPFIND - Gets the requested properties and prints them to stdout.
+void
+cdav_propfind(const char* url, CDAV_PROP** props);
+
 #endif // DAV_H
