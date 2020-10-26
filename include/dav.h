@@ -57,6 +57,7 @@ typedef struct cdav_read_file_params_t
 typedef struct cdav_recv_buffer_params_t
 {
 	char* buffer;
+	size_t buffer_sz;
 	CURL* curl;
 
 } CDAV_RECV_BUFFER_PARAMS;

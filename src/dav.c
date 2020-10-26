@@ -110,16 +110,18 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 
 	cdav_handle_rescode(p->curl);
 
-	char* buffer = p->buffer;
-	size_t max = size * nmemb;
-	int bufferlen = strlen(buffer);
+	int datalen = size * nmemb;
 
-	if (bufferlen == max)
-		buffer = (char*)realloc(buffer, bufferlen + max);
+	p->buffer_sz = p->buffer_sz + datalen;
 
-	strcat(buffer, data);
+	if (p->buffer == NULL)
+		p->buffer = (char*) realloc(NULL, p->buffer_sz);
+	else
+		p->buffer = (char*) realloc(p->buffer, p->buffer_sz);
 
-	return max;
+	strcat(p->buffer, data);
+
+	return datalen;
 }
 
 size_t
@@ -356,14 +358,12 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 	char p[] = "PROPFIND";
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
 
-	int buflen = 1024;
-
 	CDAV_RECV_BUFFER_PARAMS params;
 
-	char* buffer = malloc(sizeof(char) * buflen); // Buffer to put response in to
-	memset(buffer, '\0', buflen);
+	char* buffer = NULL;
 
 	params.buffer = buffer;
+	params.buffer_sz = 0;
 	params.curl = curl;
 
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
@@ -386,10 +386,10 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 		error_exit("CURL ERR: Exiting");
 	}
 
-	printf("%s\n", buffer);
+	printf("%s\n", params.buffer);
 
 	free(request);
-	free(buffer);
+	free(params.buffer);
 
 	curl_easy_cleanup(curl);
 }
