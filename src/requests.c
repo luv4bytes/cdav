@@ -28,7 +28,8 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer)
 	if (prop == NULL)
 		return;
 
-	int res = xmlTextWriterStartElementNS(writer, NULL, (const xmlChar*)prop->name, NULL);
+	char nsd[] = "D";
+	int res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)prop->name, NULL);
 
 	if (res < 0)
 		error_exit("Error writing element start! - Exiting");
@@ -95,6 +96,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 		cdav_write_prop(properties[i], writer);
 	}
 
+	// </prop>
 	//res = xmlTextWriterEndElement(writer);
 
 	// </propfind>

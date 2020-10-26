@@ -106,10 +106,11 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 	if (params == NULL)
 		return -1;
 
-	// TODO: Rescode
+	CDAV_RECV_BUFFER_PARAMS* p = (CDAV_RECV_BUFFER_PARAMS*)params;
 
-	char* buffer = (char*) params;
+	cdav_handle_rescode(p->curl);
 
+	char* buffer = p->buffer;
 	size_t max = size * nmemb;
 	int bufferlen = strlen(buffer);
 
@@ -264,8 +265,6 @@ cdav_get(const char* url,
 	fclose(file);
 	file = NULL;
 
-	printf("Done\n");
-
 	curl_easy_cleanup(curl);
 }
 
@@ -331,8 +330,6 @@ cdav_put(const char* file_path,
 	fclose(file);
 	file = NULL;
 
-	printf("Done\n");
-
 	curl_easy_cleanup(curl);
 }
 
@@ -361,11 +358,16 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 
 	int buflen = 1024;
 
+	CDAV_RECV_BUFFER_PARAMS params;
+
 	char* buffer = malloc(sizeof(char) * buflen); // Buffer to put response in to
 	memset(buffer, '\0', buflen);
 
+	params.buffer = buffer;
+	params.curl = curl;
+
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
 	char* request = cdav_req_propfind(props, count);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
@@ -384,16 +386,10 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 		error_exit("CURL ERR: Exiting");
 	}
 
-#ifdef TEST
 	printf("%s\n", buffer);
-#endif
-
-	// TODO: Format response and print
 
 	free(request);
 	free(buffer);
-
-	printf("Done\n");
 
 	curl_easy_cleanup(curl);
 }

@@ -53,6 +53,14 @@ typedef struct cdav_read_file_params_t
 
 } CDAV_READ_FILE_PARAMS;
 
+/// Defines a structure containing a char buffer and a curl instance.
+typedef struct cdav_recv_buffer_params_t
+{
+	char* buffer;
+	CURL* curl;
+
+} CDAV_RECV_BUFFER_PARAMS;
+
 /// Basic receive callback.
 size_t
 cdav_receive(char* data, size_t size, size_t nmemb, void* params);
