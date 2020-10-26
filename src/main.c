@@ -42,8 +42,6 @@ int main(int argc, char* argv[])
 	props[0] = cdav_new_prop();
 	props[0]->name = "allprop";
 
-	cdav_req_propfind(props, 1);
-
 	printf("##### Tests done #####\n");
 #endif
 

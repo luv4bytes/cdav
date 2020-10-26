@@ -75,7 +75,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 
 	char nsd[] = "D";
 	char name_propfind[] = "propfind";
-	char nsd_uri[] = "DAV";
+	char nsd_uri[] = "DAV:";
 
 	// <propfind>
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_propfind, (const xmlChar*)nsd_uri);
@@ -84,18 +84,18 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 		error_exit("Error writing element start! - Exiting");
 
 	// <prop>
-	char name_prop[] = "prop";
-	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
+	//char name_prop[] = "prop";
+	//res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
 
-	if (res < 0)
-		error_exit("Error writing element start! - Exiting");
+	//if (res < 0)
+	//	error_exit("Error writing element start! - Exiting");
 
 	for(size_t i = 0; i < count; i++)
 	{
 		cdav_write_prop(properties[i], writer);
 	}
 
-	res = xmlTextWriterEndElement(writer);
+	//res = xmlTextWriterEndElement(writer);
 
 	// </propfind>
 	res = xmlTextWriterEndElement(writer);
@@ -113,5 +113,13 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 	if (res < 0)
 		error_exit("Error writing document end! - Exiting");
 
-	return NULL;
+	int req_len = strlen((char*)buffer->content);
+	char* req = (char*)malloc(req_len);
+	memset(req, '\0', req_len);
+
+	strcpy(req, (char*)buffer->content);
+
+	// TODO: Free writer
+
+	return req;
 }

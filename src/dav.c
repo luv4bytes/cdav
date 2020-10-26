@@ -25,8 +25,11 @@
 #define PROVIDE_URL "Please provide a url!"
 #define PROVIDE_PATH "Please provide a path!"
 #define PROVIDE_FILE "Please provide a file!"
+#define PROVIDE_PROPS "Please provide properties!"
 
 #define INIT_ERROR "Error initializing libcurl!"
+
+#define LIBCURL_AGENT "libcurl-agent/1.0"
 
 long
 file_size(const char* file_path)
@@ -88,13 +91,34 @@ cdav_handle_rescode(CURL* curl)
 }
 
 size_t
-cdav_recieve(char* data, size_t size, size_t nmemb, void* params)
+cdav_receive(char* data, size_t size, size_t nmemb, void* params)
 {
 	CURL* curl = (CURL*) params;
 
 	cdav_handle_rescode(curl);
 
 	return nmemb * size;
+}
+
+size_t
+cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
+{
+	if (params == NULL)
+		return -1;
+
+	// TODO: Rescode
+
+	char* buffer = (char*) params;
+
+	size_t max = size * nmemb;
+	int bufferlen = strlen(buffer);
+
+	if (bufferlen == max)
+		buffer = (char*)realloc(buffer, bufferlen + max);
+
+	strcat(buffer, data);
+
+	return max;
 }
 
 size_t
@@ -183,6 +207,18 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 }
 
 void
+cdav_set_user_pw(CURL* curl, const char* user, const char* passwd)
+{
+	if (user != NULL && passwd != NULL)
+	{
+		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+		curl_easy_setopt(curl, CURLOPT_USERNAME, user);
+		curl_easy_setopt(curl, CURLOPT_PASSWORD, passwd);
+	}
+}
+
+void
 cdav_get(const char* url,
 	 const char* save_as,
 	 const char* user,
@@ -209,15 +245,9 @@ cdav_get(const char* url,
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_write_file);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
-	if (user != NULL && passwd != NULL)
-	{
-		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-
-		curl_easy_setopt(curl, CURLOPT_USERNAME, user);
-		curl_easy_setopt(curl, CURLOPT_PASSWORD, passwd);
-	}
+	cdav_set_user_pw(curl, user, passwd);
 
 	printf("GET - %s\n", url);
 
@@ -278,19 +308,13 @@ cdav_put(const char* file_path,
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &cdav_read_file);
 	curl_easy_setopt(curl, CURLOPT_READDATA, (void*) &params);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_recieve);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) curl);
 	curl_easy_setopt(curl, CURLOPT_PUT, 1);
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 	curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)params.file_sz);
 
-	if (user != NULL && passwd != NULL)
-	{
-		curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-
-		curl_easy_setopt(curl, CURLOPT_USERNAME, user);
-		curl_easy_setopt(curl, CURLOPT_PASSWORD, passwd);
-	}
+	cdav_set_user_pw(curl, user, passwd);
 
 	printf("PUT - %s\n", url);
 
@@ -313,11 +337,63 @@ cdav_put(const char* file_path,
 }
 
 void
-cdav_propfind(const char* url, CDAV_PROP** props)
+cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user, const char* passwd)
 {
 	if (url == NULL)
 		error_exit(PROVIDE_URL);
 
-	// TODO: Propfind
+	if (props == NULL)
+		error_exit(PROVIDE_PROPS);
 
+	CURL* curl = curl_easy_init();
+
+	if (curl == NULL)
+		error_exit(INIT_ERROR);
+
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	char p[] = "PROPFIND";
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+
+	int buflen = 1024;
+
+	char* buffer = malloc(sizeof(char) * buflen); // Buffer to put response in to
+	memset(buffer, '\0', buflen);
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) buffer);
+
+	char* request = cdav_req_propfind(props, count);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
+
+	cdav_set_user_pw(curl, user, passwd);
+
+	printf("PROPFIND - %s\n", url);
+
+	CURLcode result = curl_easy_perform(curl);
+
+	if (result != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(result);
+		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
+
+		error_exit("CURL ERR: Exiting");
+	}
+
+#ifdef TEST
+	printf("%s\n", buffer);
+#endif
+
+	// TODO: Format response and print
+
+	free(request);
+	free(buffer);
+
+	printf("Done\n");
+
+	curl_easy_cleanup(curl);
 }

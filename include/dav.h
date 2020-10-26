@@ -53,9 +53,13 @@ typedef struct cdav_read_file_params_t
 
 } CDAV_READ_FILE_PARAMS;
 
-/// Basic recieve callback.
+/// Basic receive callback.
 size_t
-cdav_recieve(char* data, size_t size, size_t nmemb, void* params);
+cdav_receive(char* data, size_t size, size_t nmemb, void* params);
+
+/// Puts the received bytes into a buffer.
+size_t
+cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* buffer);
 
 /// Callback for curl writing to file.
 size_t
@@ -64,6 +68,10 @@ cdav_write_file(char* data, size_t size, size_t nmemb, void* params);
 /// Read file callback for curl.
 size_t
 cdav_read_file(char* buffer, size_t size, size_t nitems, void* params);
+
+/// Sets the user and password for the current CURL instance.
+void
+cdav_set_user_pw(CURL* curl, const char* user, const char* passwd);
 
 /// WebDAV GET - The target can be saved under the path given by "save_as" parameter.
 void
@@ -81,6 +89,10 @@ cdav_put(const char* file,
 
 /// WebDAV PROPFIND - Gets the requested properties and prints them to stdout.
 void
-cdav_propfind(const char* url, CDAV_PROP** props);
+cdav_propfind(const char* url,
+	      CDAV_PROP** props,
+	      size_t count,
+	      const char* user,
+	      const char* passwd);
 
 #endif // DAV_H
