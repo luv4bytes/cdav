@@ -84,7 +84,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 	if (res < 0)
 		error_exit("Error writing element start! - Exiting");
 
-	// TODO: Named properties need the <prop> element
+	// Named properties need the <prop> element
 
 	for(size_t i = 0; i < count; i++)
 	{
@@ -113,7 +113,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 
 	strcpy(req, (char*)buffer->content);
 
-	// TODO: Free writer
+	xmlFreeTextWriter(writer);
 
 	return req;
 }

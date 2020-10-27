@@ -62,6 +62,19 @@ typedef struct cdav_recv_buffer_params_t
 
 } CDAV_RECV_BUFFER_PARAMS;
 
+/// Defines a structure for basic parameters such as URL, user and password.
+typedef struct cdav_basic_params_t
+{
+	const char* url;
+	const char* user;
+	const char* passwd;
+
+} CDAV_BASIC_PARAMS;
+
+/// Checks if the CDAV_BASIC_PARAMS is ok.
+void
+basic_params_check(CDAV_BASIC_PARAMS* params);
+
 /// Basic receive callback.
 size_t
 cdav_receive(char* data, size_t size, size_t nmemb, void* params);
@@ -84,24 +97,26 @@ cdav_set_user_pw(CURL* curl, const char* user, const char* passwd);
 
 /// WebDAV GET - The target can be saved under the path given by "save_as" parameter.
 void
-cdav_get(const char* url,
-	 const char* save_as,
-	 const char* user,
-	 const char* passwd);
+cdav_get(CDAV_BASIC_PARAMS* params,
+	 const char* save_as);
 
 /// WebDAV PUT - Puts the given file to the given url.
 void
-cdav_put(const char* file,
-	  const char* url,
-	  const char* user,
-	  const char* passwd);
+cdav_put(CDAV_BASIC_PARAMS* params,
+	 const char* file);
 
 /// WebDAV PROPFIND - Gets the requested properties and prints them to stdout.
 void
-cdav_propfind(const char* url,
+cdav_propfind(CDAV_BASIC_PARAMS* params,
 	      CDAV_PROP** props,
-	      size_t count,
-	      const char* user,
-	      const char* passwd);
+	      size_t count);
+
+/// WebDAV PROPPATCH - Sets and removes properties of resources.
+void
+cdav_proppatch(CDAV_BASIC_PARAMS* params,
+	       CDAV_PROP** set_props,
+	       size_t set_count,
+	       CDAV_PROP** rm_props,
+	       size_t rm_count);
 
 #endif // DAV_H

@@ -26,6 +26,7 @@
 #define PROVIDE_PATH "Please provide a path!"
 #define PROVIDE_FILE "Please provide a file!"
 #define PROVIDE_PROPS "Please provide properties!"
+#define PROVIDE_PARAMS "Please provide parameters!"
 
 #define INIT_ERROR "Error initializing libcurl!"
 
@@ -59,6 +60,16 @@ file_size(const char* file_path)
 	fclose(f);
 
 	return sz;
+}
+
+void
+basic_params_check(CDAV_BASIC_PARAMS* params)
+{
+	if (params == NULL)
+		error_exit(PROVIDE_PARAMS);
+
+	if (params->url == NULL)
+		error_exit(PROVIDE_URL);
 }
 
 void
@@ -115,9 +126,14 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 	p->buffer_sz = p->buffer_sz + datalen;
 
 	if (p->buffer == NULL)
+	{
 		p->buffer = (char*) realloc(NULL, p->buffer_sz);
+		memset(p->buffer, '\0', p->buffer_sz);
+	}
 	else
+	{
 		p->buffer = (char*) realloc(p->buffer, p->buffer_sz);
+	}
 
 	strcat(p->buffer, data);
 
@@ -222,13 +238,10 @@ cdav_set_user_pw(CURL* curl, const char* user, const char* passwd)
 }
 
 void
-cdav_get(const char* url,
-	 const char* save_as,
-	 const char* user,
-	 const char* passwd)
+cdav_get(CDAV_BASIC_PARAMS* basic_params,
+	 const char* save_as)
 {
-	if (url == NULL)
-		error_exit(PROVIDE_URL);
+	basic_params_check(basic_params);
 
 	if (save_as == NULL)
 		error_exit(PROVIDE_PATH);
@@ -245,14 +258,14 @@ cdav_get(const char* url,
 #ifdef TEST
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
-	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_write_file);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
-	cdav_set_user_pw(curl, user, passwd);
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	printf("GET - %s\n", url);
+	printf("GET - %s\n", basic_params->url);
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -271,16 +284,13 @@ cdav_get(const char* url,
 }
 
 void
-cdav_put(const char* file_path,
-	  const char* url,
-	  const char* user,
-	  const char* passwd)
+cdav_put(CDAV_BASIC_PARAMS* basic_params,
+	 const char* file_path)
 {
+	basic_params_check(basic_params);
+
 	if (file_path == NULL)
 		error_exit(PROVIDE_FILE);
-
-	if (url == NULL)
-		error_exit(PROVIDE_URL);
 
 	CURL* curl = curl_easy_init();
 
@@ -306,7 +316,7 @@ cdav_put(const char* file_path,
 #ifdef TEST
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
-	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &cdav_read_file);
 	curl_easy_setopt(curl, CURLOPT_READDATA, (void*) &params);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive);
@@ -315,9 +325,9 @@ cdav_put(const char* file_path,
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 	curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)params.file_sz);
 
-	cdav_set_user_pw(curl, user, passwd);
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	printf("PUT - %s\n", url);
+	printf("PUT - %s\n", basic_params->url);
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -336,10 +346,11 @@ cdav_put(const char* file_path,
 }
 
 void
-cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user, const char* passwd)
+cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
+	      CDAV_PROP** props,
+	      size_t count)
 {
-	if (url == NULL)
-		error_exit(PROVIDE_URL);
+	basic_params_check(basic_params);
 
 	if (props == NULL)
 		error_exit(PROVIDE_PROPS);
@@ -352,7 +363,7 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 #ifdef TEST
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
-	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
 	char p[] = "PROPFIND";
@@ -360,9 +371,7 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 
 	CDAV_RECV_BUFFER_PARAMS params;
 
-	char* buffer = NULL;
-
-	params.buffer = buffer;
+	params.buffer = NULL;
 	params.buffer_sz = 0;
 	params.curl = curl;
 
@@ -372,9 +381,9 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 	char* request = cdav_req_propfind(props, count);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
 
-	cdav_set_user_pw(curl, user, passwd);
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	printf("PROPFIND - %s\n", url);
+	printf("PROPFIND - %s\n", basic_params->url);
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -389,7 +398,21 @@ cdav_propfind(const char* url, CDAV_PROP** props, size_t count, const char* user
 	printf("%s\n", params.buffer);
 
 	free(request);
-	free(params.buffer);
+
+	if (params.buffer != NULL)
+		free(params.buffer);
 
 	curl_easy_cleanup(curl);
+}
+
+void
+cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
+	       CDAV_PROP** set_props,
+	       size_t set_count,
+	       CDAV_PROP** rm_props,
+	       size_t rm_count)
+{
+	basic_params_check(basic_params);
+
+	// TODO: PROPPATCH
 }
