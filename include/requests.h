@@ -37,4 +37,8 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer);
 char*
 cdav_req_propfind(CDAV_PROP** properties, size_t count);
 
+/// Creates a WebDAV PROPPATCH request.
+char*
+cdav_req_proppatch(CDAV_PROP** set_props, size_t set_count, CDAV_PROP** rm_props, size_t rm_count);
+
 #endif // REQUESTS_H

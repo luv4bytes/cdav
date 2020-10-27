@@ -27,6 +27,7 @@
 #define PROVIDE_FILE "Please provide a file!"
 #define PROVIDE_PROPS "Please provide properties!"
 #define PROVIDE_PARAMS "Please provide parameters!"
+#define INVALID_PROPERTIES "Invalid properties!"
 
 #define INIT_ERROR "Error initializing libcurl!"
 
@@ -414,5 +415,58 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 {
 	basic_params_check(basic_params);
 
-	// TODO: PROPPATCH
+	if (set_props == NULL && set_count > 0)
+		error_exit(INVALID_PROPERTIES);
+
+	if (rm_props == NULL && rm_count > 0)
+		error_exit(INVALID_PROPERTIES);
+
+	CURL* curl = curl_easy_init();
+
+	if (curl == NULL)
+		error_exit(INIT_ERROR);
+
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	char p[] = "PROPPATCH";
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+
+	CDAV_RECV_BUFFER_PARAMS params;
+
+	params.buffer = NULL;
+	params.buffer_sz = 0;
+	params.curl = curl;
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
+
+	char* request = cdav_req_proppatch(set_props, set_count, rm_props, rm_count);
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
+
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
+
+	printf("PROPFIND - %s\n", basic_params->url);
+
+	CURLcode result = curl_easy_perform(curl);
+
+	if (result != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(result);
+		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
+
+		error_exit("CURL ERR: Exiting");
+	}
+
+	printf("%s\n", params.buffer);
+
+	free(request);
+
+	if (params.buffer != NULL)
+		free(params.buffer);
+
+	curl_easy_cleanup(curl);
 }

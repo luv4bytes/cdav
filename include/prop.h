@@ -29,7 +29,7 @@
 typedef struct cdav_prop_t
 {
 	const char* name;
-	const char* text_val;
+	const char* value;
 
 	struct cdav_prop_t** children;
 	size_t children_size;

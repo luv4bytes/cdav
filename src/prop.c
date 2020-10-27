@@ -28,7 +28,7 @@ cdav_new_prop()
 	CDAV_PROP* prop = (CDAV_PROP*) malloc(sizeof(CDAV_PROP));
 
 	prop->name = NULL;
-	prop->text_val = NULL;
+	prop->value = NULL;
 	prop->children_size = 0;
 	prop->children = NULL;
 
@@ -49,8 +49,8 @@ cdav_free_prop(CDAV_PROP* prop)
 	if (prop->name != NULL)
 		free((char*)prop->name);
 
-	if (prop->text_val != NULL)
-		free((char*)prop->text_val);
+	if (prop->value != NULL)
+		free((char*)prop->value);
 
 	free(prop);
 }
