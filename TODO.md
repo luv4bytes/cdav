@@ -5,7 +5,7 @@
 - ~~PROPFIND~~
 - ~~PROPPATCH~~
 - ~~MKCOL~~
-- DELETE
+- ~~DELETE~~
 - COPY
 - MOVE
 - LOCK

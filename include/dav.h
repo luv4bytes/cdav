@@ -125,4 +125,8 @@ cdav_proppatch(CDAV_BASIC_PARAMS* params,
 void
 cdav_mkcol(CDAV_BASIC_PARAMS* params);
 
+/// WebDAV DELETE - Deletes the resource at the url.
+void
+cdav_delete(CDAV_BASIC_PARAMS* params);
+
 #endif // DAV_H

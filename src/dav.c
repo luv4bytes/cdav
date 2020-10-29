@@ -470,7 +470,7 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	printf("PROPFIND - %s\n", basic_params->url);
+	printf("PROPPATCH - %s\n", basic_params->url);
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -523,6 +523,57 @@ cdav_mkcol(CDAV_BASIC_PARAMS* basic_params)
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("MKCOL - %s\n", basic_params->url);
+
+	CURLcode result = curl_easy_perform(curl);
+
+	if (result != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(result);
+		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
+
+		error_exit("CURL ERR: Exiting");
+	}
+
+	if (params.buffer != NULL)
+		printf("%s\n", params.buffer);
+
+	if (params.buffer != NULL)
+		free(params.buffer);
+
+	curl_easy_cleanup(curl);
+}
+
+void
+cdav_delete(CDAV_BASIC_PARAMS* basic_params)
+{
+	basic_params_check(basic_params);
+
+	CURL* curl = curl_easy_init();
+
+	if (curl == NULL)
+		error_exit(INIT_ERROR);
+
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	char p[] = "DELETE";
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+
+	CDAV_RECV_BUFFER_PARAMS params;
+
+	params.buffer = NULL;
+	params.buffer_sz = 0;
+	params.curl = curl;
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
+
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
+
+	printf("DELETE - %s\n", basic_params->url);
 
 	CURLcode result = curl_easy_perform(curl);
 
