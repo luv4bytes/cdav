@@ -349,10 +349,9 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 void
 cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	      CDAV_PROP** props,
-	      size_t count)
+	      size_t count,
+	      short depth)
 {
-	// TODO: DEPTH HEADER
-
 	basic_params_check(basic_params);
 
 	if (props == NULL)
@@ -371,6 +370,23 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 
 	char p[] = "PROPFIND";
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+
+	struct curl_slist* headers = NULL;
+	struct curl_slist* headers_check = NULL;
+
+	size_t dts = digits(depth) + strlen("Depth: ");
+	char d[dts];
+	memset(d, '\0', dts);
+	sprintf(d, "Depth: %d", depth);
+
+	headers_check = curl_slist_append(headers, d);
+
+	if (headers_check == NULL)
+		error_exit("Error creating Depth header! - Exiting.");
+
+	headers = headers_check;
+
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
 	CDAV_RECV_BUFFER_PARAMS params;
 
@@ -404,6 +420,9 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 
 	if (params.buffer != NULL)
 		free(params.buffer);
+
+	if (headers != NULL)
+		curl_slist_free_all(headers);
 
 	curl_easy_cleanup(curl);
 }

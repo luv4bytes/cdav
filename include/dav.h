@@ -27,6 +27,7 @@
 #include "err.h"
 #include "requests.h"
 #include "parser.h"
+#include "helper.h"
 #include <curl/curl.h>
 
 /// CDAV File pointer.
@@ -109,7 +110,8 @@ cdav_put(CDAV_BASIC_PARAMS* params,
 void
 cdav_propfind(CDAV_BASIC_PARAMS* params,
 	      CDAV_PROP** props,
-	      size_t count);
+	      size_t count,
+	      short depth);
 
 /// WebDAV PROPPATCH - Sets and removes properties of resources.
 void

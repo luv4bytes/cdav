@@ -7,7 +7,7 @@ test=-D TEST
 LIBS= -lcurl -lxml2
 INCLUDE= -I/usr/include/libxml2/
 
-all: prep main dav prop parser requests err
+all: prep main dav prop parser requests err helper
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(test) $(LIBS) $(INCLUDE)
 
 main: prep src/main.c
@@ -27,6 +27,9 @@ parser: prep src/parser.c
 
 err: prep src/err.c
 	$(CC) -c src/err.c -o obj/err.o $(options) $(debug) $(test) $(LIBS) $(INCLUDE)
+
+helper: prep src/helper.c
+	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(test) $(LIBS) $(INCLUDE)
 
 prep: clean
 

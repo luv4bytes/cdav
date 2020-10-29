@@ -2,7 +2,7 @@
 
 ## Methods
 
-- PROPFIND
+- ~~PROPFIND~~
 - ~~PROPPATCH~~
 - ~~MKCOL~~
 - DELETE
