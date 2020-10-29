@@ -6,7 +6,7 @@
 - ~~PROPPATCH~~
 - ~~MKCOL~~
 - ~~DELETE~~
-- COPY
+- ~~COPY~~
 - MOVE
 - LOCK
 - UNLOCK
