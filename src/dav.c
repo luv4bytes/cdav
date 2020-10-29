@@ -681,3 +681,89 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 
 	curl_easy_cleanup(curl);
 }
+
+void
+cdav_move(CDAV_BASIC_PARAMS* basic_params,
+	  const char* destination,
+	  int overwrite)
+{
+	basic_params_check(basic_params);
+
+	if (destination == NULL)
+		error_exit(PROVIDE_DESTINATION);
+
+	if (overwrite < 0 || overwrite > 1)
+		error_exit(INVALID_OVERWRITE);
+
+	CURL* curl = curl_easy_init();
+
+	if (curl == NULL)
+		error_exit(INIT_ERROR);
+
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	char p[] = "MOVE";
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+
+	struct curl_slist* headers = NULL;
+
+	size_t len = strlen(destination) + strlen("Destination: ");
+	char des[len];
+	sprintf(des, "Destination: %s", destination);
+
+	headers = curl_slist_append(headers, des);
+
+	if (headers == NULL)
+		error_exit("Error creating Destination header! - Exiting.");
+
+	if (overwrite == 0)
+	{
+		char ovwr[] = "Overwrite: F";
+
+		headers = curl_slist_append(headers, ovwr);
+
+		if (headers == NULL)
+			error_exit("Error creating Destination header! - Exiting.");
+	}
+
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	CDAV_RECV_BUFFER_PARAMS params;
+
+	params.buffer = NULL;
+	params.buffer_sz = 0;
+	params.curl = curl;
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
+
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
+
+	printf("MOVE - %s\n", basic_params->url);
+	printf("%s\n", des);
+
+	CURLcode result = curl_easy_perform(curl);
+
+	if (result != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(result);
+		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
+
+		error_exit("CURL ERR: Exiting");
+	}
+
+	if (params.buffer != NULL)
+		printf("%s\n", params.buffer);
+
+	if (params.buffer != NULL)
+		free(params.buffer);
+
+	if (headers != NULL)
+		curl_slist_free_all(headers);
+
+	curl_easy_cleanup(curl);
+}

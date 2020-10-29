@@ -133,4 +133,8 @@ cdav_delete(CDAV_BASIC_PARAMS* params);
 void
 cdav_copy(CDAV_BASIC_PARAMS* params, const char* destination, int overwrite);
 
+/// WebDAV MOVE - Moves specified resource to destination.
+void
+cdav_move(CDAV_BASIC_PARAMS* params, const char* destination, int overwrite);
+
 #endif // DAV_H
