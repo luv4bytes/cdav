@@ -2,9 +2,9 @@
 
 ## Methods
 
-- ~~PROPFIND~~
+- PROPFIND
 - ~~PROPPATCH~~
-- MKCOL
+- ~~MKCOL~~
 - DELETE
 - COPY
 - MOVE

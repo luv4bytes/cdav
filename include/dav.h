@@ -119,4 +119,8 @@ cdav_proppatch(CDAV_BASIC_PARAMS* params,
 	       CDAV_PROP** rm_props,
 	       size_t rm_count);
 
+/// WebDAV MKCOL - Creates a collection with specified name at specified url.
+void
+cdav_mkcol(CDAV_BASIC_PARAMS* params);
+
 #endif // DAV_H
