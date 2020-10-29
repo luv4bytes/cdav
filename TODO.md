@@ -7,7 +7,7 @@
 - ~~MKCOL~~
 - ~~DELETE~~
 - ~~COPY~~
-- MOVE
+- ~~MOVE~~
 - LOCK
 - UNLOCK
 
