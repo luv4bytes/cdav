@@ -129,4 +129,8 @@ cdav_mkcol(CDAV_BASIC_PARAMS* params);
 void
 cdav_delete(CDAV_BASIC_PARAMS* params);
 
+/// WebDAV COPY - Copies specified resource to destination.
+void
+cdav_copy(CDAV_BASIC_PARAMS* params, const char* destination, int overwrite);
+
 #endif // DAV_H
