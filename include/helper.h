@@ -29,4 +29,8 @@
 size_t
 digits(size_t num);
 
+/// Evaluates the given argument.
+int
+eval_arg(const char* arg, const char* short_opt, const char* long_opt);
+
 #endif // HELPER_H
