@@ -1,7 +1,12 @@
 # cdav TODO
 
+## Currenty working on:
+- Controlflow
+
 ## Methods
 
+- ~~GET~~
+- ~~PUT~~
 - ~~PROPFIND~~
 - ~~PROPPATCH~~
 - ~~MKCOL~~
