@@ -1,8 +1,8 @@
 makedirs=mkdir obj/ bin/
 removedirs=rm -rf obj/ bin/
 options=-Wall
-debug=-g -D DEBUG
-test=-D TEST
+debug= -g -D DEBUG
+test= -D TEST
 
 LIBS= -lcurl -lxml2
 INCLUDE= -I/usr/include/libxml2/
