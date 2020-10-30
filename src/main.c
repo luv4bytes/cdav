@@ -188,6 +188,16 @@ int main(int argc, char* argv[])
 			depth = argv[++i];
 	}
 
+	int init = curl_global_init(CURL_GLOBAL_ALL);
+
+	if (init != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(init);
+		fprintf(stderr, "CURL ERR: %d - %s\n", init, err);
+
+		error_exit("CURL ERR: Exiting\n");
+	}
+
 	CDAV_BASIC_PARAMS params;
 
 	switch(eval_op(operation))
@@ -270,24 +280,6 @@ int main(int argc, char* argv[])
 		default:
 			error_exit(UNKNOWN_OPERATION);
 	}
-
-	int init = curl_global_init(CURL_GLOBAL_ALL);
-
-	if (init != CURLE_OK)
-	{
-		const char* err = curl_easy_strerror(init);
-		fprintf(stderr, "CURL ERR: %d - %s\n", init, err);
-
-		error_exit("CURL ERR: Exiting\n");
-	}
-
-#ifdef TEST
-	printf("##### Running tests ##### \n");
-
-	printf("##### Tests done #####\n");
-#endif
-
-	printf("Returned: %d\n", EXIT_SUCCESS);
 
 	curl_global_cleanup();
 
