@@ -30,6 +30,24 @@
 #include "helper.h"
 #include <curl/curl.h>
 
+/// Supported operations.
+enum OPS
+{
+	GET,
+	PUT,
+	PROPFIND,
+	PROPPATCH,
+	MKCOL,
+	DELETE,
+	COPY,
+	MOVE,
+	UNKNOWN
+};
+
+/// Returns one of the values defined in OPS, depending on the parameter.
+int
+eval_op(const char* operation);
+
 /// CDAV File pointer.
 FILE* file;
 

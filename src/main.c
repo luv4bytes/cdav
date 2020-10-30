@@ -22,6 +22,9 @@
 
 #include "../include/dav.h"
 
+#define UNKNOWN_OPERATION "Unknown operation! - Exiting."
+#define NO_ARGS "No arguments given!"
+
 int main(int argc, char* argv[])
 {
     /*
@@ -77,16 +80,19 @@ int main(int argc, char* argv[])
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
      *          -da --destination-address   - Specify destination address
-     *          -ow --overwrite             - Specify overwrite
+     *          --no-overwrite              - Specify no overwrite
      *
      *      MOVE:
      *          -a  --address               - Specify address
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
      *          -da --destination-address   - Specify destination address
-     *          -ow --overwrite             - Specify overwrite
+     *          --no-overwrite		    - Specify no overwrite
      *
     */
+
+	if (argc == 1) // TODO: Print help
+		error_exit(NO_ARGS);
 
 	char* file = NULL;		// -f 	--file
 	char* operation = NULL; 	// -o 	--operation
@@ -96,7 +102,7 @@ int main(int argc, char* argv[])
 	char* set_props = NULL;		// -sp 	--set-props
 	char* rm_props = NULL;		// -rp 	--rm-props
 	char* destination = NULL;	// -da 	--destination-address
-	char* overwrite = NULL;		// -ow 	--overwrite
+	int overwrite = 1;		// --no-overwrite
 	char* upload_file = NULL;	// -uf	--upload-file
 	char* save_as = NULL;		// -s 	--save-as
 	char* depth = NULL;		// -d	--depth
@@ -125,8 +131,7 @@ int main(int argc, char* argv[])
 	char arg_da_short[] = "-da";
 	char arg_da_long[] = "--destination-address";
 
-	char arg_ow_short[] = "-ow";
-	char arg_ow_long[] = "--overwrite";
+	char arg_no_ow[] = "--no-overwrite";
 
 	char arg_uf_short[] = "-uf";
 	char arg_uf_long[] = "--upload-file";
@@ -170,8 +175,8 @@ int main(int argc, char* argv[])
 		if (eval_arg(argv[i], arg_da_short, arg_da_long))
 			destination = argv[++i];
 
-		if (eval_arg(argv[i], arg_ow_short, arg_ow_long))
-			overwrite = argv[++i];
+		if (eval_arg(argv[i], arg_no_ow, NULL))
+			 overwrite = 0;
 
 		if (eval_arg(argv[i], arg_uf_short, arg_uf_long))
 			upload_file = argv[++i];
@@ -183,7 +188,88 @@ int main(int argc, char* argv[])
 			depth = argv[++i];
 	}
 
-	// TODO: Eval argument values
+	CDAV_BASIC_PARAMS params;
+
+	switch(eval_op(operation))
+	{
+		case GET:
+
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			cdav_get(&params, save_as);
+
+			break;
+
+		case PUT:
+
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			cdav_put(&params, upload_file);
+
+			break;
+
+		case PROPFIND:
+
+			// TODO: Parse prop list
+
+			break;
+
+		case PROPPATCH:
+
+			// TODO: Parse prop lists
+
+			break;
+
+		case MKCOL:
+
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			cdav_mkcol(&params);
+
+			break;
+
+		case DELETE:
+
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			cdav_delete(&params);
+
+			break;
+
+		case COPY:
+
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			cdav_copy(&params, destination, overwrite);
+
+			break;
+
+		case MOVE:
+
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			cdav_move(&params, destination, overwrite);
+
+			break;
+
+		case UNKNOWN:
+			error_exit(UNKNOWN_OPERATION);
+
+		default:
+			error_exit(UNKNOWN_OPERATION);
+	}
 
 	int init = curl_global_init(CURL_GLOBAL_ALL);
 

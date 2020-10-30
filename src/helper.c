@@ -39,8 +39,17 @@ digits(size_t num)
 int
 eval_arg(const char* arg, const char* short_opt, const char* long_opt)
 {
-	if (strcmp(arg, short_opt) == 0 || strcmp(arg, long_opt) == 0)
-		return 1;
+	if (short_opt != NULL)
+	{
+		if (strcmp(arg, short_opt) == 0)
+			return 1;
+	}
+
+	if (long_opt != NULL)
+	{
+		if (strcmp(arg, long_opt) == 0)
+			return 1;
+	}
 
 	return 0;
 }
