@@ -25,7 +25,17 @@
 #define UNKNOWN_OPERATION "Unknown operation! - Exiting."
 #define NO_ARGS "No arguments given!"
 
-int main(int argc, char* argv[])
+#define PRINT_VERSION printf("cdav %s\n", VERSION); // VERSION is defined by Makefile
+
+/// Prints help text.
+void
+print_help()
+{
+
+}
+
+int
+main(int argc, char* argv[])
 {
     /*
      * COMMAND FILE:
@@ -89,6 +99,10 @@ int main(int argc, char* argv[])
      *          -da --destination-address   - Specify destination address
      *          --no-overwrite		    - Specify no overwrite
      *
+     *	INFORMATION:
+     *
+     *		-h --help 	- Print help text
+     *		-v --version 	- Print version information
     */
 
 	if (argc == 1) // TODO: Print help
@@ -106,6 +120,8 @@ int main(int argc, char* argv[])
 	char* upload_file = NULL;	// -uf	--upload-file
 	char* save_as = NULL;		// -s 	--save-as
 	char* depth = NULL;		// -d	--depth
+	int help = 0;			// -h	--help
+	int version = 0;		// -v	--version
 
 	char arg_f_short[] = "-f";
 	char arg_f_long[] = "--file";
@@ -142,6 +158,12 @@ int main(int argc, char* argv[])
 	char arg_d_short[] = "-d";
 	char arg_d_long[] = "--depth";
 
+	char arg_h_short[] = "-h";
+	char arg_h_long[] = "--help";
+
+	char arg_v_short[] = "-v";
+	char arg_v_long[] = "--version";
+
 	for(int i = 1; i < argc; i++)
 	{
 		if ( (i + 1) > argc)
@@ -155,37 +177,55 @@ int main(int argc, char* argv[])
 		}
 
 		if (eval_arg(argv[i], arg_o_short, arg_o_long))
-			operation = argv[++i];
+			operation = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_a_short, arg_a_long))
-			address = argv[++i];
+			address = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_u_short, arg_u_long))
-			user = argv[++i];
+			user = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_pw_short, arg_pw_long))
-			password = argv[++i];
+			password = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_sp_short, arg_sp_long))
-			set_props = argv[++i];
+			set_props = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_rp_short, arg_rp_long))
-			rm_props = argv[++i];
+			rm_props = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_da_short, arg_da_long))
-			destination = argv[++i];
+			destination = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_no_ow, NULL))
 			 overwrite = 0;
 
 		if (eval_arg(argv[i], arg_uf_short, arg_uf_long))
-			upload_file = argv[++i];
+			upload_file = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_s_short, arg_s_long))
-			save_as = argv[++i];
+			save_as = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_d_short, arg_d_long))
-			depth = argv[++i];
+			depth = argv[i + 1];
+
+		if (eval_arg(argv[i], arg_h_short, arg_h_long))
+			help = 1;
+
+		if (eval_arg(argv[i], arg_v_short, arg_v_long))
+			version = 1;
+	}
+
+	if (help == 1)
+	{
+		print_help();
+		return 0;
+	}
+
+	if (version == 1)
+	{
+		PRINT_VERSION
+		return 0;
 	}
 
 	int init = curl_global_init(CURL_GLOBAL_ALL);
