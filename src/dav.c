@@ -385,7 +385,7 @@ void
 cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	      CDAV_PROP** props,
 	      size_t count,
-	      short depth)
+	      int depth)
 {
 	basic_params_check(basic_params);
 

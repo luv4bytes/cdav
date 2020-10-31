@@ -48,4 +48,8 @@ cdav_free_prop(CDAV_PROP* prop);
 void
 cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child);
 
+/// Parses the given prop string to a list of properties.
+CDAV_PROP**
+cdav_parse_props(char* props, int* count);
+
 #endif // PROP_H

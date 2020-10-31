@@ -68,3 +68,25 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child)
 
 	parent->children[parent->children_size - 1] = child;
 }
+
+CDAV_PROP**
+cdav_parse_props(char* prop_string, int* count)
+{
+	if (prop_string == NULL)
+		return NULL;
+
+	CDAV_PROP** props = NULL;
+	char* pstr = NULL;
+
+	while((pstr = strtok(prop_string, ",")) != NULL)
+	{
+		prop_string = NULL;
+		props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP) * (++*count));
+
+		int cnt = *count - 1;
+		props[cnt] = cdav_new_prop();
+		props[cnt]->name = pstr;
+	}
+
+	return props;
+}

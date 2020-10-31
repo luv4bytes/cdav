@@ -99,11 +99,31 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 	if (res < 0)
 		error_exit("Error writing element start! - Exiting");
 
+	if (count > 1 || (count == 1 && strcmp(properties[0]->name, "allprop") != 0))
+	{
+		char name_prop[] = "prop";
+
+		// <prop>
+		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
+
+		if (res < 0)
+			error_exit("Error writing element start! - Exiting");
+	}
+
 	// Named properties need the <prop> element
 
 	for(size_t i = 0; i < count; i++)
 	{
 		cdav_write_prop(properties[i], writer);
+	}
+
+	if (count > 1 || (count == 1 && strcmp(properties[0]->name, "allprop") != 0))
+	{
+		// </prop>
+		res = xmlTextWriterEndElement(writer);
+
+		if (res < 0)
+			error_exit("Error writing element end! - Exiting");
 	}
 
 	// </propfind>

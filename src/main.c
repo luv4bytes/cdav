@@ -31,7 +31,7 @@
 void
 print_help()
 {
-
+	// TODO: Print help
 }
 
 int
@@ -105,14 +105,18 @@ main(int argc, char* argv[])
      *		-v --version 	- Print version information
     */
 
-	if (argc == 1) // TODO: Print help
-		error_exit(NO_ARGS);
+	if (argc == 1)
+	{
+		print_help();
+		return 0;
+	}
 
 	char* file = NULL;		// -f 	--file
 	char* operation = NULL; 	// -o 	--operation
 	char* address = NULL;		// -a 	--address
 	char* user = NULL;		// -u 	--user
 	char* password = NULL;		// -pw 	--password
+	char* props = NULL;		// -p	--props
 	char* set_props = NULL;		// -sp 	--set-props
 	char* rm_props = NULL;		// -rp 	--rm-props
 	char* destination = NULL;	// -da 	--destination-address
@@ -137,6 +141,9 @@ main(int argc, char* argv[])
 
 	char arg_pw_short[] = "-pw";
 	char arg_pw_long[] = "--password";
+
+	char arg_p_short[] = "-p";
+	char arg_p_long[] = "--props";
 
 	char arg_sp_short[] = "-sp";
 	char arg_sp_long[] = "--set-props";
@@ -188,6 +195,9 @@ main(int argc, char* argv[])
 		if (eval_arg(argv[i], arg_pw_short, arg_pw_long))
 			password = argv[i + 1];
 
+		if (eval_arg(argv[i], arg_p_short, arg_p_long))
+			props = argv[i + 1];
+
 		if (eval_arg(argv[i], arg_sp_short, arg_sp_long))
 			set_props = argv[i + 1];
 
@@ -228,6 +238,9 @@ main(int argc, char* argv[])
 		return 0;
 	}
 
+	if (depth == 0)
+		depth = "0";
+
 	int init = curl_global_init(CURL_GLOBAL_ALL);
 
 	if (init != CURLE_OK)
@@ -239,6 +252,7 @@ main(int argc, char* argv[])
 	}
 
 	CDAV_BASIC_PARAMS params;
+	CDAV_PROP** prop_list = NULL;
 
 	switch(eval_op(operation))
 	{
@@ -264,7 +278,14 @@ main(int argc, char* argv[])
 
 		case PROPFIND:
 
-			// TODO: Parse prop list
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
+
+			int count = 0;
+			prop_list = cdav_parse_props(props, &count);
+
+			cdav_propfind(&params, prop_list, count, atoi(depth));
 
 			break;
 
