@@ -90,3 +90,45 @@ cdav_parse_props(char* prop_string, int* count)
 
 	return props;
 }
+
+CDAV_PROP**
+cdav_parse_set_props(char* prop_string, int* count)
+{
+	if (prop_string == NULL)
+		return NULL;
+
+	CDAV_PROP** props = NULL;
+
+	char* pstr = NULL;
+	char* eqstr = NULL;
+
+	while( (pstr = strtok(prop_string, ",")) != NULL)
+	{
+		prop_string = NULL;
+
+		while( (eqstr = strtok(pstr, "=")) != NULL )
+		{
+			CDAV_PROP* prop = cdav_new_prop();
+
+			prop->name = eqstr;
+
+			eqstr = strtok(NULL, "=");
+			prop->value = eqstr;
+
+			props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP) * (++*count));
+
+			props[*count - 1] = prop;
+
+			break;
+		}
+	}
+
+	return props;
+}
+
+CDAV_PROP**
+cdav_parse_rm_props(char* prop_string, int* count)
+{
+	// TODO:
+	return NULL;
+}

@@ -23,18 +23,16 @@
 #include "../include/requests.h"
 
 void
-cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer)
+cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer, char* ns)
 {
 	if (prop == NULL)
 		return;
-
-	char nsd[] = "D";
 
 	int res = 0;
 
 	if (prop->value != NULL)
 	{
-		res = xmlTextWriterWriteElementNS(writer, (const xmlChar*) nsd, (const xmlChar*)prop->name, NULL, (const xmlChar*) prop->value);
+		res = xmlTextWriterWriteElementNS(writer, (const xmlChar*)ns, (const xmlChar*)prop->name, NULL, (const xmlChar*) prop->value);
 
 		if (res < 0)
 			error_exit("Error writing element! - Exiting");
@@ -43,7 +41,7 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer)
 	}
 	else
 	{
-		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)prop->name, NULL);
+		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)ns, (const xmlChar*)prop->name, NULL);
 
 		if (res < 0)
 			error_exit("Error writing element start! - Exiting");
@@ -51,7 +49,7 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer)
 
 	for(size_t i = 0; i < prop->children_size; i++)
 	{
-		cdav_write_prop(prop->children[i], writer);
+		cdav_write_prop(prop->children[i], writer, ns);
 	}
 
 	res = xmlTextWriterEndElement(writer);
@@ -110,11 +108,9 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 			error_exit("Error writing element start! - Exiting");
 	}
 
-	// Named properties need the <prop> element
-
 	for(size_t i = 0; i < count; i++)
 	{
-		cdav_write_prop(properties[i], writer);
+		cdav_write_prop(properties[i], writer, nsd);
 	}
 
 	if (count > 1 || (count == 1 && strcmp(properties[0]->name, "allprop") != 0))
@@ -215,7 +211,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 
 		for(size_t i = 0; i < set_count; i++)
 		{
-			cdav_write_prop(set_props[i], writer);
+			cdav_write_prop(set_props[i], writer, NULL);
 		}
 
 		// </prop>
@@ -248,7 +244,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 
 		for(size_t i = 0; i < set_count; i++)
 		{
-			cdav_write_prop(rm_props[i], writer);
+			cdav_write_prop(rm_props[i], writer, NULL);
 		}
 
 		// </prop>

@@ -18,6 +18,7 @@
 
 ## Mechanisms
 
+- Nested PROPPATCH properties
 - Formatted output (json)
 - Controlflow
 - Command file (.cdav)

@@ -252,7 +252,6 @@ main(int argc, char* argv[])
 	}
 
 	CDAV_BASIC_PARAMS params;
-	CDAV_PROP** prop_list = NULL;
 
 	switch(eval_op(operation))
 	{
@@ -277,6 +276,8 @@ main(int argc, char* argv[])
 			break;
 
 		case PROPFIND:
+		{
+			CDAV_PROP** prop_list = NULL;
 
 			params.url = address;
 			params.user = user;
@@ -288,12 +289,27 @@ main(int argc, char* argv[])
 			cdav_propfind(&params, prop_list, count, atoi(depth));
 
 			break;
+		}
 
 		case PROPPATCH:
+		{
+			params.url = address;
+			params.user = user;
+			params.passwd = password;
 
-			// TODO: Parse prop lists
+			CDAV_PROP** sprops_list = NULL;
+			int sprop_count = 0;
+
+			CDAV_PROP** rprops_list = NULL;
+			int rprop_count = 0;
+
+			sprops_list = cdav_parse_set_props(set_props, &sprop_count);
+			rprops_list = cdav_parse_rm_props(rm_props, &rprop_count);
+
+			cdav_proppatch(&params, sprops_list, sprop_count, rprops_list, rprop_count);
 
 			break;
+		}
 
 		case MKCOL:
 
