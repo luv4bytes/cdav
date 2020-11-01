@@ -125,10 +125,3 @@ cdav_parse_set_props(char* prop_string, int* count)
 
 	return props;
 }
-
-CDAV_PROP**
-cdav_parse_rm_props(char* prop_string, int* count)
-{
-	// TODO:
-	return NULL;
-}

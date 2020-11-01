@@ -56,8 +56,4 @@ cdav_parse_props(char* props, int* count);
 CDAV_PROP**
 cdav_parse_set_props(char* props, int* count);
 
-/// Parses the given prop string as properties to be removed via PROPPATCH.
-CDAV_PROP**
-cdav_parse_rm_props(char* props, int* count);
-
 #endif // PROP_H
