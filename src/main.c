@@ -31,7 +31,22 @@
 void
 print_help()
 {
+	printf("\n");
+
+	PRINT_VERSION
+	printf("\n%s\n", "cdav is a console WebDAV client that can be used to communicate with WebDAV servers.");
+	printf("%s\n", "It's either usable by running it with arguments on the command line. Or specifying a cdav file which holds the instructions and arguments.");
+
 	// TODO: Print help
+
+	printf("\n");
+}
+
+/// Executes instructions defined in the commandfile.
+void
+exec_cdavfile(char* file)
+{
+	// TODO: Exec cdavfile
 }
 
 int
@@ -178,9 +193,11 @@ main(int argc, char* argv[])
 
 		if (eval_arg(argv[i], arg_f_short, arg_f_long) == 1)
 		{
-			// TODO: Eval command file and execute instructions
 			file = argv[i + 1];
-			break;
+
+			exec_cdavfile(file);
+
+			return 0;
 		}
 
 		if (eval_arg(argv[i], arg_o_short, arg_o_long))
