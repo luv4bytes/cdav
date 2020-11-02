@@ -22,19 +22,6 @@
 
 #include "../include/dav.h"
 
-#define PROVIDE_URL "Please provide a url!"
-#define PROVIDE_PATH "Please provide a path!"
-#define PROVIDE_FILE "Please provide a file!"
-#define PROVIDE_PROPS "Please provide properties!"
-#define PROVIDE_PARAMS "Please provide parameters!"
-#define PROVIDE_DESTINATION "Please provide a destination!"
-#define INVALID_PROPERTIES "Invalid properties!"
-#define INVALID_OVERWRITE "Overwrite indication must be 0 or 1!"
-
-#define INIT_ERROR "Error initializing libcurl!"
-
-#define LIBCURL_AGENT "libcurl-agent/1.0"
-
 int
 eval_op(const char* operation)
 {

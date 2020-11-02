@@ -22,10 +22,7 @@
 
 #include "../include/dav.h"
 
-#define UNKNOWN_OPERATION "Unknown operation! - Exiting."
-#define NO_ARGS "No arguments given!"
-
-#define PRINT_VERSION printf("cdav %s\n", VERSION); // VERSION is defined by Makefile
+#define PRINT_VERSION printf("%s\n", VERSION); // Version is defined by Makefile
 
 /// Prints help text.
 void
@@ -46,7 +43,22 @@ print_help()
 void
 exec_cdavfile(char* file)
 {
+	if (file == NULL)
+		error_exit(PROVIDE_COMMANDFILE);
+
+	FILE* cdavfile;
+
+	cdavfile = fopen(file, "r");
+
+	if (cdavfile == NULL)
+	{
+		int err = errno;
+		error_exit(strerror(err));
+	}
+
 	// TODO: Exec cdavfile
+
+	fclose(cdavfile);
 }
 
 int

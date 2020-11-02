@@ -20,14 +20,24 @@
  *
 */
 
-#ifndef CDAV_H
-#define CDAV_H
+#ifndef MESSAGES_H
+#define MESSAGES_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
+#define UNKNOWN_OPERATION "Unknown operation! - Exiting."
+#define NO_ARGS "No arguments given!"
 
-#include "messages.h"
+#define PROVIDE_URL "Please provide a url!"
+#define PROVIDE_PATH "Please provide a path!"
+#define PROVIDE_FILE "Please provide a file!"
+#define PROVIDE_PROPS "Please provide properties!"
+#define PROVIDE_PARAMS "Please provide parameters!"
+#define PROVIDE_DESTINATION "Please provide a destination!"
+#define PROVIDE_COMMANDFILE "Please provide a command file!"
 
-#endif // CDAV_H
+#define INVALID_PROPERTIES "Invalid properties!"
+#define INVALID_OVERWRITE "Overwrite indication must be 0 or 1!"
+
+#define INIT_ERROR "Error initializing libcurl!"
+#define LIBCURL_AGENT "libcurl-agent/1.0"
+
+#endif // MESSAGES_H

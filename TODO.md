@@ -1,7 +1,7 @@
 # cdav TODO
 
 ## Currenty working on:
-- Controlflow
+- Command file (.cdav)
 
 ## Methods
 
@@ -20,6 +20,5 @@
 
 - Nested PROPPATCH properties
 - Formatted output (json)
-- Controlflow
 - Command file (.cdav)
 - Other authentication methods
