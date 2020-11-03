@@ -35,7 +35,7 @@ helper: prep src/helper.c
 	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
 deps:
-	apt-get install $(dependencies)
+	apt-get install -y $(dependencies)
 
 prep: clean
 
