@@ -396,19 +396,24 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	struct curl_slist* headers = NULL;
 	struct curl_slist* headers_check = NULL;
 
-	int len_depth = strlen("Depth: ");
-	int len_arg_d = strlen(depth);
-	int len = len_depth + len_arg_d;
-	char* d = (char*)malloc(sizeof(char) * len);
-	memset(d, '\0', len);
-	sprintf(d, "Depth: %s", depth);
+	char* d = NULL;
 
-	headers_check = curl_slist_append(headers, d);
+	if (depth != NULL)
+	{
+		int len_depth = strlen("Depth: ");
+		int len_arg_d = strlen(depth);
+		int len = len_depth + len_arg_d;
+		d = (char*)malloc(sizeof(char) * len);
+		memset(d, '\0', len);
+		sprintf(d, "Depth: %s", depth);
 
-	if (headers_check == NULL)
-		error_exit("Error creating Depth header! - Exiting.");
+		headers_check = curl_slist_append(headers, d);
 
-	headers = headers_check;
+		if (headers_check == NULL)
+			error_exit("Error creating Depth header! - Exiting.");
+
+		headers = headers_check;
+	}
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
