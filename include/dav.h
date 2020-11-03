@@ -129,7 +129,7 @@ void
 cdav_propfind(CDAV_BASIC_PARAMS* params,
 	      CDAV_PROP** props,
 	      size_t count,
-	      int depth);
+	      char* depth);
 
 /// WebDAV PROPPATCH - Sets and removes properties of resources.
 void

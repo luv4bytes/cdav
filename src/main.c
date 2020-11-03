@@ -21,6 +21,7 @@
 */
 
 #include "../include/dav.h"
+#include "../include/parser.h"
 
 #define PRINT_VERSION printf("cdav %s\n", VERSION); // Version is defined by Makefile
 
@@ -138,21 +139,8 @@ main(int argc, char* argv[])
 		return 0;
 	}
 
-	char* file = NULL;		// -f 	--file
-	char* operation = NULL; 	// -o 	--operation
-	char* address = NULL;		// -a 	--address
-	char* user = NULL;		// -u 	--user
-	char* password = NULL;		// -pw 	--password
-	char* props = NULL;		// -p	--props
-	char* set_props = NULL;		// -sp 	--set-props
-	char* rm_props = NULL;		// -rp 	--rm-props
-	char* destination = NULL;	// -da 	--destination-address
-	int overwrite = 1;		// --no-overwrite
-	char* upload_file = NULL;	// -uf	--upload-file
-	char* save_as = NULL;		// -s 	--save-as
-	char* depth = NULL;		// -d	--depth
-	int help = 0;			// -h	--help
-	int version = 0;		// -v	--version
+	ARGS args;
+	init_args(&args);
 
 	char arg_f_short[] = "-f";
 	char arg_f_long[] = "--file";
@@ -205,70 +193,67 @@ main(int argc, char* argv[])
 
 		if (eval_arg(argv[i], arg_f_short, arg_f_long) == 1)
 		{
-			file = argv[i + 1];
+			args.file = argv[i + 1];
 
-			exec_cdavfile(file);
+			exec_cdavfile(args.file);
 
 			return 0;
 		}
 
 		if (eval_arg(argv[i], arg_o_short, arg_o_long))
-			operation = argv[i + 1];
+			args.operation = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_a_short, arg_a_long))
-			address = argv[i + 1];
+			args.address = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_u_short, arg_u_long))
-			user = argv[i + 1];
+			args.user = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_pw_short, arg_pw_long))
-			password = argv[i + 1];
+			args.passwd = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_p_short, arg_p_long))
-			props = argv[i + 1];
+			args.props = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_sp_short, arg_sp_long))
-			set_props = argv[i + 1];
+			args.set_props = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_rp_short, arg_rp_long))
-			rm_props = argv[i + 1];
+			args.rm_props = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_da_short, arg_da_long))
-			destination = argv[i + 1];
+			args.destination = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_no_ow, NULL))
-			 overwrite = 0;
+			 args.overwrite = 0;
 
 		if (eval_arg(argv[i], arg_uf_short, arg_uf_long))
-			upload_file = argv[i + 1];
+			args.upload_file = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_s_short, arg_s_long))
-			save_as = argv[i + 1];
+			args.save_as = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_d_short, arg_d_long))
-			depth = argv[i + 1];
+			args.depth = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_h_short, arg_h_long))
-			help = 1;
+			args.help = 1;
 
 		if (eval_arg(argv[i], arg_v_short, arg_v_long))
-			version = 1;
+			args.version = 1;
 	}
 
-	if (help == 1)
+	if (args.help == 1)
 	{
 		print_help();
 		return 0;
 	}
 
-	if (version == 1)
+	if (args.version == 1)
 	{
 		PRINT_VERSION
 		return 0;
 	}
-
-	if (depth == 0)
-		depth = "0";
 
 	int init = curl_global_init(CURL_GLOBAL_ALL);
 
@@ -282,25 +267,21 @@ main(int argc, char* argv[])
 
 	CDAV_BASIC_PARAMS params;
 
-	switch(eval_op(operation))
+	params.url = args.address;
+	params.user = args.user;
+	params.passwd = args.passwd;
+
+	switch(eval_op(args.operation))
 	{
 		case GET:
 
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
-			cdav_get(&params, save_as);
+			cdav_get(&params, args.save_as);
 
 			break;
 
 		case PUT:
 
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
-			cdav_put(&params, upload_file);
+			cdav_put(&params, args.upload_file);
 
 			break;
 
@@ -308,32 +289,24 @@ main(int argc, char* argv[])
 		{
 			CDAV_PROP** prop_list = NULL;
 
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
 			int count = 0;
-			prop_list = cdav_parse_props(props, &count);
+			prop_list = cdav_parse_props(args.props, &count);
 
-			cdav_propfind(&params, prop_list, count, atoi(depth));
+			cdav_propfind(&params, prop_list, count, args.depth);
 
 			break;
 		}
 
 		case PROPPATCH:
 		{
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
 			CDAV_PROP** sprops_list = NULL;
 			int sprop_count = 0;
 
 			CDAV_PROP** rprops_list = NULL;
 			int rprop_count = 0;
 
-			sprops_list = cdav_parse_set_props(set_props, &sprop_count);
-			rprops_list = cdav_parse_props(rm_props, &rprop_count);
+			sprops_list = cdav_parse_set_props(args.set_props, &sprop_count);
+			rprops_list = cdav_parse_props(args.rm_props, &rprop_count);
 
 			cdav_proppatch(&params, sprops_list, sprop_count, rprops_list, rprop_count);
 
@@ -342,19 +315,11 @@ main(int argc, char* argv[])
 
 		case MKCOL:
 
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
 			cdav_mkcol(&params);
 
 			break;
 
 		case DELETE:
-
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
 
 			cdav_delete(&params);
 
@@ -362,21 +327,13 @@ main(int argc, char* argv[])
 
 		case COPY:
 
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
-			cdav_copy(&params, destination, overwrite);
+			cdav_copy(&params, args.destination, args.overwrite);
 
 			break;
 
 		case MOVE:
 
-			params.url = address;
-			params.user = user;
-			params.passwd = password;
-
-			cdav_move(&params, destination, overwrite);
+			cdav_move(&params, args.destination, args.overwrite);
 
 			break;
 

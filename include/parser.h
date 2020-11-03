@@ -25,4 +25,29 @@
 
 #include "cdav.h"
 
+/// Defines a structure to hold argument values.
+typedef struct args_struct_t
+{
+	char* file;		// -f --file
+	char* operation;	// -o --operation
+	char* address;		// -a --address
+	char* user;		// -u --user
+	char* passwd;		// -pw --password
+	char* props;		// -p --props
+	char* set_props;	// -sp --set-props
+	char* rm_props;		// -rp --rm-props
+	char* destination;	// -da --destination-address
+	int overwrite;		// --no-overwrite
+	char* upload_file;	// -uf --upload-file
+	char* save_as;		// -s --save-as
+	char* depth;		// -d --depth
+	int help;		// -h --help
+	int version;		// -v --version
+
+} ARGS;
+
+/// Initializes ARGS structure fields.
+void
+init_args(ARGS* args);
+
 #endif // PARSER_H

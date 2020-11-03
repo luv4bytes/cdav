@@ -21,3 +21,26 @@
 */
 
 #include "../include/parser.h"
+
+void
+init_args(ARGS* args)
+{
+	if (args == NULL)
+		return;
+
+	args->file = NULL;
+	args->operation = NULL;
+	args->address = NULL;
+	args->user = NULL;
+	args->passwd = NULL;
+	args->props = NULL;
+	args->set_props = NULL;
+	args->rm_props = NULL;
+	args->destination = NULL;
+	args->overwrite = 1;
+	args->upload_file = NULL;
+	args->save_as = NULL;
+	args->depth = NULL;
+	args->help = 0;
+	args->version = 0;
+}

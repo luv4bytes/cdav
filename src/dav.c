@@ -372,7 +372,7 @@ void
 cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	      CDAV_PROP** props,
 	      size_t count,
-	      int depth)
+	      char* depth)
 {
 	basic_params_check(basic_params);
 
@@ -396,10 +396,12 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	struct curl_slist* headers = NULL;
 	struct curl_slist* headers_check = NULL;
 
-	size_t dts = digits(depth) + strlen("Depth: ");
-	char d[dts];
-	memset(d, '\0', dts);
-	sprintf(d, "Depth: %d", depth);
+	int len_depth = strlen("Depth: ");
+	int len_arg_d = strlen(depth);
+	int len = len_depth + len_arg_d;
+	char* d = (char*)malloc(sizeof(char) * len);
+	memset(d, '\0', len);
+	sprintf(d, "Depth: %s", depth);
 
 	headers_check = curl_slist_append(headers, d);
 
@@ -445,6 +447,9 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 
 	if (headers != NULL)
 		curl_slist_free_all(headers);
+
+	if (d != NULL)
+		free(d);
 
 	curl_easy_cleanup(curl);
 }
