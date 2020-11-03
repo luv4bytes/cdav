@@ -8,6 +8,8 @@ version= -D VERSION=\"1.0\"
 LIBS= -lcurl -lxml2
 INCLUDE= -I/usr/include/libxml2/
 
+dependencies= libcurl4-openssl-dev libxml2-dev
+
 all: prep main dav prop parser requests err helper
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
@@ -31,6 +33,9 @@ err: prep src/err.c
 
 helper: prep src/helper.c
 	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
+
+deps:
+	apt-get install $(dependencies)
 
 prep: clean
 
