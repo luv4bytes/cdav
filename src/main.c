@@ -22,7 +22,7 @@
 
 #include "../include/dav.h"
 
-#define PRINT_VERSION printf("%s\n", VERSION); // Version is defined by Makefile
+#define PRINT_VERSION printf("cdav %s\n", VERSION); // Version is defined by Makefile
 
 /// Prints help text.
 void
