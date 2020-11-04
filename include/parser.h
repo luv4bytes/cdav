@@ -75,4 +75,8 @@ typedef struct cmd_t
 void
 init_args(ARGS* args);
 
+/// Evaluates the given argument.
+int
+eval_arg(const char* arg, const char* short_opt, const char* long_opt);
+
 #endif // PARSER_H

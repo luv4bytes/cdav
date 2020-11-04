@@ -23,6 +23,36 @@
 #include "../include/helper.h"
 
 size_t
+file_size(const char* file_path)
+{
+	if (file_path == NULL)
+		return -1;
+
+	FILE* f = fopen(file_path, "r");
+
+	if (f == NULL)
+		return -1;
+
+	if (fseek(f, 0, SEEK_END) == -1)
+	{
+		fclose(f);
+		return -1;
+	}
+
+	long sz = ftell(f);
+
+	if (sz == -1)
+	{
+		fclose(f);
+		return -1;
+	}
+
+	fclose(f);
+
+	return sz;
+}
+
+size_t
 digits(size_t num)
 {
 	size_t count = 0;
@@ -34,22 +64,4 @@ digits(size_t num)
 	}
 
 	return count;
-}
-
-int
-eval_arg(const char* arg, const char* short_opt, const char* long_opt)
-{
-	if (short_opt != NULL)
-	{
-		if (strcmp(arg, short_opt) == 0)
-			return 1;
-	}
-
-	if (long_opt != NULL)
-	{
-		if (strcmp(arg, long_opt) == 0)
-			return 1;
-	}
-
-	return 0;
 }

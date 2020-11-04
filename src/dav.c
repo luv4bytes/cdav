@@ -22,36 +22,6 @@
 
 #include "../include/dav.h"
 
-long
-file_size(const char* file_path)
-{
-	if (file_path == NULL)
-		return -1;
-
-	FILE* f = fopen(file_path, "r");
-
-	if (f == NULL)
-		return -1;
-
-	if (fseek(f, 0, SEEK_END) == -1)
-	{
-		fclose(f);
-		return -1;
-	}
-
-	long sz = ftell(f);
-
-	if (sz == -1)
-	{
-		fclose(f);
-		return -1;
-	}
-
-	fclose(f);
-
-	return sz;
-}
-
 void
 basic_params_check(CDAV_BASIC_PARAMS* params)
 {

@@ -33,10 +33,6 @@
 /// CDAV File pointer.
 FILE* file;
 
-/// Returns the size of the given file.
-long
-file_size(const char* file_path);
-
 /// Defines a structure that is passed into callbacks writing files.
 typedef struct cdav_write_file_params_t
 {

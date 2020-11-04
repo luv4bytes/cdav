@@ -25,12 +25,12 @@
 
 #include "cdav.h"
 
+/// Returns the size of the given file.
+size_t
+file_size(const char* file_path);
+
 /// Returns the number of digits in given number.
 size_t
 digits(size_t num);
-
-/// Evaluates the given argument.
-int
-eval_arg(const char* arg, const char* short_opt, const char* long_opt);
 
 #endif // HELPER_H
