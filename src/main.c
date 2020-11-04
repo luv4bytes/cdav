@@ -32,8 +32,7 @@ print_help()
 	printf("\n");
 
 	PRINT_VERSION
-	printf("\n%s\n", "cdav is a console WebDAV client that can be used to communicate with WebDAV servers.");
-	printf("%s\n", "It's either usable by running it with arguments on the command line. Or specifying a cdav file which holds the instructions and arguments.");
+	printf("\n%s\n", "cdav is currently in development. For further information see https://github.com/luv4bytes/cdav");
 
 	// TODO: Print help
 
@@ -49,6 +48,14 @@ exec_cdavfile(char* file)
 
 	FILE* cdavfile;
 
+	size_t fsz = file_size(file);
+
+	if (fsz == -1)
+	{
+		int err = errno;
+		error_exit(strerror(err));
+	}
+
 	cdavfile = fopen(file, "r");
 
 	if (cdavfile == NULL)
@@ -57,9 +64,20 @@ exec_cdavfile(char* file)
 		error_exit(strerror(err));
 	}
 
-	// TODO: Exec cdavfile
+	char* buffer = (char*)malloc(sizeof(char) * fsz);
+
+	if (fread(buffer, sizeof(char), fsz, cdavfile) <= 0)
+	{
+		if (ferror(cdavfile) != 0)
+		{
+			int err = errno;
+			error_exit(strerror(err));
+		}
+	}
 
 	fclose(cdavfile);
+
+	free(buffer);
 }
 
 int

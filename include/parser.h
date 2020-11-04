@@ -25,6 +25,24 @@
 
 #include "cdav.h"
 
+/// Defines operations.
+typedef enum
+{
+	GET,
+	PUT,
+	PROPFIND,
+	PROPPATCH,
+	MKCOL,
+	DELETE,
+	COPY,
+	MOVE,
+	UNKNOWN
+} OPS;
+
+/// Evaluates the given operation string.
+OPS
+eval_op(const char* op);
+
 /// Defines a structure to hold argument values.
 typedef struct args_struct_t
 {
@@ -45,6 +63,13 @@ typedef struct args_struct_t
 	int version;		// -v --version
 
 } ARGS;
+
+/// Defines a command.
+typedef struct cmd_t
+{
+	ARGS args;
+	OPS operation;
+} CMD;
 
 /// Initializes ARGS structure fields.
 void

@@ -3,7 +3,7 @@
 ## Currenty working on:
 - Command file (.cdav)
 
-## Methods
+## Methods WebDAV
 
 - ~~GET~~
 - ~~PUT~~
@@ -22,3 +22,6 @@
 - Formatted output (json)
 - Command file (.cdav)
 - Other authentication methods
+
+- CardDAV
+- CalDAV

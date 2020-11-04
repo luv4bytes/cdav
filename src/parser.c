@@ -44,3 +44,36 @@ init_args(ARGS* args)
 	args->help = 0;
 	args->version = 0;
 }
+
+OPS
+eval_op(const char* operation)
+{
+	if (operation == NULL)
+		return UNKNOWN;
+
+	if (strcmp(operation, "GET") == 0)
+		return GET;
+
+	if (strcmp(operation, "PUT") == 0)
+		return PUT;
+
+	if (strcmp(operation, "PROPFIND") == 0)
+		return PROPFIND;
+
+	if (strcmp(operation, "PROPPATCH") == 0)
+		return PROPPATCH;
+
+	if (strcmp(operation, "MKCOL") == 0)
+		return MKCOL;
+
+	if (strcmp(operation, "DELETE") == 0)
+		return DELETE;
+
+	if (strcmp(operation, "COPY") == 0)
+		return COPY;
+
+	if (strcmp(operation, "MOVE") == 0)
+		return MOVE;
+
+	return UNKNOWN;
+}
