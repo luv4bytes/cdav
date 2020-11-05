@@ -43,6 +43,6 @@ cdav_req_proppatch(CDAV_PROP** set_props, size_t set_count, CDAV_PROP** rm_props
 
 /// Creates WebDAV LOCK request.
 char*
-cdav_req_lock(const char* scope, const char* type, const char* owner, const char* depth);
+cdav_req_lock(const char* scope, const char* type, const char* owner);
 
 #endif // REQUESTS_H
