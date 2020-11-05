@@ -284,3 +284,56 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 
 	return req;
 }
+
+char*
+cdav_req_lock(const char* scope,
+	      const char* type,
+	      const char* owner,
+	      const char* depth)
+{
+	if (scope == NULL)
+		return NULL;
+
+	if (type == NULL)
+		return NULL;
+
+	if (depth == NULL)
+		depth = "0";
+
+	int res;
+	xmlBufferPtr buffer = xmlBufferCreate();
+
+	if (buffer == NULL)
+		error_exit("Error creating xmlBufferPtr! - Exiting");
+
+	xmlTextWriterPtr writer = xmlNewTextWriterMemory(buffer, 0);
+
+	if (writer == NULL)
+		error_exit("Error creating xmlTextWriterPtr! - Exiting");
+
+	res = xmlTextWriterSetIndent(writer, 1);
+
+	if (res < 0)
+		error_exit("Error setting indentation! - Exiting");
+
+	// document start
+	char enc[] = "UTF-8";
+	res = xmlTextWriterStartDocument(writer, NULL, enc, NULL);
+
+	if (res < 0)
+		error_exit("Error writing document start! - Exiting");
+
+	char nsd[] = "D";
+	char name_propfind[] = "lockinfo";
+	char nsd_uri[] = "DAV:";
+
+	// <lockinfo>
+	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_propfind, (const xmlChar*)nsd_uri);
+
+	// TODO:
+
+	// </lockinfo>
+	res = xmlTextWriterEndElement(writer);
+
+	return NULL;
+}

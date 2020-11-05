@@ -734,3 +734,19 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 
 	curl_easy_cleanup(curl);
 }
+
+void
+cdav_lock(CDAV_BASIC_PARAMS* basic_params, LOCKSCOPE scope, LOCKTYPE type)
+{
+	// TODO:
+
+	return;
+}
+
+void
+cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* token)
+{
+	// TODO:
+
+	return;
+}

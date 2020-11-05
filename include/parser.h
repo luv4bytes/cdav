@@ -64,13 +64,6 @@ typedef struct args_struct_t
 
 } ARGS;
 
-/// Defines a command.
-typedef struct cmd_t
-{
-	ARGS args;
-	OPS operation;
-} CMD;
-
 /// Initializes ARGS structure fields.
 void
 init_args(ARGS* args);

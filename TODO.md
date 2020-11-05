@@ -1,7 +1,7 @@
 # cdav TODO
 
 ## Currenty working on:
-- Command file (.cdav)
+- LOCK, UNLOCK
 
 ## Methods WebDAV
 
