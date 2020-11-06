@@ -133,25 +133,21 @@ cdav_copy(CDAV_BASIC_PARAMS* params, const char* destination, int overwrite);
 void
 cdav_move(CDAV_BASIC_PARAMS* params, const char* destination, int overwrite);
 
-/// Defines lockscopes.
-typedef enum
-{
-	EXCLUSIVE,
-	SHARED
+/// Checks if the given losck scope is valid.
+void
+cdav_check_lockscope(const char* scope);
 
-} LOCKSCOPE;
-
-/// Defines locktypes.
-typedef enum
-{
-	WRITE,
-	READ
-
-} LOCKTYPE;
+/// Checks if the given lock type is valid.
+void
+cdav_check_locktype(const char* type);
 
 /// WebDAV LOCK - Locks given resource with specified scope and type.
 void
-cdav_lock(CDAV_BASIC_PARAMS* params, LOCKSCOPE scope, LOCKTYPE type);
+cdav_lock(CDAV_BASIC_PARAMS* params,
+	  const char* scope,
+	  const char* type,
+	  const char* owner,
+	  const char* depth);
 
 /// WebDAV UNLOCK - Unlocks the resource with given lock token.
 void

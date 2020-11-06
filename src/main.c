@@ -147,6 +147,15 @@ main(int argc, char* argv[])
      *          -da --destination-address   - Specify destination address
      *          --no-overwrite		    - Specify no overwrite
      *
+     *	    LOCK:
+     *          -a  --address               - Specify address
+     *          -u  --user                  - Specify user
+     *          -pw --password              - Specify password
+     *		-ls --lock-scope	    - Specify lock scope
+     *		-lt --lock-type		    - Specify lock type
+     *	 	-d  --depth		    - Specify depth
+     *		-lo  --lock-owner	    - Specify lock owner
+     *
      *	INFORMATION:
      *
      *		-h --help 	- Print help text
@@ -199,6 +208,15 @@ main(int argc, char* argv[])
 
 	char arg_d_short[] = "-d";
 	char arg_d_long[] = "--depth";
+
+	char arg_ls_short[] = "-ls";
+	char arg_ls_long[] = "--lock-scope";
+
+	char arg_lt_short[] = "-lt";
+	char arg_lt_long[] = "--lock-type";
+
+	char arg_lo_short[] = "-lo";
+	char arg_lo_long[] = "--lock-owner";
 
 	char arg_h_short[] = "-h";
 	char arg_h_long[] = "--help";
@@ -255,6 +273,15 @@ main(int argc, char* argv[])
 
 		if (eval_arg(argv[i], arg_d_short, arg_d_long))
 			args.depth = argv[i + 1];
+
+		if (eval_arg(argv[i], arg_ls_short, arg_ls_long))
+			args.lock_scope = argv[i + 1];
+
+		if (eval_arg(argv[i], arg_lt_short, arg_lt_long))
+			args.lock_type = argv[i + 1];
+
+		if (eval_arg(argv[i], arg_lo_short, arg_lo_long))
+			args.lock_owner = argv[i + 1];
 
 		if (eval_arg(argv[i], arg_h_short, arg_h_long))
 			args.help = 1;
@@ -354,6 +381,12 @@ main(int argc, char* argv[])
 		case MOVE:
 
 			cdav_move(&params, args.destination, args.overwrite);
+
+			break;
+
+		case LOCK:
+
+			cdav_lock(&params, args.lock_scope, args.lock_type, args.lock_owner, args.depth);
 
 			break;
 

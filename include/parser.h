@@ -36,6 +36,8 @@ typedef enum
 	DELETE,
 	COPY,
 	MOVE,
+	LOCK,
+	UNLOCK,
 	UNKNOWN
 } OPS;
 
@@ -46,21 +48,24 @@ eval_op(const char* op);
 /// Defines a structure to hold argument values.
 typedef struct args_struct_t
 {
-	char* file;		// -f --file
-	char* operation;	// -o --operation
-	char* address;		// -a --address
-	char* user;		// -u --user
-	char* passwd;		// -pw --password
-	char* props;		// -p --props
-	char* set_props;	// -sp --set-props
-	char* rm_props;		// -rp --rm-props
-	char* destination;	// -da --destination-address
+	char* file;		// -f 	--file
+	char* operation;	// -o 	--operation
+	char* address;		// -a 	--address
+	char* user;		// -u 	--user
+	char* passwd;		// -pw 	--password
+	char* props;		// -p 	--props
+	char* set_props;	// -sp 	--set-props
+	char* rm_props;		// -rp 	--rm-props
+	char* destination;	// -da 	--destination-address
 	int overwrite;		// --no-overwrite
-	char* upload_file;	// -uf --upload-file
-	char* save_as;		// -s --save-as
-	char* depth;		// -d --depth
-	int help;		// -h --help
-	int version;		// -v --version
+	char* upload_file;	// -uf 	--upload-file
+	char* save_as;		// -s 	--save-as
+	char* depth;		// -d 	--depth
+	int help;		// -h 	--help
+	int version;		// -v 	--version
+	char* lock_scope;	// -ls 	--lock-scope
+	char* lock_type;	// -lt 	--lock-type
+	char* lock_owner;	// -lo	--lock-owner
 
 } ARGS;
 

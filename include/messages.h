@@ -33,6 +33,8 @@
 #define PROVIDE_PARAMS "Please provide parameters!"
 #define PROVIDE_DESTINATION "Please provide a destination!"
 #define PROVIDE_COMMANDFILE "Please provide a command file!"
+#define PROVIDE_LOCKSCOPE "Please provida a valid lock scope!"
+#define PROVIDE_LOCKTYPE "Please provide a valid lock type!"
 
 #define INVALID_PROPERTIES "Invalid properties!"
 #define INVALID_OVERWRITE "Overwrite indication must be 0 or 1!"

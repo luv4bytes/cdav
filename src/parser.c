@@ -75,6 +75,12 @@ eval_op(const char* operation)
 	if (strcmp(operation, "MOVE") == 0)
 		return MOVE;
 
+	if (strcmp(operation, "LOCK") == 0)
+		return LOCK;
+
+	if (strcmp(operation, "UNLOCK") == 0)
+		return UNLOCK;
+
 	return UNKNOWN;
 }
 
