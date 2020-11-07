@@ -40,7 +40,7 @@ cdav_handle_rescode(CURL* curl)
 
 	char msg[] = "Response: %ld\n";
 
-	if (res_code > 400)
+	if (res_code >= 400)
 	{
 		fprintf(stderr, msg, res_code);
 		error_exit(NULL);
