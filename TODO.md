@@ -1,7 +1,8 @@
 # cdav TODO
 
 ## Currenty working on:
-- LOCK, UNLOCK
+
+- Nested PROPPATCH properties
 
 ## Methods WebDAV
 
@@ -13,8 +14,8 @@
 - ~~DELETE~~
 - ~~COPY~~
 - ~~MOVE~~
-- LOCK
-- UNLOCK
+- ~~LOCK~~
+- ~~UNLOCK~~
 
 ## Mechanisms
 
