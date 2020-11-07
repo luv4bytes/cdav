@@ -38,26 +38,12 @@ cdav_handle_rescode(CURL* curl)
 	long res_code = 0;
 	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
 
-	char msg[] = "Response: %ld - %s\n";
+	char msg[] = "Response: %ld\n";
 
-	switch (res_code)
+	if (res_code > 400)
 	{
-		case 401: // UNAUTHORIZED
-
-			fprintf(stderr, msg, res_code, "Unauthorized");
-			error_exit(NULL);
-
-			break;
-
-		case 404: // NOT FOUND
-
-			fprintf(stderr, msg, res_code, "Not found");
-			error_exit(NULL);
-
-			break;
-
-		default:
-			break;
+		fprintf(stderr, msg, res_code);
+		error_exit(NULL);
 	}
 }
 
