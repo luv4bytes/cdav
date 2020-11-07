@@ -137,20 +137,15 @@ cdav_move(CDAV_BASIC_PARAMS* params, const char* destination, int overwrite);
 void
 cdav_check_lockscope(const char* scope);
 
-/// Checks if the given lock type is valid.
-void
-cdav_check_locktype(const char* type);
-
 /// WebDAV LOCK - Locks given resource with specified scope and type.
 void
 cdav_lock(CDAV_BASIC_PARAMS* params,
 	  const char* scope,
-	  const char* type,
 	  const char* owner,
 	  const char* depth);
 
 /// WebDAV UNLOCK - Unlocks the resource with given lock token.
 void
-cdav_unlock(CDAV_BASIC_PARAMS* params, const char* token);
+cdav_unlock(CDAV_BASIC_PARAMS* params, const char* lock_token);
 
 #endif // DAV_H

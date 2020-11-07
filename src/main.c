@@ -152,9 +152,14 @@ main(int argc, char* argv[])
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
      *		-ls --lock-scope	    - Specify lock scope
-     *		-lt --lock-type		    - Specify lock type
      *	 	-d  --depth		    - Specify depth
      *		-lo  --lock-owner	    - Specify lock owner
+     *
+     *	    UNLOCK:
+     *          -a  --address               - Specify address
+     *          -u  --user                  - Specify user
+     *          -pw --password              - Specify password
+     *		-lt --lock-token	    - Specify lock token to unlock
      *
      *	INFORMATION:
      *
@@ -213,7 +218,7 @@ main(int argc, char* argv[])
 	char arg_ls_long[] = "--lock-scope";
 
 	char arg_lt_short[] = "-lt";
-	char arg_lt_long[] = "--lock-type";
+	char arg_lt_long[] = "--lock-token";
 
 	char arg_lo_short[] = "-lo";
 	char arg_lo_long[] = "--lock-owner";
@@ -318,7 +323,7 @@ main(int argc, char* argv[])
 
 		if (eval_arg(argv[i], arg_lt_short, arg_lt_long))
 		{
-			args.lock_type = argv[i + 1];
+			args.lock_token = argv[i + 1];
 			continue;
 		}
 
@@ -437,7 +442,13 @@ main(int argc, char* argv[])
 
 		case LOCK:
 
-			cdav_lock(&params, args.lock_scope, args.lock_type, args.lock_owner, args.depth);
+			cdav_lock(&params, args.lock_scope, args.lock_owner, args.depth);
+
+			break;
+
+		case UNLOCK:
+
+			cdav_unlock(&params, args.lock_token);
 
 			break;
 

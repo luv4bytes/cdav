@@ -42,8 +42,8 @@ init_args(ARGS* args)
 	args->save_as = NULL;
 	args->depth = NULL;
 	args->lock_scope = NULL;
-	args->lock_type = NULL;
 	args->lock_owner = NULL;
+	args->lock_token = NULL;
 	args->help = 0;
 	args->version = 0;
 }

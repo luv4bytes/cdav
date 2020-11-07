@@ -296,13 +296,9 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 
 char*
 cdav_req_lock(const char* scope,
-	      const char* type,
 	      const char* owner)
 {
 	if (scope == NULL)
-		return NULL;
-
-	if (type == NULL)
 		return NULL;
 
 	int res;
@@ -364,6 +360,7 @@ cdav_req_lock(const char* scope,
 		error_exit(ERROR_ELEMENT_END);
 
 	char name_locktype[] = "locktype";
+	char locktype[] = "write";
 
 	// <locktype>
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_locktype, NULL);
@@ -372,7 +369,7 @@ cdav_req_lock(const char* scope,
 		error_exit(ERROR_ELEMENT_START);
 
 	// <type/>
-	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)type, NULL);
+	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)locktype, NULL);
 
 	if (res < 0)
 		error_exit(ERROR_ELEMENT_START);

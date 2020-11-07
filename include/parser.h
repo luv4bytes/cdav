@@ -64,8 +64,8 @@ typedef struct args_struct_t
 	int help;		// -h 	--help
 	int version;		// -v 	--version
 	char* lock_scope;	// -ls 	--lock-scope
-	char* lock_type;	// -lt 	--lock-type
 	char* lock_owner;	// -lo	--lock-owner
+	char* lock_token;	// -lt	--lock-token
 
 } ARGS;
 

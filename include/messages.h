@@ -34,7 +34,7 @@
 #define PROVIDE_DESTINATION "Please provide a destination!"
 #define PROVIDE_COMMANDFILE "Please provide a command file!"
 #define PROVIDE_LOCKSCOPE "Please provide a valid lock scope!"
-#define PROVIDE_LOCKTYPE "Please provide a valid lock type!"
+#define PROVIDE_LOCKTOKEN "Please provide a valid lock token!"
 
 #define INVALID_PROPERTIES "Invalid properties!"
 #define INVALID_OVERWRITE "Overwrite indication must be 0 or 1!"

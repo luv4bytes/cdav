@@ -746,26 +746,14 @@ cdav_check_lockscope(const char* scope)
 }
 
 void
-cdav_check_locktype(const char* type)
-{
-	if (type == NULL)
-		error_exit(PROVIDE_LOCKTYPE);
-
-	if ( (strcmp(type, "write") != 0) && (strcmp(type, "read") != 0) )
-		error_exit(PROVIDE_LOCKTYPE);
-}
-
-void
 cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 	  const char* scope,
-	  const char* type,
 	  const char* owner,
 	  const char* depth)
 {
 	basic_params_check(basic_params);
 
 	cdav_check_lockscope(scope);
-	cdav_check_locktype(type);
 
 	CURL* curl = curl_easy_init();
 
@@ -804,7 +792,7 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
-	char* request = cdav_req_lock(scope, type, owner);
+	char* request = cdav_req_lock(scope, owner);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
@@ -834,9 +822,71 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 
 }
 void
-cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* token)
+cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 {
-	// TODO:
+	basic_params_check(basic_params);
 
-	return;
+	if (lock_token == NULL)
+		error_exit(PROVIDE_LOCKTOKEN);
+
+	CURL* curl = curl_easy_init();
+
+	if (curl == NULL)
+		error_exit(INIT_ERROR);
+
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	char p[] = "UNLOCK";
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+
+	struct curl_slist* headers = NULL;
+
+	size_t len = strlen(lock_token) + strlen("Lock-Token: ");
+	char tok[len];
+	sprintf(tok, "Lock-Token: %s", lock_token);
+
+	headers = curl_slist_append(headers, tok);
+
+	if (headers == NULL)
+		error_exit("Error creating Lock-Token header! - Exiting.");
+
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	CDAV_RECV_BUFFER_PARAMS params;
+
+	params.buffer = NULL;
+	params.buffer_sz = 0;
+	params.curl = curl;
+
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
+
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
+
+	printf("UNLOCK - %s\n", basic_params->url);
+
+	CURLcode result = curl_easy_perform(curl);
+
+	if (result != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(result);
+		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
+
+		error_exit("CURL ERR: Exiting");
+	}
+
+	if (params.buffer != NULL)
+		printf("%s\n", params.buffer);
+
+	if (params.buffer != NULL)
+		free(params.buffer);
+
+	if (headers != NULL)
+		curl_slist_free_all(headers);
+
+	curl_easy_cleanup(curl);
 }
