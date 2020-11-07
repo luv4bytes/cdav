@@ -382,6 +382,12 @@ main(int argc, char* argv[])
 
 			break;
 
+		case HEAD:
+
+			cdav_head(&params);
+
+			break;
+
 		case PUT:
 
 			cdav_put(&params, args.upload_file);

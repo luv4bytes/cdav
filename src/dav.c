@@ -83,6 +83,7 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 
 	int datalen = size * nmemb;
 
+	size_t oldlen = p->buffer_sz;
 	p->buffer_sz = p->buffer_sz + datalen;
 
 	if (p->buffer == NULL)
@@ -95,7 +96,11 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 		p->buffer = (char*) realloc(p->buffer, p->buffer_sz);
 	}
 
-	strcat(p->buffer, data);
+	size_t j = 0;
+	for(size_t i = oldlen; i < p->buffer_sz; i++)
+	{
+		p->buffer[i] = data[j++];
+	}
 
 	return datalen;
 }
@@ -239,6 +244,58 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 
 	fclose(file);
 	file = NULL;
+
+	curl_easy_cleanup(curl);
+}
+
+void
+cdav_head(CDAV_BASIC_PARAMS* basic_params)
+{
+	basic_params_check(basic_params);
+
+	CURL* curl = curl_easy_init();
+
+	if (curl == NULL)
+		error_exit(INIT_ERROR);
+
+#ifdef TEST
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+#endif
+	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	char p[] = "HEAD";
+	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, p);
+	curl_easy_setopt(curl, CURLOPT_NOBODY, 1);
+
+	CDAV_RECV_BUFFER_PARAMS params;
+
+	params.buffer = NULL;
+	params.buffer_sz = 0;
+	params.curl = curl;
+
+	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &cdav_receive_into_buffer);
+	curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*) &params);
+
+	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
+
+	printf("HEAD - %s\n", basic_params->url);
+
+	CURLcode result = curl_easy_perform(curl);
+
+	if (result != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(result);
+		fprintf(stderr, "CURL ERR: %d - %s\n", result, err);
+
+		error_exit("CURL ERR: Exiting");
+	}
+
+	if (params.buffer != NULL)
+		printf("%s\n", params.buffer);
+
+	if (params.buffer != NULL)
+		free(params.buffer);
 
 	curl_easy_cleanup(curl);
 }

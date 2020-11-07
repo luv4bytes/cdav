@@ -97,6 +97,10 @@ void
 cdav_get(CDAV_BASIC_PARAMS* params,
 	 const char* save_as);
 
+/// WebDAV HEAD - Response is printed to stdout.
+void
+cdav_head(CDAV_BASIC_PARAMS* params);
+
 /// WebDAV PUT - Puts the given file to the given url.
 void
 cdav_put(CDAV_BASIC_PARAMS* params,

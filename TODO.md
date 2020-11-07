@@ -7,6 +7,7 @@
 ## Methods WebDAV
 
 - ~~GET~~
+- ~~HEAD~~
 - ~~PUT~~
 - ~~PROPFIND~~
 - ~~PROPPATCH~~

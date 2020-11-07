@@ -57,6 +57,9 @@ eval_op(const char* operation)
 	if (strcmp(operation, "GET") == 0)
 		return GET;
 
+	if (strcmp(operation, "HEAD") == 0)
+		return HEAD;
+
 	if (strcmp(operation, "PUT") == 0)
 		return PUT;
 

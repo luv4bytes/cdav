@@ -29,6 +29,7 @@
 typedef enum
 {
 	GET,
+	HEAD,
 	PUT,
 	PROPFIND,
 	PROPPATCH,
