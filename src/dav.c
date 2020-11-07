@@ -103,11 +103,11 @@ cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 	size_t res_sz = size * nmemb;
 	char mode[1] = "w";
 
-	if (file == NULL)
+	if (w_params->file == NULL)
 	{
-		file = fopen(save_as, mode);
+		w_params->file = fopen(save_as, mode);
 
-		if (file == NULL)
+		if (w_params->file == NULL)
 		{
 			int err = errno;
 			const char* errstr = strerror(err);
@@ -117,15 +117,15 @@ cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 		}
 	}
 
-	int written = fwrite(data, size, nmemb, file);
+	int written = fwrite(data, size, nmemb, w_params->file);
 
 	if (written <= 0)
 	{
 		int err = errno;
 		const char* errstr = strerror(err);
 
-		fclose(file);
-		file = NULL;
+		fclose(w_params->file);
+		w_params->file = NULL;
 
 		fprintf(stderr, "Error writing data: %d - %s\n", err, errstr);
 		error_exit(NULL);
@@ -145,11 +145,11 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 
 	char mode[1] = "r";
 
-	if (file == NULL)
+	if (r_params->file == NULL)
 	{
-		file = fopen(file_path, mode);
+		r_params->file = fopen(file_path, mode);
 
-		if (file == NULL)
+		if (r_params->file == NULL)
 		{
 			int err = errno;
 			const char* errstr = strerror(err);
@@ -159,15 +159,15 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 		}
 	}
 
-	int bytes_read = fread(buffer, size, (size * nitems), file);
+	int bytes_read = fread(buffer, size, (size * nitems), r_params->file);
 
 	if (bytes_read <= 0)
 	{
 		int err = errno;
 		const char* errstr = strerror(err);
 
-		fclose(file);
-		file = NULL;
+		fclose(r_params->file);
+		r_params->file = NULL;
 
 		fprintf(stderr, "Error reading data: %d - %s\n", err, errstr);
 		error_exit(NULL);
@@ -203,6 +203,7 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 		error_exit(INIT_ERROR);
 
 	CDAV_WRITE_FILE_PARAMS params;
+	params.file = NULL;
 	params.save_as = save_as;
 	params.curl = curl;
 
@@ -228,8 +229,8 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 		error_exit("CURL ERR: Exiting");
 	}
 
-	fclose(file);
-	file = NULL;
+	if (params.file != NULL)
+		fclose(params.file);
 
 	curl_easy_cleanup(curl);
 }
@@ -312,6 +313,7 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	}
 
 	CDAV_READ_FILE_PARAMS params;
+	params.file = NULL;
 	params.file_path = file_path;
 	params.file_sz = file_sz;
 	params.curl = curl;
@@ -342,8 +344,8 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 		error_exit("CURL ERR: Exiting");
 	}
 
-	fclose(file);
-	file = NULL;
+	if (params.file != NULL)
+		fclose(params.file);
 
 	curl_easy_cleanup(curl);
 }

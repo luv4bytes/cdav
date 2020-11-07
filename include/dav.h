@@ -30,13 +30,11 @@
 #include "helper.h"
 #include <curl/curl.h>
 
-/// CDAV File pointer.
-FILE* file;
-
 /// Defines a structure that is passed into callbacks writing files.
 typedef struct cdav_write_file_params_t
 {
 	const char* save_as;
+	FILE* file;
 	CURL* curl;
 
 } CDAV_WRITE_FILE_PARAMS;
@@ -46,6 +44,7 @@ typedef struct cdav_read_file_params_t
 {
 	const char* file_path;
 	long file_sz;
+	FILE* file;
 	CURL* curl;
 
 } CDAV_READ_FILE_PARAMS;
