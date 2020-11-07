@@ -41,6 +41,9 @@ init_args(ARGS* args)
 	args->upload_file = NULL;
 	args->save_as = NULL;
 	args->depth = NULL;
+	args->lock_scope = NULL;
+	args->lock_type = NULL;
+	args->lock_owner = NULL;
 	args->help = 0;
 	args->version = 0;
 }

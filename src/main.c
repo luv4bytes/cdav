@@ -239,55 +239,106 @@ main(int argc, char* argv[])
 		}
 
 		if (eval_arg(argv[i], arg_o_short, arg_o_long))
+		{
 			args.operation = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_a_short, arg_a_long))
+		{
 			args.address = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_u_short, arg_u_long))
+		{
 			args.user = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_pw_short, arg_pw_long))
+		{
 			args.passwd = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_p_short, arg_p_long))
+		{
 			args.props = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_sp_short, arg_sp_long))
+		{
 			args.set_props = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_rp_short, arg_rp_long))
+		{
 			args.rm_props = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_da_short, arg_da_long))
+		{
 			args.destination = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_no_ow, NULL))
-			 args.overwrite = 0;
+		{
+			args.overwrite = 0;
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_uf_short, arg_uf_long))
+		{
 			args.upload_file = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_s_short, arg_s_long))
+		{
 			args.save_as = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_d_short, arg_d_long))
+		{
 			args.depth = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_ls_short, arg_ls_long))
+		{
 			args.lock_scope = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_lt_short, arg_lt_long))
+		{
 			args.lock_type = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_lo_short, arg_lo_long))
+		{
 			args.lock_owner = argv[i + 1];
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_h_short, arg_h_long))
+		{
 			args.help = 1;
+			continue;
+		}
 
 		if (eval_arg(argv[i], arg_v_short, arg_v_long))
+		{
 			args.version = 1;
+			continue;
+		}
 	}
 
 	if (args.help == 1)

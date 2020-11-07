@@ -741,7 +741,7 @@ cdav_check_lockscope(const char* scope)
 	if (scope == NULL)
 		error_exit(PROVIDE_LOCKSCOPE);
 
-	if ( (strcmp(scope, "exclusive") != 0) || (strcmp(scope, "shared") != 0) )
+	if ( (strcmp(scope, "exclusive") != 0) && (strcmp(scope, "shared") != 0) )
 		error_exit(PROVIDE_LOCKSCOPE);
 }
 
@@ -751,7 +751,7 @@ cdav_check_locktype(const char* type)
 	if (type == NULL)
 		error_exit(PROVIDE_LOCKTYPE);
 
-	if ( (strcmp(type, "write") != 0) || (strcmp(type, "read") != 0) )
+	if ( (strcmp(type, "write") != 0) && (strcmp(type, "read") != 0) )
 		error_exit(PROVIDE_LOCKTYPE);
 }
 
