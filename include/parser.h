@@ -67,6 +67,8 @@ typedef struct args_struct_t
 	char* lock_scope;	// -ls 	--lock-scope
 	char* lock_owner;	// -lo	--lock-owner
 	char* lock_token;	// -lt	--lock-token
+	int follow_redirect;	// --no-redirect
+	char* proxy;		// --proxy
 
 } ARGS;
 

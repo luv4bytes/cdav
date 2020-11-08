@@ -101,18 +101,24 @@ main(int argc, char* argv[])
      *          -a  --address    - Specify address
      *          -u  --user       - Specify user
      *          -pw --password   - Specify password
+     *		--no-redirect	 - Specify if redirects should not be followed
+     *		--proxy		 - Specify proxy
      *          -s  --save-as    - Specify saving destination
      *
      *      PUT:
      *          -a  --address     - Specify address
      *          -u  --user        - Specify user
      *          -pw --password    - Specify password
+     *		--no-redirect	  - Specify if redirects should not be followed
+     *		--proxy		  - Specify proxy
      *          -uf --upload-file - Specify file for upload
      *
      *      PROPFIND:
      *          -a  --address    - Specify address
      *          -u  --user       - Specify user
      *          -pw --password   - Specify password
+     *		--no-redirect	 - Specify if redirects should not be followed
+     *		--proxy		 - Specify proxy
      *          -p  --props      - Specify properties, separated by comma
      *          -d  --depth      - Specify PROPFIND depth
      *
@@ -120,6 +126,8 @@ main(int argc, char* argv[])
      *          -a  --address    - Specify address
      *          -u  --user       - Specify user
      *          -pw --password   - Specify password
+     *		--no-redirect	 - Specify if redirects should not be followed
+     *		--proxy		 - Specify proxy
      *          -sp --setprops   - Specify properties to be set, separated by comma (prop1=test,prop2=21)
      *          -rp --rmprops    - Specify properties to be removed, separated by comma (prop1,prop2)
      *
@@ -127,16 +135,22 @@ main(int argc, char* argv[])
      *          -a  --address    - Specify address
      *          -u  --user       - Specify user
      *          -pw --password   - Specify password
+     *		--proxy		 - Specify proxy
+     *		--no-redirect	 - Specify if redirects should not be followed
      *
      *      DELETE:
      *          -a  --address    - Specify address
      *          -u  --user       - Specify user
      *          -pw --password   - Specify password
+     *		--proxy		 - Specify proxy
+     *		--no-redirect	 - Specify if redirects should not be followed
      *
      *      COPY:
      *          -a  --address               - Specify address
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
+     *		--no-redirect	 	    - Specify if redirects should not be followed
+     *		--proxy		 	    - Specify proxy
      *          -da --destination-address   - Specify destination address
      *          --no-overwrite              - Specify no overwrite
      *
@@ -144,6 +158,8 @@ main(int argc, char* argv[])
      *          -a  --address               - Specify address
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
+     *		--no-redirect	 	    - Specify if redirects should not be followed
+     *		--proxy		 	    - Specify proxy
      *          -da --destination-address   - Specify destination address
      *          --no-overwrite		    - Specify no overwrite
      *
@@ -151,6 +167,8 @@ main(int argc, char* argv[])
      *          -a  --address               - Specify address
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
+     *		--no-redirect	 	    - Specify if redirects should not be followed
+     *		--proxy		 	    - Specify proxy
      *		-ls --lock-scope	    - Specify lock scope
      *	 	-d  --depth		    - Specify depth
      *		-lo  --lock-owner	    - Specify lock owner
@@ -159,6 +177,8 @@ main(int argc, char* argv[])
      *          -a  --address               - Specify address
      *          -u  --user                  - Specify user
      *          -pw --password              - Specify password
+     *		--proxy		 	    - Specify proxy
+     *		--no-redirect	 	    - Specify if redirects should not be followed
      *		-lt --lock-token	    - Specify lock token to unlock
      *
      *	INFORMATION:
@@ -228,6 +248,10 @@ main(int argc, char* argv[])
 
 	char arg_v_short[] = "-v";
 	char arg_v_long[] = "--version";
+
+	char arg_no_redirect[] = "--no-redirect";
+
+	char arg_proxy[] = "--proxy";
 
 	for(int i = 1; i < argc; i++)
 	{
@@ -344,6 +368,18 @@ main(int argc, char* argv[])
 			args.version = 1;
 			continue;
 		}
+
+		if (eval_arg(argv[i], arg_no_redirect, NULL))
+		{
+			args.follow_redirect = 0;
+			continue;
+		}
+
+		if (eval_arg(argv[i], arg_proxy, NULL))
+		{
+			args.proxy = argv[i + 1];
+			continue;
+		}
 	}
 
 	if (args.help == 1)
@@ -373,6 +409,8 @@ main(int argc, char* argv[])
 	params.url = args.address;
 	params.user = args.user;
 	params.passwd = args.passwd;
+	params.follow_redirect = args.follow_redirect;
+	params.proxy = args.proxy;
 
 	switch(eval_op(args.operation))
 	{

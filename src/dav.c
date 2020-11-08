@@ -23,6 +23,20 @@
 #include "../include/dav.h"
 
 void
+print_redirect_info(CDAV_BASIC_PARAMS* params, CURL* curl)
+{
+	if (params->follow_redirect == 0)
+	{
+		char* loc = NULL;
+
+		curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &loc);
+
+		if (loc != NULL)
+			printf("Redirect not allowed. Redirect location would be %s\n", loc);
+	}
+}
+
+void
 basic_params_check(CDAV_BASIC_PARAMS* params)
 {
 	if (params == NULL)
@@ -215,6 +229,9 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("GET - %s\n", basic_params->url);
@@ -228,6 +245,8 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.file != NULL)
 		fclose(params.file);
@@ -264,6 +283,9 @@ cdav_head(CDAV_BASIC_PARAMS* basic_params)
 	curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*) &params);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("HEAD - %s\n", basic_params->url);
@@ -277,6 +299,8 @@ cdav_head(CDAV_BASIC_PARAMS* basic_params)
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);
@@ -330,6 +354,9 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 	curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)params.file_sz);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("PUT - %s\n", basic_params->url);
@@ -343,6 +370,8 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.file != NULL)
 		fclose(params.file);
@@ -411,6 +440,9 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	char* request = cdav_req_propfind(props, count);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("PROPFIND - %s\n", basic_params->url);
@@ -428,6 +460,8 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	printf("%s\n", params.buffer);
 
 	free(request);
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -482,6 +516,9 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 	char* request = cdav_req_proppatch(set_props, set_count, rm_props, rm_count);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("PROPPATCH - %s\n", basic_params->url);
@@ -499,6 +536,8 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 	printf("%s\n", params.buffer);
 
 	free(request);
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -534,6 +573,9 @@ cdav_mkcol(CDAV_BASIC_PARAMS* basic_params)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("MKCOL - %s\n", basic_params->url);
@@ -547,6 +589,8 @@ cdav_mkcol(CDAV_BASIC_PARAMS* basic_params)
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);
@@ -585,6 +629,9 @@ cdav_delete(CDAV_BASIC_PARAMS* basic_params)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("DELETE - %s\n", basic_params->url);
@@ -598,6 +645,8 @@ cdav_delete(CDAV_BASIC_PARAMS* basic_params)
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);
@@ -667,6 +716,9 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("COPY - %s\n", basic_params->url);
@@ -681,6 +733,8 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);
@@ -753,6 +807,9 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("MOVE - %s\n", basic_params->url);
@@ -767,6 +824,8 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);
@@ -840,6 +899,9 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 	char* request = cdav_req_lock(scope, owner);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("LOCK - %s\n", basic_params->url);
@@ -853,6 +915,8 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);
@@ -910,6 +974,9 @@ cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive_into_buffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
+	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
+
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
 	printf("UNLOCK - %s\n", basic_params->url);
@@ -923,6 +990,8 @@ cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 
 		error_exit("CURL ERR: Exiting");
 	}
+
+	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		printf("%s\n", params.buffer);

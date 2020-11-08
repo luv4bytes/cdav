@@ -64,8 +64,14 @@ typedef struct cdav_basic_params_t
 	const char* url;
 	const char* user;
 	const char* passwd;
+	int follow_redirect;
+	const char* proxy;
 
 } CDAV_BASIC_PARAMS;
+
+/// Prints the redirect url if a redirect would be necessary and the --no-redirect option was specified.
+void
+print_redirect_info(CDAV_BASIC_PARAMS* params, CURL* curl);
 
 /// Checks if the CDAV_BASIC_PARAMS is ok.
 void

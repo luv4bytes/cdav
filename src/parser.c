@@ -46,6 +46,8 @@ init_args(ARGS* args)
 	args->lock_token = NULL;
 	args->help = 0;
 	args->version = 0;
+	args->follow_redirect = 1;
+	args->proxy = NULL;
 }
 
 OPS
