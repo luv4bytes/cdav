@@ -209,7 +209,7 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	basic_params_check(basic_params);
 
 	if (save_as == NULL)
-		error_exit(PROVIDE_PATH);
+		error_exit(PROVIDE_SAVEPATH);
 
 	CURL* curl = curl_easy_init();
 

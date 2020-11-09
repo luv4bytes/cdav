@@ -27,7 +27,7 @@
 #define NO_ARGS "No arguments given!"
 
 #define PROVIDE_URL "Please provide a url!"
-#define PROVIDE_PATH "Please provide a path!"
+#define PROVIDE_SAVEPATH "Please provide a path for saving!"
 #define PROVIDE_FILE "Please provide a file!"
 #define PROVIDE_PROPS "Please provide properties!"
 #define PROVIDE_PARAMS "Please provide parameters!"
