@@ -69,6 +69,34 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child)
 	parent->children[parent->children_size - 1] = child;
 }
 
+CDAV_PROP*
+cdav_prop_from_str(char* str)
+{
+	if (str == NULL)
+		return NULL;
+
+	CDAV_PROP* prop = NULL;
+
+	char* pstr = NULL;
+	char* ostr = str;
+
+	if (strstr(str, "=") != NULL)
+	{
+		while( (pstr = strtok(str, "=")) != NULL)
+		{
+			str = NULL;
+
+			// TODO: Parse prop
+		}
+	}
+
+	prop = cdav_new_prop();
+
+	prop->name = ostr;
+
+	return prop;
+}
+
 CDAV_PROP**
 cdav_parse_props(char* prop_string, int* count)
 {
@@ -76,51 +104,21 @@ cdav_parse_props(char* prop_string, int* count)
 		return NULL;
 
 	CDAV_PROP** props = NULL;
-	char* pstr = NULL;
-
-	while((pstr = strtok(prop_string, ",")) != NULL)
-	{
-		prop_string = NULL;
-		props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP) * (++*count));
-
-		int cnt = *count - 1;
-		props[cnt] = cdav_new_prop();
-		props[cnt]->name = pstr;
-	}
-
-	return props;
-}
-
-CDAV_PROP**
-cdav_parse_set_props(char* prop_string, int* count)
-{
-	if (prop_string == NULL)
-		return NULL;
-
-	CDAV_PROP** props = NULL;
 
 	char* pstr = NULL;
-	char* eqstr = NULL;
 
 	while( (pstr = strtok(prop_string, ",")) != NULL)
 	{
 		prop_string = NULL;
 
-		while( (eqstr = strtok(pstr, "=")) != NULL )
-		{
-			CDAV_PROP* prop = cdav_new_prop();
+		CDAV_PROP* prop = cdav_prop_from_str(pstr);
 
-			prop->name = eqstr;
-
-			eqstr = strtok(NULL, "=");
-			prop->value = eqstr;
-
-			props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP) * (++*count));
-
-			props[*count - 1] = prop;
-
+		if (prop == NULL)
 			break;
-		}
+
+		props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP) * (++*count));
+
+		props[*count - 1] = prop;
 	}
 
 	return props;
