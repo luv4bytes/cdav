@@ -111,6 +111,20 @@ void
 cdav_put(CDAV_BASIC_PARAMS* params,
 	 const char* file);
 
+/*
+	Property string scheme:
+
+	propA,propB={propB_Child=propB_Child_value,propC},propD
+
+	<propA/>
+	<propB>
+		<propB_Child>propB_Child_value</propB_Child>
+		<propC/>
+	</propB>
+	<propD/>
+*/
+
+
 /// WebDAV PROPFIND - Gets the requested properties and prints them to stdout.
 void
 cdav_propfind(CDAV_BASIC_PARAMS* params,

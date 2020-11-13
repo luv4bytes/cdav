@@ -24,6 +24,7 @@
 #define PROP_H
 
 #include "cdav.h"
+#include <regex.h>
 
 // Defines a WebDAV property.
 typedef struct cdav_prop_t
