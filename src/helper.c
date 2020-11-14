@@ -65,3 +65,32 @@ digits(size_t num)
 
 	return count;
 }
+
+void
+str_cpy_from_to(char* dest, char* src, size_t from, size_t to)
+{
+	if (dest == NULL)
+		return;
+
+	if (src == NULL)
+		return;
+
+	size_t j = 0;
+
+	for(size_t i = from; i < to; i++)
+	{
+		dest[j++] = src[i];
+	}
+}
+
+void
+str_set_from_to(char* dest, char c, size_t from, size_t to)
+{
+	if (dest == NULL)
+		return;
+
+	for(size_t i = from; i < to; i++)
+	{
+		dest[i] = c;
+	}
+}

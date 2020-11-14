@@ -24,7 +24,11 @@
 #define PROP_H
 
 #include "cdav.h"
+#include "err.h"
+#include "helper.h"
 #include <regex.h>
+
+#define MAX_MATCHES 257
 
 // Defines a WebDAV property.
 typedef struct cdav_prop_t

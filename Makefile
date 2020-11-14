@@ -5,24 +5,24 @@ debug= -g -D DEBUG
 test= -D TEST
 version= -D VERSION=\"1.0\"
 
-LIBS= -lcurl -lxml2
-INCLUDE= -I/usr/include/libxml2/
+LIBS=-lcurl -lxml2
+INCLUDE=-I/usr/include/libxml2/
 
 dependencies= libcurl4-openssl-dev libxml2-dev
 
 all: prep main dav prop parser requests err helper
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
-main: prep src/main.c
+main: prep dav src/main.c
 	$(CC) -c src/main.c -o obj/main.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
-dav: prep src/dav.c
+dav: prep prop requests src/dav.c
 	$(CC) -c src/dav.c -o obj/dav.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
 prop: prep src/prop.c
 	$(CC) -c src/prop.c -o obj/prop.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
-requests: prep src/requests.c
+requests: prep prop src/requests.c
 	$(CC) -c src/requests.c -o obj/requests.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
 parser: prep src/parser.c

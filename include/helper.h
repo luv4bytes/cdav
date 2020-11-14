@@ -33,4 +33,12 @@ file_size(const char* file_path);
 size_t
 digits(size_t num);
 
+/// Copies bytes from index "from" to "to" from "src" into "dest".
+void
+str_cpy_from_to(char* dest, char* src, size_t from, size_t to);
+
+/// Sets byte "c" from index "from" to "to" in "dest".
+void
+str_set_from_to(char* dest, char c, size_t from, size_t to);
+
 #endif // HELPER_H
