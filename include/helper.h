@@ -24,6 +24,7 @@
 #define HELPER_H
 
 #include "cdav.h"
+#include <ctype.h>
 
 /// Returns the size of the given file.
 size_t
@@ -40,5 +41,9 @@ str_cpy_from_to(char* dest, char* src, size_t from, size_t to);
 /// Sets byte "c" from index "from" to "to" in "dest".
 void
 str_set_from_to(char* dest, char c, size_t from, size_t to);
+
+/// Turns the given string to upper case.
+void
+str_to_upper(const char* str, char* buffer, size_t len);
 
 #endif // HELPER_H

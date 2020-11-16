@@ -56,37 +56,43 @@ eval_op(const char* operation)
 	if (operation == NULL)
 		return UNKNOWN;
 
-	if (strcmp(operation, "GET") == 0)
+	size_t len = strlen(operation) + 1;
+	char buffer[len];
+	memset(buffer, 0, len);
+
+	str_to_upper(operation, buffer, len);
+
+	if (strcmp(buffer, "GET") == 0)
 		return GET;
 
-	if (strcmp(operation, "HEAD") == 0)
+	if (strcmp(buffer, "HEAD") == 0)
 		return HEAD;
 
-	if (strcmp(operation, "PUT") == 0)
+	if (strcmp(buffer, "PUT") == 0)
 		return PUT;
 
-	if (strcmp(operation, "PROPFIND") == 0)
+	if (strcmp(buffer, "PROPFIND") == 0)
 		return PROPFIND;
 
-	if (strcmp(operation, "PROPPATCH") == 0)
+	if (strcmp(buffer, "PROPPATCH") == 0)
 		return PROPPATCH;
 
-	if (strcmp(operation, "MKCOL") == 0)
+	if (strcmp(buffer, "MKCOL") == 0)
 		return MKCOL;
 
-	if (strcmp(operation, "DELETE") == 0)
+	if (strcmp(buffer, "DELETE") == 0)
 		return DELETE;
 
-	if (strcmp(operation, "COPY") == 0)
+	if (strcmp(buffer, "COPY") == 0)
 		return COPY;
 
-	if (strcmp(operation, "MOVE") == 0)
+	if (strcmp(buffer, "MOVE") == 0)
 		return MOVE;
 
-	if (strcmp(operation, "LOCK") == 0)
+	if (strcmp(buffer, "LOCK") == 0)
 		return LOCK;
 
-	if (strcmp(operation, "UNLOCK") == 0)
+	if (strcmp(buffer, "UNLOCK") == 0)
 		return UNLOCK;
 
 	return UNKNOWN;

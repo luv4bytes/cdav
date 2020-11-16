@@ -24,6 +24,7 @@
 #define PARSER_H
 
 #include "cdav.h"
+#include "helper.h"
 
 /// Defines operations.
 typedef enum

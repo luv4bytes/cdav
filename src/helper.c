@@ -94,3 +94,15 @@ str_set_from_to(char* dest, char c, size_t from, size_t to)
 		dest[i] = c;
 	}
 }
+
+void
+str_to_upper(const char* str, char* buffer, size_t len)
+{
+	if (str == NULL)
+		return;
+
+	for(size_t i = 0; i < len; i++)
+	{
+		buffer[i] = toupper(str[i]);
+	}
+}

@@ -86,6 +86,8 @@ cdav_parse_props(char* prop_string, int* count)
 	if (prop_string == NULL)
 		return NULL;
 
+	CDAV_PROP** list = NULL;
+
 	const char* nested = "\\w*=\\{.*\\}";
 	const char* val = "\\w*=\\w*";
 	const char* single = "\\w*";
@@ -126,15 +128,18 @@ cdav_parse_props(char* prop_string, int* count)
 			if (from == -1 && to == -1)
 				break;
 
-			size_t sz = to - from;
+			size_t sz = (to - from) + 1;
 
-			char buffer[sz + 1];
-			memset(buffer, 0, sz + 1);
+			char buffer[sz];
+			memset(buffer, 0, sz);
 
 			str_cpy_from_to(buffer, prop_string, from, to);
 			str_set_from_to(prop_string, ' ', from, to);
 
-			// TODO: Parse match
+			CDAV_PROP* p = cdav_prop_from_str(buffer);
+
+			if (p != NULL)
+				list = (CDAV_PROP**)realloc(list, sizeof(CDAV_PROP) * *count++);
 		}
 	}
 
