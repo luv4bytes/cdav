@@ -26,9 +26,6 @@
 #include "cdav.h"
 #include "err.h"
 #include "helper.h"
-#include <regex.h>
-
-#define MAX_MATCHES 257
 
 // Defines a WebDAV property.
 typedef struct cdav_prop_t
@@ -52,10 +49,6 @@ cdav_free_prop(CDAV_PROP* prop);
 /// Adds the child to the parents children list.
 void
 cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child);
-
-/// Parses the given str and returns a CDAV_PROP*.
-CDAV_PROP*
-cdav_prop_from_str(char* str);
 
 /// Parses the given prop string to CDAV_PROP**.
 CDAV_PROP**

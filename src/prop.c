@@ -69,105 +69,13 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child)
 	parent->children[parent->children_size - 1] = child;
 }
 
-CDAV_PROP*
-cdav_prop_from_str(char* str)
-{
-	if (str == NULL)
-		return NULL;
-
-	// TODO: PARSE
-
-	return NULL;
-}
-
 CDAV_PROP**
 cdav_parse_props(char* prop_string, int* count)
 {
 	if (prop_string == NULL)
 		return NULL;
 
-	CDAV_PROP** list = NULL;
-
-	const char* nested = "\\w*=\\{.*\\}";
-	const char* val = "\\w*=\\w*";
-	const char* single = "\\w*";
-
-	regex_t reg_nested;
-	regex_t reg_val;
-	regex_t reg_single;
-
-	int comp_nested = regcomp(&reg_nested, nested, REG_EXTENDED);
-
-	if (comp_nested != 0)
-		error_exit("Could not compile nested regex!");
-
-	int comp_val = regcomp(&reg_val, val, REG_EXTENDED);
-
-	if (comp_val != 0)
-		error_exit("Could not compile value regex!");
-
-	int comp_single = regcomp(&reg_single, single, REG_EXTENDED);
-
-	if (comp_single != 0)
-		error_exit("Could not compile single property regex!");
-
-	regmatch_t nested_matches[MAX_MATCHES];
-
-	int exec = regexec(&reg_nested, prop_string, MAX_MATCHES, nested_matches, 0);
-
-	if (exec != 0 && exec != 1)
-		error_exit("Error executing regex!");
-
-	if (exec == 0)
-	{
-		for(int i = 0; i < MAX_MATCHES; i++)
-		{
-			size_t from = nested_matches[i].rm_so;
-			size_t to = nested_matches[i].rm_eo;
-
-			if (from == -1 && to == -1)
-				break;
-
-			size_t sz = (to - from) + 1;
-
-			char buffer[sz];
-			memset(buffer, 0, sz);
-
-			str_cpy_from_to(buffer, prop_string, from, to);
-			str_set_from_to(prop_string, ' ', from, to);
-
-			CDAV_PROP* p = cdav_prop_from_str(buffer);
-
-			if (p != NULL)
-				list = (CDAV_PROP**)realloc(list, sizeof(CDAV_PROP) * *count++);
-		}
-	}
-
-	regmatch_t val_matches[MAX_MATCHES];
-
-	exec = regexec(&reg_nested, prop_string, MAX_MATCHES, val_matches, 0);
-
-	if (exec != 0 && exec != 1)
-		error_exit("Error executing regex!");
-
-	if (exec == 0)
-	{
-		// TODO: Parse Match
-	}
-
-	regmatch_t single_matches[MAX_MATCHES];
-
-	exec = regexec(&reg_nested, prop_string, MAX_MATCHES, single_matches, 0);
-
-	if (exec != 0 && exec != 1)
-		error_exit("Error executing regex!");
-
-	if (exec == 0)
-	{
-		// TODO: Parse Match
-	}
-
-	// TODO: Regex
+	// TODO: PARSE
 
 	return NULL;
 }
