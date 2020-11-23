@@ -219,6 +219,17 @@ cdav_parse_props(char* prop_string, int* count)
 		propname[name_ind++] = c;
 	}
 
+	size_t namelen = strlen(propname);
+
+	if (namelen > 0)
+	{
+		char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+		strcpy(tmp, propname);
+		TOKEN name = {SYMBOL, tmp};
+
+		tokens[++tokencount - 1] = name;
+	}
+
 #ifdef DEBUG
 	for(size_t i = 0; i < tokencount; i++)
 		printf("%s\n", tokens[i].value);
