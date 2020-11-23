@@ -27,6 +27,14 @@
 #include "err.h"
 #include "helper.h"
 
+#define T_ASSIGN '='
+#define T_CHILD_START '{'
+#define T_CHILD_END '}'
+#define T_DELIM ','
+
+#define MAX_TOKENS 4096
+#define MAX_NAMELEN 512
+
 // Defines a WebDAV property.
 typedef struct cdav_prop_t
 {
@@ -37,6 +45,21 @@ typedef struct cdav_prop_t
 	size_t children_size;
 
 } CDAV_PROP;
+
+typedef enum
+{
+	SYMBOL,
+	ASSIGN,
+	CHILD_START,
+	CHILD_END,
+	DELIM
+} TYPE;
+
+typedef struct token_t
+{
+	TYPE type;
+	char* value;
+} TOKEN;
 
 /// Creates a new property.
 CDAV_PROP*
@@ -49,6 +72,10 @@ cdav_free_prop(CDAV_PROP* prop);
 /// Adds the child to the parents children list.
 void
 cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child);
+
+/// Parses the given symbol to a CDAV_PROP*.
+CDAV_PROP*
+parse_symbol(TOKEN* tokens, TOKEN symbol);
 
 /// Parses the given prop string to CDAV_PROP**.
 CDAV_PROP**

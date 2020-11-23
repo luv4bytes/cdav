@@ -69,13 +69,167 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child)
 	parent->children[parent->children_size - 1] = child;
 }
 
+/* SCHEME
+
+	Following scheme is used to determine property hierarchies for WebDAV commands.
+
+	======
+
+	PROP = {CHILD = VALUE, CHILD = {SECONDCHILD}}, PROP = VALUE
+
+	======
+
+	Basically translates to following hierarchy in XML:
+
+		<PROP>
+			<CHILD>VALUE</CHILD>
+			<CHILD>
+				<SECONDCHILD/>
+			</CHILD>
+		</PROP>
+		<PROP>VALUE</PROP>
+
+*/
+
+CDAV_PROP*
+parse_symbol(TOKEN* tokens, TOKEN symbol)
+{
+	// TODO: Parse
+
+	return NULL;
+}
+
 CDAV_PROP**
 cdav_parse_props(char* prop_string, int* count)
 {
 	if (prop_string == NULL)
 		return NULL;
 
-	// TODO: PARSE
+	TOKEN tokens[MAX_TOKENS];
+	memset(tokens, 0, MAX_TOKENS * sizeof(TOKEN*));
+	size_t tokencount = 0;
+
+	char propname[MAX_NAMELEN];
+	memset(propname, 0, MAX_NAMELEN);
+
+	size_t name_ind = 0;
+
+	size_t len = strlen(prop_string);
+	for(size_t i = 0; i < len; i++)
+	{
+		char c = prop_string[i];
+
+		if (c == ' ' || c == '\n')
+			continue;
+
+		size_t namelen = strlen(propname);
+
+		if (c == T_ASSIGN)
+		{
+			if (namelen != 0)
+			{
+				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				strcpy(tmp, propname);
+				TOKEN name = {SYMBOL, tmp};
+
+				tokens[++tokencount - 1] = name;
+			}
+
+			memset(propname, 0, MAX_NAMELEN);
+
+			name_ind = 0;
+
+			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			tmp[0] = c;
+			TOKEN assign = {ASSIGN, tmp};
+			tokens[++tokencount - 1] = assign;
+
+			continue;
+		}
+
+		if (c == T_CHILD_START)
+		{
+			if (namelen != 0)
+			{
+				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				strcpy(tmp, propname);
+				TOKEN name = {SYMBOL, tmp};
+
+				tokens[++tokencount - 1] = name;
+			}
+
+			memset(propname, 0, MAX_NAMELEN);
+
+			name_ind = 0;
+
+			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			tmp[0] = c;
+			TOKEN start = {CHILD_START, tmp};
+			tokens[++tokencount - 1] = start;
+
+			continue;
+		}
+
+		if (c == T_CHILD_END)
+		{
+			if (namelen != 0)
+			{
+				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				strcpy(tmp, propname);
+				TOKEN name = {SYMBOL, tmp};
+
+				tokens[++tokencount - 1] = name;
+			}
+
+			memset(propname, 0, MAX_NAMELEN);
+
+			name_ind = 0;
+
+			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			tmp[0] = c;
+			TOKEN end = {CHILD_END, tmp};
+			tokens[++tokencount - 1] = end;
+
+			continue;
+		}
+
+		if (c == T_DELIM)
+		{
+			if (namelen != 0)
+			{
+				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				strcpy(tmp, propname);
+				TOKEN name = {SYMBOL, tmp};
+
+				tokens[++tokencount - 1] = name;
+			}
+
+			memset(propname, 0, MAX_NAMELEN);
+
+			name_ind = 0;
+
+			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			tmp[0] = c;
+			TOKEN delim = {DELIM, tmp};
+			tokens[++tokencount - 1] = delim;
+
+			continue;
+		}
+
+		propname[name_ind++] = c;
+	}
+
+#ifdef DEBUG
+	for(size_t i = 0; i < tokencount; i++)
+		printf("%s\n", tokens[i].value);
+#endif
+
+	if (tokencount == 0)
+		return NULL;
+
+	// TODO: Parse tokens
 
 	return NULL;
+
+	// TODO: Free memory
 }
