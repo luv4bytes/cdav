@@ -59,6 +59,7 @@ typedef struct token_t
 {
 	TYPE type;
 	char* value;
+	size_t index;
 } TOKEN;
 
 /// Creates a new property.
@@ -75,7 +76,7 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child);
 
 /// Parses the given symbol to a CDAV_PROP*.
 CDAV_PROP*
-parse_symbol(TOKEN* tokens, TOKEN symbol);
+parse_symbol(TOKEN* tokens, TOKEN symbol, size_t* new_i);
 
 /// Parses the given prop string to CDAV_PROP**.
 CDAV_PROP**

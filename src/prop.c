@@ -92,9 +92,45 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child)
 */
 
 CDAV_PROP*
-parse_symbol(TOKEN* tokens, TOKEN symbol)
+parse_symbol(TOKEN* tokens, TOKEN symbol, size_t* new_i)
 {
-	// TODO: Parse
+	if (symbol.type != SYMBOL)
+	{
+		(*new_i)++;
+		return NULL;
+	}
+
+	size_t ind = *new_i;
+
+	switch(tokens[++ind].type)
+	{
+		case SYMBOL:
+			return NULL;
+
+		case ASSIGN:
+			// value assignment
+			break;
+
+		// TODO:
+
+		case DELIM:
+		// found prop
+		{
+			CDAV_PROP* p = cdav_new_prop();
+			p->name = symbol.value;
+
+			*new_i = ind;
+
+			return p;
+		}
+		case CHILD_START:
+			// bullshit
+			return NULL;
+
+		case CHILD_END:
+			// bullshit
+			return NULL;
+	}
 
 	return NULL;
 }
@@ -130,7 +166,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp};
+				TOKEN name = {SYMBOL, tmp, tokencount};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -141,7 +177,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 			char* tmp = (char*)calloc(0, sizeof(char) * 1);
 			tmp[0] = c;
-			TOKEN assign = {ASSIGN, tmp};
+			TOKEN assign = {ASSIGN, tmp, tokencount};
 			tokens[++tokencount - 1] = assign;
 
 			continue;
@@ -153,7 +189,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp};
+				TOKEN name = {SYMBOL, tmp, tokencount};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -176,7 +212,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp};
+				TOKEN name = {SYMBOL, tmp, tokencount};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -199,7 +235,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp};
+				TOKEN name = {SYMBOL, tmp, tokencount};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -238,7 +274,22 @@ cdav_parse_props(char* prop_string, int* count)
 	if (tokencount == 0)
 		return NULL;
 
-	// TODO: Parse tokens
+	CDAV_PROP** props = NULL;
+
+	size_t ind = 0;
+
+	while(ind <= tokencount)
+	{
+		CDAV_PROP* p = parse_symbol(tokens, tokens[ind], &ind);
+
+		if (p == NULL)
+			continue;
+
+		if (props == NULL)
+			props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP*) * ++(*count));
+
+		props[*count - 1] = p;
+	}
 
 	return NULL;
 
