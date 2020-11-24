@@ -48,6 +48,7 @@ typedef struct cdav_prop_t
 
 typedef enum
 {
+	DEFAULT,
 	SYMBOL,
 	ASSIGN,
 	CHILD_START,

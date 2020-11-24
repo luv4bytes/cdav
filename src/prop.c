@@ -104,14 +104,24 @@ parse_symbol(TOKEN* tokens, TOKEN symbol, size_t* new_i)
 
 	switch(tokens[++ind].type)
 	{
+		case DEFAULT:
+		// next token is end of tokens
+		{
+			CDAV_PROP* p = cdav_new_prop();
+			p->name = symbol.value;
+
+			*new_i = ind;
+
+			return p;
+		}
+
 		case SYMBOL:
+			// syntax bullshit -> asd asd ...
 			return NULL;
 
 		case ASSIGN:
-			// value assignment
+			// TODO: value assignment
 			break;
-
-		// TODO:
 
 		case DELIM:
 		// found prop
@@ -124,11 +134,11 @@ parse_symbol(TOKEN* tokens, TOKEN symbol, size_t* new_i)
 			return p;
 		}
 		case CHILD_START:
-			// bullshit
+			// syntax bullshit -> prop{...}...
 			return NULL;
 
 		case CHILD_END:
-			// bullshit
+			// TODO: Symbol used as value or property
 			return NULL;
 	}
 
@@ -278,15 +288,14 @@ cdav_parse_props(char* prop_string, int* count)
 
 	size_t ind = 0;
 
-	while(ind <= tokencount)
+	while(ind < tokencount)
 	{
 		CDAV_PROP* p = parse_symbol(tokens, tokens[ind], &ind);
 
 		if (p == NULL)
 			continue;
 
-		if (props == NULL)
-			props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP*) * ++(*count));
+		props = (CDAV_PROP**)realloc(props, sizeof(CDAV_PROP*) * ++(*count));
 
 		props[*count - 1] = p;
 	}
