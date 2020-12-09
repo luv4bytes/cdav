@@ -120,8 +120,15 @@ parse_symbol(TOKEN* tokens, TOKEN symbol, size_t* new_i)
 			return NULL;
 
 		case ASSIGN:
+		{
 			// TODO: value assignment
-			break;
+
+			CDAV_PROP* p = cdav_new_prop();
+			*new_i = ind;
+			cdav_prop_add_child(p, parse_symbol(tokens, tokens[*new_i], new_i));
+
+			return p;
+		}
 
 		case DELIM:
 		// found prop
