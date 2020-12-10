@@ -1,6 +1,6 @@
 # cdav TODO
 
-## Currenty working on:
+## Currently working on:
 - Command file
 
 ## Mechanisms

@@ -324,7 +324,7 @@ cdav_parse_props(char* prop_string, int* count)
 		props[*count - 1] = p;
 	}
 
-	return props;
+	// TODO: Memory!
 
-	// TODO: Free memory
+	return props;
 }
