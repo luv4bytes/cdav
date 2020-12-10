@@ -1,5 +1,3 @@
-# cdav TODO
-
 ## Currently working on:
 - Command file
 
