@@ -472,6 +472,9 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	if (d != NULL)
 		free(d);
 
+	for(size_t i = 0; i < count; i++)
+		cdav_free_prop(props[i]);
+
 	curl_easy_cleanup(curl);
 }
 
@@ -541,6 +544,16 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 
 	if (params.buffer != NULL)
 		free(params.buffer);
+
+	for(size_t i = 0; i < set_count; i++)
+	{
+		cdav_free_prop(set_props[i]);
+	}
+
+	for(size_t i = 0; i < rm_count; i++)
+	{
+		cdav_free_prop(rm_props[i]);
+	}
 
 	curl_easy_cleanup(curl);
 }
