@@ -120,7 +120,16 @@ parse_token(CDAV_PROP* parent, TOKEN* tokens, TOKEN tok, size_t* new_i)
 			}
 
 			if (tokens[*new_i - 1].type == ASSIGN && parent != NULL)
+			{
 				parent->value = tok.value;
+
+				*new_i = *new_i + 1;
+
+				return NULL;
+			}
+
+			prop = cdav_new_prop();
+			prop->name = tok.value;
 
 			*new_i = *new_i + 1;
 
@@ -132,16 +141,29 @@ parse_token(CDAV_PROP* parent, TOKEN* tokens, TOKEN tok, size_t* new_i)
 			break;
 
 		case CHILD_START:
+		{
+			CDAV_PROP* prop = NULL;
+
 			*new_i = *new_i + 1;
+
+			while((prop = parse_token(parent, tokens, tokens[*new_i], new_i)) != NULL)
+			{
+				cdav_prop_add_child(parent, prop);
+			}
+
 			break;
+		}
 
 		case CHILD_END:
 			*new_i = *new_i + 1;
 			break;
 
 		case DELIM:
+		{
 			*new_i = *new_i + 1;
-			break;
+
+			return parse_token(parent, tokens, tokens[*new_i], new_i);
+		}
 	}
 
 	return NULL;
@@ -302,7 +324,7 @@ cdav_parse_props(char* prop_string, int* count)
 		props[*count - 1] = p;
 	}
 
-	return NULL;
+	return props;
 
 	// TODO: Free memory
 }
