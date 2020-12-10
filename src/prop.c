@@ -92,61 +92,56 @@ cdav_prop_add_child(CDAV_PROP* parent, CDAV_PROP* child)
 */
 
 CDAV_PROP*
-parse_symbol(TOKEN* tokens, TOKEN symbol, size_t* new_i)
+parse_token(CDAV_PROP* parent, TOKEN* tokens, TOKEN tok, size_t* new_i)
 {
-	if (symbol.type != SYMBOL)
-	{
-		(*new_i)++;
-		return NULL;
-	}
-
-	size_t ind = *new_i;
-
-	switch(tokens[++ind].type)
+	switch (tok.type)
 	{
 		case DEFAULT:
-		// next token is end of tokens
-		{
-			CDAV_PROP* p = cdav_new_prop();
-			p->name = symbol.value;
-
-			*new_i = ind;
-
-			return p;
-		}
+			return NULL;
 
 		case SYMBOL:
-			// syntax bullshit -> asd asd ...
-			return NULL;
+		{
+			CDAV_PROP* prop = NULL;
+
+			if (tokens[*new_i + 1].type == ASSIGN)
+			{
+				*new_i = *new_i + 2;
+
+				prop = cdav_new_prop();
+
+				prop->name = tok.value;
+
+				CDAV_PROP* child = parse_token(prop, tokens, tokens[*new_i], new_i);
+
+				if (child != NULL)
+					cdav_prop_add_child(prop, child);
+
+				return prop;
+			}
+
+			if (tokens[*new_i - 1].type == ASSIGN && parent != NULL)
+				parent->value = tok.value;
+
+			*new_i = *new_i + 1;
+
+			return prop;
+		}
 
 		case ASSIGN:
-		{
-			// TODO: value assignment
+			*new_i = *new_i + 1;
+			break;
 
-			CDAV_PROP* p = cdav_new_prop();
-			*new_i = ind;
-			cdav_prop_add_child(p, parse_symbol(tokens, tokens[*new_i], new_i));
-
-			return p;
-		}
-
-		case DELIM:
-		// found prop
-		{
-			CDAV_PROP* p = cdav_new_prop();
-			p->name = symbol.value;
-
-			*new_i = ind;
-
-			return p;
-		}
 		case CHILD_START:
-			// syntax bullshit -> prop{...}...
-			return NULL;
+			*new_i = *new_i + 1;
+			break;
 
 		case CHILD_END:
-			// TODO: Symbol used as value or property
-			return NULL;
+			*new_i = *new_i + 1;
+			break;
+
+		case DELIM:
+			*new_i = *new_i + 1;
+			break;
 	}
 
 	return NULL;
@@ -297,7 +292,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 	while(ind < tokencount)
 	{
-		CDAV_PROP* p = parse_symbol(tokens, tokens[ind], &ind);
+		CDAV_PROP* p = parse_token(NULL, tokens, tokens[ind], &ind);
 
 		if (p == NULL)
 			continue;
