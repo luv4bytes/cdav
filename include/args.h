@@ -20,8 +20,8 @@
  *
 */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef ARGS_H
+#define ARGS_H
 
 #include "cdav.h"
 #include "helper.h"
@@ -81,4 +81,4 @@ init_args(ARGS* args);
 int
 eval_arg(const char* arg, const char* short_opt, const char* long_opt);
 
-#endif // PARSER_H
+#endif // ARGS_H
