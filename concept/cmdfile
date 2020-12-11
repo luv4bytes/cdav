@@ -1,7 +1,7 @@
 # Some general information 
 # The cdav file will contain a definition of commands that will be executed.
 # Each command block can have at least all the arguments that can be passed to cdav when executed by itself on the CLI.
-# Additionally there are 
+# Additionally there are arguments that can be used to determine the execution behaviour for the file.
 
 # !cdav! is needed for cdav to execute the file. If not found the file won't be executed.
 !cdav!
