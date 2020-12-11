@@ -21,7 +21,7 @@
 */
 
 #include "../include/dav.h"
-#include "../include/parser.h"
+#include "../include/args.h"
 #include "../include/cmdfile.h"
 
 #define PRINT_VERSION printf("cdav %s\n", VERSION); // Version is defined by Makefile
