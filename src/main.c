@@ -22,6 +22,7 @@
 
 #include "../include/dav.h"
 #include "../include/parser.h"
+#include "../include/cmdfile.h"
 
 #define PRINT_VERSION printf("cdav %s\n", VERSION); // Version is defined by Makefile
 
@@ -37,49 +38,6 @@ print_help()
 	// TODO: Print help
 
 	printf("\n");
-}
-
-/// Executes instructions defined in the commandfile.
-void
-exec_cdavfile(char* file)
-{
-	if (file == NULL)
-		error_exit(PROVIDE_COMMANDFILE);
-
-	FILE* cdavfile;
-
-	size_t fsz = file_size(file);
-
-	if (fsz == -1)
-	{
-		int err = errno;
-		error_exit(strerror(err));
-	}
-
-	cdavfile = fopen(file, "r");
-
-	if (cdavfile == NULL)
-	{
-		int err = errno;
-		error_exit(strerror(err));
-	}
-
-	char* buffer = (char*)malloc(sizeof(char) * fsz);
-
-	if (fread(buffer, sizeof(char), fsz, cdavfile) <= 0)
-	{
-		if (ferror(cdavfile) != 0)
-		{
-			int err = errno;
-			error_exit(strerror(err));
-		}
-	}
-
-	fclose(cdavfile);
-
-	// TODO: Exec
-
-	free(buffer);
 }
 
 int
@@ -262,7 +220,7 @@ main(int argc, char* argv[])
 		{
 			args.file = argv[i + 1];
 
-			exec_cdavfile(args.file);
+			exec_cmdfile(args.file);
 
 			return 0;
 		}
