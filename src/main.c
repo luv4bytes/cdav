@@ -128,8 +128,8 @@ main(int argc, char* argv[])
      *          -pw --password   - Specify password
      *		--no-redirect	 - Specify if redirects should not be followed
      *		--proxy		 - Specify proxy
-     *          -sp --setprops   - Specify properties to be set, separated by comma (prop1=test,prop2=21)
-     *          -rp --rmprops    - Specify properties to be removed, separated by comma (prop1,prop2)
+     *          -sp --set-props   - Specify properties to be set, separated by comma (prop1=test,prop2=21)
+     *          -rp --rm-props    - Specify properties to be removed, separated by comma (prop1,prop2)
      *
      *      MKCOL:
      *          -a  --address    - Specify address
@@ -218,7 +218,7 @@ main(int argc, char* argv[])
 	char arg_sp_long[] = "--set-props";
 
 	char arg_rp_short[] = "-rp";
-	char arg_rp_long[] = "--rp-props";
+	char arg_rp_long[] = "--rm-props";
 
 	char arg_da_short[] = "-da";
 	char arg_da_long[] = "--destination-address";

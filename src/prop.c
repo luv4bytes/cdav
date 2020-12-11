@@ -324,5 +324,13 @@ cdav_parse_props(char* prop_string, int* count)
 		props[*count - 1] = p;
 	}
 
+	for(size_t i = 0; i < tokencount; i++)
+	{
+		if (tokens[i].type != SYMBOL)
+		{
+			free(tokens[i].value);
+		}
+	}
+
 	return props;
 }

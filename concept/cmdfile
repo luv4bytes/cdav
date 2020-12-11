@@ -1,0 +1,43 @@
+# Some general information 
+# The cdav file will contain a definition of commands that will be executed.
+# Each command block can have at least all the arguments that can be passed to cdav when executed by itself on the CLI.
+# Additionally there are 
+
+# !cdav! is needed for cdav to execute the file. If not found the file won't be executed.
+!cdav!
+
+# You can specify variables in a special block called VAR.
+# They can be accessed in a "Makefile-manner".
+
+VAR
+{
+	user=somedude
+	password=verysecret
+}
+
+
+# This is how a command block looks like
+SetSomeProperties
+{
+	operation=proppatch
+	address="https://example.com/dav/test.jpg"
+	user=$user
+	password=verysecretpassword
+	set-props="tesprop, hello, parent={child=123}"
+	proxy="https://proxy.com/"
+	no-redirect
+	
+	# To specify parallel execution of blocks the "parallel-level" can be used to specify the order and parallelity of block execution.
+	parallel-level=0
+}
+
+GetAllInfo
+{
+	operation=propfind
+	address="https://example.com/dav/test.jpg"
+	user=somedude
+	password=$password
+	props="allprop"
+	depth=infinity
+	parallel-level=0
+}
