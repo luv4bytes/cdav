@@ -1,10 +1,10 @@
+!cdav!
+# !cdav! is needed for cdav to execute the file. If not found the file won't be executed.
+
 # Some general information 
 # The cdav file will contain a definition of commands that will be executed.
 # Each command block can have at least all the arguments that can be passed to cdav when executed by itself on the CLI.
 # Additionally there are arguments that can be used to determine the execution behaviour for the file.
-
-# !cdav! is needed for cdav to execute the file. If not found the file won't be executed.
-!cdav!
 
 # You can specify variables in a special block called VAR.
 # They can be accessed in a "Makefile-manner".
@@ -14,7 +14,6 @@ VAR
 	user=somedude
 	password=verysecret
 }
-
 
 # This is how a command block looks like
 SetSomeProperties

@@ -39,6 +39,8 @@
 #define INVALID_PROPERTIES "Invalid properties!"
 #define INVALID_OVERWRITE "Overwrite indication must be 0 or 1!"
 
+#define INVALID_COMMANDFILE "Given commandfile is missing the \"!cdav!\" directive.\nThe directive needs to be the first line of the file."
+
 #define INIT_ERROR "Error initializing libcurl!"
 #define LIBCURL_AGENT "libcurl-agent/1.0"
 

@@ -27,6 +27,8 @@
 #include "err.h"
 #include "helper.h"
 
+#define EXEC_DIRECTIVE "!cdav!"
+
 /// Defines types of tokens in a cdav commandfile.
 typedef enum
 {
@@ -43,6 +45,10 @@ typedef struct cmdfile_token_t
 	CMDFILE_TOKEN_TYPE type;
 
 } CMDFILE_TOKEN;
+
+/// Checks if the given file is a valid cdav commandfile.
+int
+isCdavFile(FILE* file);
 
 /// Executes the instructions in the given commandfile.
 void

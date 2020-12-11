@@ -22,11 +22,47 @@
 
 #include "../include/cmdfile.h"
 
+int
+isCdavFile(FILE* file)
+{
+	if (file == NULL)
+		return -1;
+
+	char* line = NULL;
+	size_t cnt = 0;
+
+	ssize_t read = getline(&line, &cnt, file);
+
+	if (read == -1)
+	{
+		int err = errno;
+		char* errstr = strerror(err);
+
+		error_exit(errstr);
+	}
+
+	if (strstr(line, EXEC_DIRECTIVE) == NULL)
+	{
+		free(line);
+		return -1;
+	}
+
+	return 0;
+}
+
 void
 exec_cmdfile(const char* file)
 {
 	if (file == NULL)
 		error_exit(PROVIDE_COMMANDFILE);
+
+	if (access(file, R_OK) != 0)
+	{
+		int err = errno;
+		const char* errstr = strerror(err);
+
+		error_exit(errstr);
+	}
 
 	FILE* cdavfile;
 
@@ -46,24 +82,10 @@ exec_cmdfile(const char* file)
 		error_exit(strerror(err));
 	}
 
-	char* buffer = (char*)malloc(sizeof(char) * fsz);
-
-	if (fread(buffer, sizeof(char), fsz, cdavfile) <= 0)
-	{
-		if (ferror(cdavfile) != 0)
-		{
-			int err = errno;
-			error_exit(strerror(err));
-		}
-	}
-
-#ifdef DEBUG
-	printf("%s\n", buffer);
-#endif
+	if (isCdavFile(cdavfile) == -1)
+		error_exit(INVALID_COMMANDFILE);
 
 	fclose(cdavfile);
 
 	// TODO: Exec
-
-	free(buffer);
 }
