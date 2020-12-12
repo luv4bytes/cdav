@@ -85,7 +85,7 @@ exec_cmdfile(const char* file)
 	if (isCdavFile(cdavfile) == -1)
 		error_exit(INVALID_COMMANDFILE);
 
-	fclose(cdavfile);
+	
 
-	// TODO: Exec
+	fclose(cdavfile);
 }

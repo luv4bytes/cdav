@@ -60,7 +60,6 @@ typedef struct token_t
 {
 	TYPE type;
 	char* value;
-	size_t index;
 } TOKEN;
 
 /// Creates a new property.

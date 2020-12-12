@@ -26,8 +26,28 @@
 #include "cdav.h"
 #include "err.h"
 #include "helper.h"
+#include "args.h"
 
 #define EXEC_DIRECTIVE "!cdav!"
+
+/// Defines the types for command blocks.
+typedef enum
+{
+	COMMAND,	// Basic command.
+	VAR			// Special block for variables.
+
+} CMDBLOCK_TYPE;
+
+/// Defines a command block holding basic arguments and special arguments for commandfile execution.
+typedef struct cmdblock_t
+{
+	ARGS args;
+	CMDBLOCK_TYPE type;
+
+	const char* name;
+	int parallelity_level;
+
+} CMDBLOCK;
 
 /// Defines types of tokens in a cdav commandfile.
 typedef enum
@@ -35,7 +55,10 @@ typedef enum
 	CMD_DEFAULT,
 	CMD_KEYWORD,
 	CMD_ASSIGN,
-	CMD_NAME
+	CMD_NAME,
+	CMD_VARIABLE,
+	CMD_START,
+	CMD_END
 
 } CMDFILE_TOKEN_TYPE;
 
@@ -43,6 +66,7 @@ typedef enum
 typedef struct cmdfile_token_t
 {
 	CMDFILE_TOKEN_TYPE type;
+	char* value;
 
 } CMDFILE_TOKEN;
 

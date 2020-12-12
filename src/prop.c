@@ -200,7 +200,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp, tokencount};
+				TOKEN name = {SYMBOL, tmp};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -211,7 +211,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 			char* tmp = (char*)calloc(0, sizeof(char) * 1);
 			tmp[0] = c;
-			TOKEN assign = {ASSIGN, tmp, tokencount};
+			TOKEN assign = {ASSIGN, tmp};
 			tokens[++tokencount - 1] = assign;
 
 			continue;
@@ -223,7 +223,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp, tokencount};
+				TOKEN name = {SYMBOL, tmp};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -246,7 +246,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp, tokencount};
+				TOKEN name = {SYMBOL, tmp};
 
 				tokens[++tokencount - 1] = name;
 			}
@@ -269,7 +269,7 @@ cdav_parse_props(char* prop_string, int* count)
 			{
 				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
 				strcpy(tmp, propname);
-				TOKEN name = {SYMBOL, tmp, tokencount};
+				TOKEN name = {SYMBOL, tmp};
 
 				tokens[++tokencount - 1] = name;
 			}
