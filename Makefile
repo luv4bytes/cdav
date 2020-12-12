@@ -1,3 +1,5 @@
+# Makefile for cdav
+
 makedirs=mkdir obj/ bin/
 removedirs=rm -rf obj/ bin/
 options=-Wall
