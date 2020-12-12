@@ -1,5 +1,5 @@
 # cdav
-Console WebDAV client.
+Console WebDAV client for Linux.
 
 cdav is currently in its initial development phase.
 
@@ -11,3 +11,8 @@ cdav is currently in its initial development phase.
 - Other authentication methods
 - CardDAV
 - CalDAV
+
+## Compile
+
+To build cdav in its current state, make sure to run 
+`make deps` before running `make`.
