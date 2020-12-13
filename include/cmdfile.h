@@ -30,6 +30,16 @@
 
 #define EXEC_DIRECTIVE "!cdav!"
 
+#define CMDTOK_ASSIGN '='
+#define CMDTOK_CMDSTART '{'
+#define CMDTOK_CMDEND '}'
+#define CMDTOK_VALUEIDENT '\"'
+#define CMDTOK_COMMENTSTART '#'
+
+#define BLOCK_VAR "VAR"
+
+#define NAME_LEN 1024
+
 /// Defines the types for command blocks.
 typedef enum
 {
@@ -73,6 +83,14 @@ typedef struct cmdfile_token_t
 /// Checks if the given file is a valid cdav commandfile.
 int
 isCdavFile(FILE* file);
+
+/// Creates a new token with the given type and value and adds it to the list.
+CMDFILE_TOKEN
+new_token(CMDFILE_TOKEN_TYPE type, const char* value);
+
+/// Parses the commandfile and extracts tokens.
+CMDFILE_TOKEN*
+parse_cmdfile(FILE* file);
 
 /// Executes the instructions in the given commandfile.
 void

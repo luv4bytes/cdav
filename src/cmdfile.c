@@ -50,6 +50,123 @@ isCdavFile(FILE* file)
 	return 0;
 }
 
+CMDFILE_TOKEN
+new_token(CMDFILE_TOKEN_TYPE type, const char* value)
+{
+	CMDFILE_TOKEN tok;
+
+	tok.type = type;
+	tok.value = (char*) calloc(0, strlen(value));
+	strcpy(tok.value, value);
+
+	return tok;
+}
+
+CMDFILE_TOKEN*
+parse_cmdfile(FILE* file)
+{
+	CMDFILE_TOKEN* tokens = NULL;
+	size_t tokencount = 0;
+
+	char* line = NULL;
+	size_t sz = 0;
+	ssize_t read = 0;
+
+	char symbol[NAME_LEN];
+	memset(symbol, 0, NAME_LEN);
+
+	while( (read = getline(&line, &sz, file)) != -1)	
+	{
+		if (line[0] == '\n')
+		{
+			free(line);
+			line = NULL;
+			continue;
+		}
+
+		for(size_t i = 0; i < read; i++)
+		{
+			if (line[i] == '\n')
+			{
+				free(line);
+				line = NULL;
+				break;
+			}
+
+			if (line[i] == CMDTOK_COMMENTSTART)
+			{
+				free(line);
+				line = NULL;
+				break;
+			}
+
+			if (line[i] == CMDTOK_CMDSTART)
+			{
+				CMDFILE_TOKEN tok = new_token(CMD_START, &line[i]);
+				
+				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+				tokens[tokencount - 1] = tok;
+
+				continue;
+			}
+
+			if (line[i] == CMDTOK_CMDEND)
+			{
+				CMDFILE_TOKEN tok = new_token(CMD_END, &line[i]);
+
+				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+				tokens[tokencount - 1] = tok;
+
+				continue;
+			}	
+
+			if (line[i] == CMDTOK_ASSIGN)
+			{
+				CMDFILE_TOKEN tok = new_token(CMD_ASSIGN, &line[i]);
+
+				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+				tokens[tokencount - 1] = tok;
+
+				continue;
+			}
+
+			// TODO: Extract symbols
+
+			symbol[i] = line[i];
+		}
+
+		if (symbol[0] != 0)
+		{
+			CMDFILE_TOKEN tok = new_token(CMD_NAME, symbol);
+
+			tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+			tokens[tokencount - 1] = tok;
+
+			memset(symbol, 0, NAME_LEN);
+		}
+
+		if (line != NULL)
+			free(line);
+
+		// TODO: Parse
+	}
+
+	if (read == -1)
+	{
+		int err = errno;
+		char* errstr = strerror(err);
+
+		error_exit(errstr);
+	}
+
+	#ifdef DEBUG
+		for(size_t i = 0; i < tokencount; i++)
+			printf("%s\n", tokens[i].value);
+	#endif
+
+	return tokens;
+}
+
 void
 exec_cmdfile(const char* file)
 {
@@ -85,7 +202,9 @@ exec_cmdfile(const char* file)
 	if (isCdavFile(cdavfile) == -1)
 		error_exit(INVALID_COMMANDFILE);
 
-	
+	CMDFILE_TOKEN* tokens = parse_cmdfile(cdavfile);	
+
+	// TODO: Exec
 
 	fclose(cdavfile);
 }
