@@ -51,13 +51,25 @@ isCdavFile(FILE* file)
 }
 
 CMDFILE_TOKEN
-new_token(CMDFILE_TOKEN_TYPE type, const char* value)
+new_token_str(CMDFILE_TOKEN_TYPE type, const char* value)
 {
 	CMDFILE_TOKEN tok;
 
 	tok.type = type;
 	tok.value = (char*) calloc(0, strlen(value));
 	strcpy(tok.value, value);
+
+	return tok;
+}
+
+CMDFILE_TOKEN
+new_token_char(CMDFILE_TOKEN_TYPE type, char value)
+{
+	CMDFILE_TOKEN tok;
+
+	tok.type = type;
+	tok.value = (char*) calloc(0, sizeof(char));
+	tok.value[0] = value;
 
 	return tok;
 }
@@ -71,6 +83,8 @@ parse_cmdfile(FILE* file)
 	char* line = NULL;
 	size_t sz = 0;
 	ssize_t read = 0;
+
+	size_t symbolIndex = 0;
 
 	char symbol[NAME_LEN];
 	memset(symbol, 0, NAME_LEN);
@@ -100,9 +114,23 @@ parse_cmdfile(FILE* file)
 				break;
 			}
 
+			// TODO: Implement other tokens
+
 			if (line[i] == CMDTOK_CMDSTART)
 			{
-				CMDFILE_TOKEN tok = new_token(CMD_START, &line[i]);
+				if (symbol[0] != 0)
+				{
+					CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
+
+					tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+					tokens[tokencount - 1] = tok;
+
+					memset(symbol, 0, NAME_LEN);
+
+					symbolIndex = 0;
+				}
+
+				CMDFILE_TOKEN tok = new_token_char(CMD_START, line[i]);
 				
 				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
 				tokens[tokencount - 1] = tok;
@@ -112,7 +140,19 @@ parse_cmdfile(FILE* file)
 
 			if (line[i] == CMDTOK_CMDEND)
 			{
-				CMDFILE_TOKEN tok = new_token(CMD_END, &line[i]);
+				if (symbol[0] != 0)
+				{
+					CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
+
+					tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+					tokens[tokencount - 1] = tok;
+
+					memset(symbol, 0, NAME_LEN);
+
+					symbolIndex = 0;
+				}
+
+				CMDFILE_TOKEN tok = new_token_char(CMD_END, line[i]);
 
 				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
 				tokens[tokencount - 1] = tok;
@@ -122,7 +162,19 @@ parse_cmdfile(FILE* file)
 
 			if (line[i] == CMDTOK_ASSIGN)
 			{
-				CMDFILE_TOKEN tok = new_token(CMD_ASSIGN, &line[i]);
+				if (symbol[0] != 0)
+				{
+					CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
+
+					tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+					tokens[tokencount - 1] = tok;
+
+					memset(symbol, 0, NAME_LEN);
+
+					symbolIndex = 0;
+				}
+
+				CMDFILE_TOKEN tok = new_token_char(CMD_ASSIGN, line[i]);
 
 				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
 				tokens[tokencount - 1] = tok;
@@ -130,23 +182,38 @@ parse_cmdfile(FILE* file)
 				continue;
 			}
 
-			// TODO: Extract symbols
+			if (line[i] == CMDTOK_ASSIGN_END)
+			{
+				if (symbol[0] != 0)
+				{
+					CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
 
-			symbol[i] = line[i];
-		}
+					tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+					tokens[tokencount - 1] = tok;
 
-		if (symbol[0] != 0)
-		{
-			CMDFILE_TOKEN tok = new_token(CMD_NAME, symbol);
+					memset(symbol, 0, NAME_LEN);
 
-			tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
-			tokens[tokencount - 1] = tok;
+					symbolIndex = 0;
+				}
 
-			memset(symbol, 0, NAME_LEN);
+				CMDFILE_TOKEN tok = new_token_char(CMD_ASSIGN_END, line[i]);
+
+				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+				tokens[tokencount - 1] = tok;
+
+				continue;
+			}
+
+			symbol[symbolIndex++] = line[i];
 		}
 
 		if (line != NULL)
 			free(line);
+
+		#ifdef DEBUG
+			for(size_t i = 0; i < tokencount; i++)
+				printf("%s\n", tokens[i].value);
+		#endif
 
 		// TODO: Parse
 	}

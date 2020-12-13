@@ -31,6 +31,7 @@
 #define EXEC_DIRECTIVE "!cdav!"
 
 #define CMDTOK_ASSIGN '='
+#define CMDTOK_ASSIGN_END ';'
 #define CMDTOK_CMDSTART '{'
 #define CMDTOK_CMDEND '}'
 #define CMDTOK_VALUEIDENT '\"'
@@ -65,6 +66,7 @@ typedef enum
 	CMD_DEFAULT,
 	CMD_KEYWORD,
 	CMD_ASSIGN,
+	CMD_ASSIGN_END,
 	CMD_NAME,
 	CMD_VARIABLE,
 	CMD_START,
@@ -84,9 +86,13 @@ typedef struct cmdfile_token_t
 int
 isCdavFile(FILE* file);
 
-/// Creates a new token with the given type and value and adds it to the list.
+/// Creates a new token with the given type and value as char* and adds it to the list.
 CMDFILE_TOKEN
-new_token(CMDFILE_TOKEN_TYPE type, const char* value);
+new_token_str(CMDFILE_TOKEN_TYPE type, const char* value);
+
+/// Creates a new token with the given type and value as char and adds it to the list.
+CMDFILE_TOKEN
+new_token_char(CMDFILE_TOKEN_TYPE type, char value);
 
 /// Parses the commandfile and extracts tokens.
 CMDFILE_TOKEN*
