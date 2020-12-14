@@ -74,8 +74,19 @@ new_token_char(CMDFILE_TOKEN_TYPE type, char value)
 	return tok;
 }
 
+void
+free_token(CMDFILE_TOKEN* token)
+{
+	#ifdef DEBUG
+		printf("%s\n", token->value);
+	#endif
+
+	if (token->value != NULL)
+		free(token->value);
+}
+
 CMDFILE_TOKEN*
-parse_cmdfile(FILE* file)
+lex_cmdfile(FILE* file, size_t* count)
 {
 	CMDFILE_TOKEN* tokens = NULL;
 	size_t tokencount = 0;
@@ -107,6 +118,9 @@ parse_cmdfile(FILE* file)
 				break;
 			}
 
+			if (line[i] == '\t')
+				symbolIndex--;
+
 			if (line[i] == CMDTOK_COMMENTSTART)
 			{
 				free(line);
@@ -114,7 +128,27 @@ parse_cmdfile(FILE* file)
 				break;
 			}
 
-			// TODO: Implement other tokens
+			if (line[i] == CMDTOK_VALUEIDENT)
+			{
+				if (symbol[0] != 0)
+				{
+					CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
+
+					tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+					tokens[tokencount - 1] = tok;
+
+					memset(symbol, 0, NAME_LEN);
+
+					symbolIndex = 0;
+				}
+
+				CMDFILE_TOKEN tok = new_token_char(CMD_VALUEIDENT, line[i]);
+				
+				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+				tokens[tokencount - 1] = tok;
+
+				continue;
+			}
 
 			if (line[i] == CMDTOK_CMDSTART)
 			{
@@ -209,29 +243,96 @@ parse_cmdfile(FILE* file)
 
 		if (line != NULL)
 			free(line);
-
-		#ifdef DEBUG
-			for(size_t i = 0; i < tokencount; i++)
-				printf("%s\n", tokens[i].value);
-		#endif
-
-		// TODO: Parse
-	}
-
-	if (read == -1)
-	{
-		int err = errno;
-		char* errstr = strerror(err);
-
-		error_exit(errstr);
 	}
 
 	#ifdef DEBUG
-		for(size_t i = 0; i < tokencount; i++)
-			printf("%s\n", tokens[i].value);
+		if (tokens != NULL)
+		{
+			for(size_t i = 0; i < tokencount; i++)
+				printf("%s\n", tokens[i].value);
+		}	
 	#endif
 
+	*count = tokencount;
+
 	return tokens;
+}
+
+CMDBLOCK*
+parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
+{
+	if (tokens == NULL)
+		error_exit("No tokens for parsing.");
+
+	CMDBLOCK* blocks = NULL;
+	CMDBLOCK lastBlock;
+
+	for(size_t i = 0; i < count; i++)
+	{
+		CMDFILE_TOKEN* current = &tokens[i];
+
+		if (current->value == NULL)
+			continue;
+
+		switch(current->type)
+		{
+			case CMD_DEFAULT:
+				break;
+
+			case CMD_ASSIGN:
+				break;
+
+			case CMD_ASSIGN_END:
+				break;
+
+			case CMD_NAME:
+				break;
+
+			case CMD_VALUEIDENT:
+				break;
+
+			case CMD_START:
+			{
+				if (i == 0)
+					break;
+
+				CMDFILE_TOKEN* before = &tokens[i - 1];
+
+				switch (before->type)
+				{
+					case CMD_NAME:
+
+						if (strcmp(before->value, BLOCK_VAR) == 0)
+						{
+							lastBlock.type = VAR;
+							lastBlock.name = BLOCK_VAR;
+						}							
+						else
+						{
+							lastBlock.type = COMMAND;
+							lastBlock.name = before->value;
+						}
+
+						// TODO: Parse
+
+					default:
+						break;
+				}
+
+				break;
+			}
+
+			case CMD_END:
+				break;
+
+			default:
+				break;
+		}
+	}
+	
+	// TODO: Special blocks
+
+	return blocks;
 }
 
 void
@@ -269,9 +370,13 @@ exec_cmdfile(const char* file)
 	if (isCdavFile(cdavfile) == -1)
 		error_exit(INVALID_COMMANDFILE);
 
-	CMDFILE_TOKEN* tokens = parse_cmdfile(cdavfile);	
+	size_t count = 0;
 
-	// TODO: Exec
+	CMDFILE_TOKEN* tokens = lex_cmdfile(cdavfile, &count);	
+	CMDBLOCK* blocks = parse_tokens(tokens, count);
+
+	// TODO: Execute blocks
+	// TODO: Free tokens
 
 	fclose(cdavfile);
 }

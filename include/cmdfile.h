@@ -64,11 +64,10 @@ typedef struct cmdblock_t
 typedef enum
 {
 	CMD_DEFAULT,
-	CMD_KEYWORD,
 	CMD_ASSIGN,
 	CMD_ASSIGN_END,
 	CMD_NAME,
-	CMD_VARIABLE,
+	CMD_VALUEIDENT,
 	CMD_START,
 	CMD_END
 
@@ -94,9 +93,17 @@ new_token_str(CMDFILE_TOKEN_TYPE type, const char* value);
 CMDFILE_TOKEN
 new_token_char(CMDFILE_TOKEN_TYPE type, char value);
 
-/// Parses the commandfile and extracts tokens.
+/// Performs lexical analysis of the commandfile.
 CMDFILE_TOKEN*
-parse_cmdfile(FILE* file);
+lex_cmdfile(FILE* file, size_t* count);
+
+/// Parses the given tokens to CMDBLOCK*.
+CMDBLOCK*
+parse_tokens(CMDFILE_TOKEN* tokens, size_t count);
+
+/// Frees the memory used by the CMDFILE_TOKEN.
+void
+free_token(CMDFILE_TOKEN* token);
 
 /// Executes the instructions in the given commandfile.
 void
