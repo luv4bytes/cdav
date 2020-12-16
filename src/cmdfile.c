@@ -100,6 +100,11 @@ lex_cmdfile(FILE* file, size_t* count)
 	char symbol[NAME_LEN];
 	memset(symbol, 0, NAME_LEN);
 
+	/* TODO:
+	Valueident
+	Escaped chars
+	*/
+
 	while( (read = getline(&line, &sz, file)) != -1)	
 	{
 		if (line[0] == '\n')
@@ -130,6 +135,8 @@ lex_cmdfile(FILE* file, size_t* count)
 
 			if (line[i] == CMDTOK_VALUEIDENT)
 			{
+				int breakout = 0;
+
 				if (symbol[0] != 0)
 				{
 					CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
@@ -146,6 +153,29 @@ lex_cmdfile(FILE* file, size_t* count)
 				
 				tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
 				tokens[tokencount - 1] = tok;
+
+				for(int j = i + 1; j < read; j++)
+				{
+					if (line[j] == CMDTOK_VALUEIDENT)
+					{
+						CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
+
+						tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+						tokens[tokencount - 1] = tok;
+
+						memset(symbol, 0, NAME_LEN);
+
+						symbolIndex = 0; 
+
+						breakout = 1;
+						break;
+					}
+
+					symbol[symbolIndex++] = line[j];
+				}
+
+				if (breakout == 1)
+					break;
 
 				continue;
 			}
@@ -437,11 +467,21 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 					break;
 				}
 
-				cmd_set_arg(&lastBlock, before->value, next->value);
-				break;
+				if (next->type == CMD_VALUEIDENT)
+				{
+					CMDFILE_TOKEN* val = &tokens[ind + 1];
+					CMDFILE_TOKEN* end = &tokens[ind + 2];
 
-			case CMD_VALUEIDENT:
-				// TODO:
+					// TODO: Values are not right yet
+
+					if (end->type == CMD_VALUEIDENT)
+					{
+						cmd_set_arg(&lastBlock, before->value, val->value);
+						break;	
+					}
+				}
+
+				cmd_set_arg(&lastBlock, before->value, next->value);
 				break;
 
 			case CMD_START:
@@ -473,6 +513,8 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 				blocks = (CMDBLOCK*) realloc(blocks, sizeof(CMDBLOCK) * ++blockCount);
 				blocks[blockCount - 1] = lastBlock;
 
+				init_args(&lastBlock.args);
+
 				break;
 
 			default:
@@ -480,7 +522,15 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 		}
 	}
 	
-	// TODO: Special blocks
+	/* TODO: 
+	Variables '$'
+	Variable array not fixed size
+	*/
+
+	#ifdef DEBUG
+		for(int i = 0; i < blockCount; i++)
+			printf("%s\n", blocks[i].name);
+	#endif 
 
 	return blocks;
 }

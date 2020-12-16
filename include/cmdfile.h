@@ -45,6 +45,7 @@
 /// Defines the types for command blocks.
 typedef enum
 {
+	NONE,
 	COMMAND,	// Basic command.
 	VAR			// Special block for variables.
 
