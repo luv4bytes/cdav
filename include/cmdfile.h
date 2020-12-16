@@ -65,8 +65,8 @@ typedef struct cmdblock_t
 /// Structure stores the used variables in the commandfile.
 typedef struct variables_t
 {
-	char* names[MAX_VARS];
-	char* values[MAX_VARS];
+	char** names;
+	char** values;
 
 	size_t lastIndex;
 	

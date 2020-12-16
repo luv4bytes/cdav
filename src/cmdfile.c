@@ -101,7 +101,6 @@ lex_cmdfile(FILE* file, size_t* count)
 	memset(symbol, 0, NAME_LEN);
 
 	/* TODO:
-	Valueident
 	Escaped chars
 	*/
 
@@ -155,11 +154,16 @@ lex_cmdfile(FILE* file, size_t* count)
 				tokens[tokencount - 1] = tok;
 
 				for(int j = i + 1; j < read; j++)
-				{
+				{				
 					if (line[j] == CMDTOK_VALUEIDENT)
 					{
 						CMDFILE_TOKEN tok = new_token_str(CMD_NAME, symbol);
 
+						tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
+						tokens[tokencount - 1] = tok;
+
+						tok = new_token_char(CMD_VALUEIDENT, line[i]);
+				
 						tokens = (CMDFILE_TOKEN*) realloc(tokens, sizeof(CMDFILE_TOKEN) * ++tokencount);
 						tokens[tokencount - 1] = tok;
 
@@ -294,10 +298,13 @@ var_add_variable(VARIABLES* vars, const char* name, const char* value)
 	if (vars == NULL)
 		return;
 
-	vars->names[vars->lastIndex] = (char*) calloc(0, sizeof(char));
+	vars->names = (char**) realloc(vars->names, sizeof(char*) * vars->lastIndex + 1);
+	vars->values = (char**) realloc(vars->values, sizeof(char*) * vars->lastIndex + 1);
+	
+	vars->names[vars->lastIndex] = (char*) calloc(0, strlen(name) + 1);
 	strcpy(vars->names[vars->lastIndex], name);
 
-	vars->values[vars->lastIndex] = (char*) calloc(0, sizeof(char));
+	vars->values[vars->lastIndex] = (char*) calloc(0, strlen(name) + 1);
 	strcpy(vars->values[vars->lastIndex], value);
 
 	vars->lastIndex++;
@@ -469,10 +476,11 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 
 				if (next->type == CMD_VALUEIDENT)
 				{
+					if ((ind + 1) > count || (ind + 2) > count)
+						error_exit("Error on value identifiers. Please check assignments.");
+
 					CMDFILE_TOKEN* val = &tokens[ind + 1];
 					CMDFILE_TOKEN* end = &tokens[ind + 2];
-
-					// TODO: Values are not right yet
 
 					if (end->type == CMD_VALUEIDENT)
 					{
@@ -524,7 +532,6 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 	
 	/* TODO: 
 	Variables '$'
-	Variable array not fixed size
 	*/
 
 	#ifdef DEBUG
