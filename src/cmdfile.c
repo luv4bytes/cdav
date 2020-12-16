@@ -258,6 +258,150 @@ lex_cmdfile(FILE* file, size_t* count)
 	return tokens;
 }
 
+void
+var_add_variable(VARIABLES* vars, const char* name, const char* value)
+{
+	if (vars == NULL)
+		return;
+
+	vars->names[vars->lastIndex] = (char*) calloc(0, sizeof(char));
+	strcpy(vars->names[vars->lastIndex], name);
+
+	vars->values[vars->lastIndex] = (char*) calloc(0, sizeof(char));
+	strcpy(vars->values[vars->lastIndex], value);
+
+	vars->lastIndex++;
+}
+
+void
+cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
+{
+	if (block == NULL)
+		return;
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_F_LONG, 2, strlen(ARG_F_LONG)) == 0)
+	{
+		block->args.file = value;
+		return;
+	}
+		
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_O_LONG, 2, strlen(ARG_O_LONG)) == 0)
+	{
+		block->args.operation = value;
+		return;
+	}
+		
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_A_LONG, 2, strlen(ARG_A_LONG)) == 0)
+	{
+		block->args.address = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_U_LONG, 2, strlen(ARG_U_LONG)) == 0)
+	{
+		block->args.user = value;
+		return;
+	}
+		
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_PW_LONG, 2, strlen(ARG_PW_LONG)) == 0)
+	{
+		block->args.passwd = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_P_LONG, 2, strlen(ARG_P_LONG)) == 0)
+	{
+		block->args.props = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_SP_LONG, 2, strlen(ARG_SP_LONG)) == 0)
+	{
+		block->args.set_props = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_RP_LONG, 2, strlen(ARG_RP_LONG)) == 0)
+	{
+		block->args.rm_props = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_DA_LONG, 2, strlen(ARG_DA_LONG)) == 0)
+	{
+		block->args.destination = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_NO_OW, 2, strlen(ARG_NO_OW)) == 0)
+	{
+		block->args.overwrite = 0;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_UF_LONG, 2, strlen(ARG_UF_LONG)) == 0)
+	{
+		block->args.upload_file = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_S_LONG, 2, strlen(ARG_S_LONG)) == 0)
+	{
+		block->args.save_as = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_D_LONG, 2, strlen(ARG_D_LONG)) == 0)
+	{
+		block->args.depth = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_LS_LONG, 2, strlen(ARG_LS_LONG)) == 0)
+	{
+		block->args.lock_scope = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_LT_LONG, 2, strlen(ARG_LT_LONG)) == 0)
+	{
+		block->args.lock_token = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_LO_LONG, 2, strlen(ARG_LO_LONG)) == 0)
+	{
+		block->args.lock_owner = value;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_H_LONG, 2, strlen(ARG_H_LONG)) == 0)
+	{
+		block->args.help = 1;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_V_LONG, 2, strlen(ARG_V_LONG)) == 0)
+	{
+		block->args.version = 1;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_NO_REDIRECT, 2, strlen(ARG_NO_REDIRECT)) == 0)
+	{
+		block->args.follow_redirect = 0;
+		return;
+	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_PROXY, 2, strlen(ARG_PROXY)) == 0)
+	{
+		block->args.proxy = value;
+		return;
+	}
+
+	// TODO: Malloc because of freed tokens?
+}
+
 CMDBLOCK*
 parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 {
@@ -265,39 +409,43 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 		error_exit("No tokens for parsing.");
 
 	CMDBLOCK* blocks = NULL;
+	size_t blockCount = 0;
 	CMDBLOCK lastBlock;
+	
+	init_args(&lastBlock.args);
 
 	for(size_t i = 0; i < count; i++)
 	{
 		CMDFILE_TOKEN* current = &tokens[i];
+
+		int ind = i > 0 ? i - 1 : i;
+		CMDFILE_TOKEN* before = &tokens[ind];
+
+		ind = (i == (i - 1)) ? i : i + 1;
+		CMDFILE_TOKEN* next = &tokens[ind];
 
 		if (current->value == NULL)
 			continue;
 
 		switch(current->type)
 		{
-			case CMD_DEFAULT:
-				break;
-
 			case CMD_ASSIGN:
-				break;
 
-			case CMD_ASSIGN_END:
-				break;
+				if (lastBlock.type == VAR)
+				{
+					var_add_variable(&variables, before->value, next->value);
+					break;
+				}
 
-			case CMD_NAME:
+				cmd_set_arg(&lastBlock, before->value, next->value);
 				break;
 
 			case CMD_VALUEIDENT:
+				// TODO:
 				break;
 
 			case CMD_START:
 			{
-				if (i == 0)
-					break;
-
-				CMDFILE_TOKEN* before = &tokens[i - 1];
-
 				switch (before->type)
 				{
 					case CMD_NAME:
@@ -313,8 +461,6 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 							lastBlock.name = before->value;
 						}
 
-						// TODO: Parse
-
 					default:
 						break;
 				}
@@ -323,6 +469,10 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 			}
 
 			case CMD_END:
+				
+				blocks = (CMDBLOCK*) realloc(blocks, sizeof(CMDBLOCK) * ++blockCount);
+				blocks[blockCount - 1] = lastBlock;
+
 				break;
 
 			default:

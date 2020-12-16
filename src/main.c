@@ -154,69 +154,13 @@ main(int argc, char* argv[])
 	ARGS args;
 	init_args(&args);
 
-	char arg_f_short[] = "-f";
-	char arg_f_long[] = "--file";
-
-	char arg_o_short[] = "-o";
-	char arg_o_long[] = "--operation";
-
-	char arg_a_short[] = "-a";
-	char arg_a_long[] = "--address";
-
-	char arg_u_short[] = "-u";
-	char arg_u_long[] = "--user";
-
-	char arg_pw_short[] = "-pw";
-	char arg_pw_long[] = "--password";
-
-	char arg_p_short[] = "-p";
-	char arg_p_long[] = "--props";
-
-	char arg_sp_short[] = "-sp";
-	char arg_sp_long[] = "--set-props";
-
-	char arg_rp_short[] = "-rp";
-	char arg_rp_long[] = "--rm-props";
-
-	char arg_da_short[] = "-da";
-	char arg_da_long[] = "--destination-address";
-
-	char arg_no_ow[] = "--no-overwrite";
-
-	char arg_uf_short[] = "-uf";
-	char arg_uf_long[] = "--upload-file";
-
-	char arg_s_short[] = "-s";
-	char arg_s_long[] = "--save-as";
-
-	char arg_d_short[] = "-d";
-	char arg_d_long[] = "--depth";
-
-	char arg_ls_short[] = "-ls";
-	char arg_ls_long[] = "--lock-scope";
-
-	char arg_lt_short[] = "-lt";
-	char arg_lt_long[] = "--lock-token";
-
-	char arg_lo_short[] = "-lo";
-	char arg_lo_long[] = "--lock-owner";
-
-	char arg_h_short[] = "-h";
-	char arg_h_long[] = "--help";
-
-	char arg_v_short[] = "-v";
-	char arg_v_long[] = "--version";
-
-	char arg_no_redirect[] = "--no-redirect";
-
-	char arg_proxy[] = "--proxy";
 
 	for(int i = 1; i < argc; i++)
 	{
 		if ( (i + 1) > argc)
 			break;
 
-		if (eval_arg(argv[i], arg_f_short, arg_f_long) == 1)
+		if (eval_arg(argv[i], ARG_F_SHORT, ARG_F_LONG) == 1)
 		{
 			args.file = argv[i + 1];
 
@@ -225,115 +169,115 @@ main(int argc, char* argv[])
 			return 0;
 		}
 
-		if (eval_arg(argv[i], arg_o_short, arg_o_long))
+		if (eval_arg(argv[i], ARG_O_SHORT, ARG_O_LONG))
 		{
 			args.operation = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_a_short, arg_a_long))
+		if (eval_arg(argv[i], ARG_A_SHORT, ARG_A_LONG))
 		{
 			args.address = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_u_short, arg_u_long))
+		if (eval_arg(argv[i], ARG_U_SHORT, ARG_U_LONG))
 		{
 			args.user = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_pw_short, arg_pw_long))
+		if (eval_arg(argv[i], ARG_PW_SHORT, ARG_PW_LONG))
 		{
 			args.passwd = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_p_short, arg_p_long))
+		if (eval_arg(argv[i], ARG_P_SHORT, ARG_P_LONG))
 		{
 			args.props = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_sp_short, arg_sp_long))
+		if (eval_arg(argv[i], ARG_SP_SHORT, ARG_SP_LONG))
 		{
 			args.set_props = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_rp_short, arg_rp_long))
+		if (eval_arg(argv[i], ARG_RP_SHORT, ARG_RP_LONG))
 		{
 			args.rm_props = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_da_short, arg_da_long))
+		if (eval_arg(argv[i], ARG_DA_SHORT, ARG_DA_LONG))
 		{
 			args.destination = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_no_ow, NULL))
+		if (eval_arg(argv[i], ARG_NO_OW, NULL))
 		{
 			args.overwrite = 0;
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_uf_short, arg_uf_long))
+		if (eval_arg(argv[i], ARG_UF_SHORT, ARG_UF_LONG))
 		{
 			args.upload_file = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_s_short, arg_s_long))
+		if (eval_arg(argv[i], ARG_S_SHORT, ARG_S_LONG))
 		{
 			args.save_as = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_d_short, arg_d_long))
+		if (eval_arg(argv[i], ARG_D_SHORT, ARG_D_LONG))
 		{
 			args.depth = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_ls_short, arg_ls_long))
+		if (eval_arg(argv[i], ARG_LS_SHORT, ARG_LS_LONG))
 		{
 			args.lock_scope = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_lt_short, arg_lt_long))
+		if (eval_arg(argv[i], ARG_LT_SHORT, ARG_LT_LONG))
 		{
 			args.lock_token = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_lo_short, arg_lo_long))
+		if (eval_arg(argv[i], ARG_LO_SHORT, ARG_LO_LONG))
 		{
 			args.lock_owner = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_h_short, arg_h_long))
+		if (eval_arg(argv[i], ARG_H_SHORT, ARG_H_LONG))
 		{
 			args.help = 1;
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_v_short, arg_v_long))
+		if (eval_arg(argv[i], ARG_V_SHORT, ARG_V_LONG))
 		{
 			args.version = 1;
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_no_redirect, NULL))
+		if (eval_arg(argv[i], ARG_NO_REDIRECT, NULL))
 		{
 			args.follow_redirect = 0;
 			continue;
 		}
 
-		if (eval_arg(argv[i], arg_proxy, NULL))
+		if (eval_arg(argv[i], ARG_PROXY, NULL))
 		{
 			args.proxy = argv[i + 1];
 			continue;

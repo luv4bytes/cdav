@@ -106,3 +106,27 @@ str_to_upper(const char* str, char* buffer, size_t len)
 		buffer[i] = toupper(str[i]);
 	}
 }
+
+int
+strcmp_from_to(const char* first, size_t from_first, size_t to_first,
+               const char* sec, size_t from_sec, size_t to_sec)
+{
+	if (first == NULL && sec == NULL)
+		return 0;
+
+	if ( (to_first - from_first) != (to_sec - from_sec) )
+		return -1;
+
+	for(size_t i = from_first; i < to_first; i++)
+	{
+		#ifdef DEBUG
+			printf("%c\n", first[i]);
+			printf("%c\n", sec[from_sec + i]);
+		#endif
+
+		if (first[i] != sec[from_sec + i])
+			return -1;
+	}
+
+	return 0;
+}

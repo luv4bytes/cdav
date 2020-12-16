@@ -40,6 +40,7 @@
 #define BLOCK_VAR "VAR"
 
 #define NAME_LEN 1024
+#define MAX_VARS 1024
 
 /// Defines the types for command blocks.
 typedef enum
@@ -59,6 +60,16 @@ typedef struct cmdblock_t
 	int parallelity_level;
 
 } CMDBLOCK;
+
+/// Structure stores the used variables in the commandfile.
+typedef struct variables_t
+{
+	char* names[MAX_VARS];
+	char* values[MAX_VARS];
+
+	size_t lastIndex;
+	
+} VARIABLES;
 
 /// Defines types of tokens in a cdav commandfile.
 typedef enum
@@ -80,6 +91,17 @@ typedef struct cmdfile_token_t
 	char* value;
 
 } CMDFILE_TOKEN;
+
+/// Global Variables structure.
+VARIABLES variables;
+
+/// Adds a new variable with given values.
+void
+var_add_variable(VARIABLES* vars, const char* name, const char* value);
+
+/// Sets the value for the given argument.
+void
+cmd_set_arg(CMDBLOCK* block, char* arg, char* value);
 
 /// Checks if the given file is a valid cdav commandfile.
 int

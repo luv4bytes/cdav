@@ -18,6 +18,7 @@ VAR
 }
 
 # This is how a command block looks like
+# The properties of a command block are named after the long names of the arguments.
 SetSomeProperties
 {
 	operation=proppatch;

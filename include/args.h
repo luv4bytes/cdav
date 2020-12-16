@@ -26,6 +26,63 @@
 #include "cdav.h"
 #include "helper.h"
 
+#define ARG_F_SHORT "-f"
+#define ARG_F_LONG "--file"
+
+#define ARG_O_SHORT "-o"
+#define ARG_O_LONG "--operation"
+
+#define ARG_A_SHORT "-a"
+#define ARG_A_LONG "--address"
+
+#define ARG_U_SHORT "-u"
+#define ARG_U_LONG "--user"
+
+#define ARG_PW_SHORT "-pw"
+#define ARG_PW_LONG "--password"
+
+#define ARG_P_SHORT "-p"
+#define ARG_P_LONG "--props"
+
+#define ARG_SP_SHORT "-sp"
+#define ARG_SP_LONG "--set-props"
+
+#define ARG_RP_SHORT "-rp"
+#define ARG_RP_LONG "--rm-props"
+
+#define ARG_DA_SHORT "-da"
+#define ARG_DA_LONG "--destination-address"
+
+#define ARG_NO_OW "--no-overwrite"
+
+#define ARG_UF_SHORT "-uf"
+#define ARG_UF_LONG "--upload-file"
+
+#define ARG_S_SHORT "-s"
+#define ARG_S_LONG "--save-as"
+
+#define ARG_D_SHORT "-d"
+#define ARG_D_LONG "--depth"
+
+#define ARG_LS_SHORT "-ls"
+#define ARG_LS_LONG "--lock-scope"
+
+#define ARG_LT_SHORT "-lt"
+#define ARG_LT_LONG "--lock-token"
+
+#define ARG_LO_SHORT "-lo"
+#define ARG_LO_LONG "--lock-owner"
+
+#define ARG_H_SHORT "-h"
+#define ARG_H_LONG "--help"
+
+#define ARG_V_SHORT "-v"
+#define ARG_V_LONG "--version"
+
+#define ARG_NO_REDIRECT "--no-redirect"
+
+#define ARG_PROXY "--proxy"
+
 /// Defines operations.
 typedef enum
 {
@@ -50,10 +107,10 @@ eval_op(const char* op);
 /// Defines a structure to hold argument values.
 typedef struct args_struct_t
 {
-	char* file;		// -f 	--file
+	char* file;			// -f 	--file
 	char* operation;	// -o 	--operation
 	char* address;		// -a 	--address
-	char* user;		// -u 	--user
+	char* user;			// -u 	--user
 	char* passwd;		// -pw 	--password
 	char* props;		// -p 	--props
 	char* set_props;	// -sp 	--set-props
@@ -63,7 +120,7 @@ typedef struct args_struct_t
 	char* upload_file;	// -uf 	--upload-file
 	char* save_as;		// -s 	--save-as
 	char* depth;		// -d 	--depth
-	int help;		// -h 	--help
+	int help;			// -h 	--help
 	int version;		// -v 	--version
 	char* lock_scope;	// -ls 	--lock-scope
 	char* lock_owner;	// -lo	--lock-owner

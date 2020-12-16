@@ -46,4 +46,9 @@ str_set_from_to(char* dest, char c, size_t from, size_t to);
 void
 str_to_upper(const char* str, char* buffer, size_t len);
 
+/// Compares the first string from 'from_first' to 'to_first' with the second string from 'from_sec' to 'to_sec'.
+int
+strcmp_from_to(const char* first, size_t from_first, size_t to_first,
+               const char* sec, size_t from_sec, size_t to_sec);
+
 #endif // HELPER_H
