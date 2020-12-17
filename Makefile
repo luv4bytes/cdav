@@ -22,22 +22,22 @@ dav: prep prop requests src/dav.c
 	$(CC) -c src/dav.c -o obj/dav.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
 prop: prep src/prop.c
-	$(CC) -c src/prop.c -o obj/prop.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
+	$(CC) -c src/prop.c -o obj/prop.o $(options) $(debug) $(test) $(version)
 
 requests: prep prop src/requests.c
 	$(CC) -c src/requests.c -o obj/requests.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
 args: prep src/args.c
-	$(CC) -c src/args.c -o obj/args.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
+	$(CC) -c src/args.c -o obj/args.o $(options) $(debug) $(test) $(version)
 
 cmdfile: prep src/cmdfile.c
-	$(CC) -c src/cmdfile.c -o obj/cmdfile.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
+	$(CC) -c src/cmdfile.c -o obj/cmdfile.o $(options) $(debug) $(test) $(version)
 
 err: prep src/err.c
-	$(CC) -c src/err.c -o obj/err.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
+	$(CC) -c src/err.c -o obj/err.o $(options) $(debug) $(test) $(version)
 
 helper: prep src/helper.c
-	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
+	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(test) $(version)
 
 deps:
 	apt-get install -y $(dependencies)
