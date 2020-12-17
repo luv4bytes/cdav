@@ -12,7 +12,7 @@ INCLUDE=-I/usr/include/libxml2/
 
 dependencies= libcurl4-openssl-dev libxml2-dev
 
-all: prep main dav prop args requests err helper cmdfile
+all: prep main dav prop args requests helper cmdfile
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(test) $(version) $(LIBS) $(INCLUDE)
 
 main: prep dav src/main.c
@@ -32,9 +32,6 @@ args: prep src/args.c
 
 cmdfile: prep src/cmdfile.c
 	$(CC) -c src/cmdfile.c -o obj/cmdfile.o $(options) $(debug) $(test) $(version)
-
-err: prep src/err.c
-	$(CC) -c src/err.c -o obj/err.o $(options) $(debug) $(test) $(version)
 
 helper: prep src/helper.c
 	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(test) $(version)

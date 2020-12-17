@@ -44,7 +44,7 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer, char* ns)
 		res = xmlTextWriterWriteElementNS(writer, (const xmlChar*)ns, (const xmlChar*)prop->name, NULL, (const xmlChar*) prop->value);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT);
 
 		return;
 	}
@@ -53,7 +53,7 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer, char* ns)
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)ns, (const xmlChar*)prop->name, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 	}
 
 	for(size_t i = 0; i < prop->children_size; i++)
@@ -64,7 +64,7 @@ cdav_write_prop(CDAV_PROP* prop, xmlTextWriterPtr writer, char* ns)
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 }
 
 char*
@@ -77,24 +77,24 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 	xmlBufferPtr buffer = xmlBufferCreate();
 
 	if (buffer == NULL)
-		error_exit(ERROR_XML_BUFFER);
+		ERROR_EXIT("%s\n", ERROR_XML_BUFFER);
 
 	xmlTextWriterPtr writer = xmlNewTextWriterMemory(buffer, 0);
 
 	if (writer == NULL)
-		error_exit(ERROR_XML_WRITER);
+		ERROR_EXIT("%s\n", ERROR_XML_WRITER);
 
 	res = xmlTextWriterSetIndent(writer, 1);
 
 	if (res < 0)
-		error_exit("Error setting indentation! - Exiting");
+		ERROR_EXIT("Error setting indentation! - Exiting");
 
 	// document start
 	char enc[] = "UTF-8";
 	res = xmlTextWriterStartDocument(writer, NULL, enc, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_DOC_START);
+		ERROR_EXIT("%s\n", ERROR_DOC_START);
 
 	char nsd[] = "D";
 	char name_propfind[] = "propfind";
@@ -104,7 +104,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_propfind, (const xmlChar*)nsd_uri);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	if (count > 1 || (count == 1 && strcmp(properties[0]->name, "allprop") != 0))
 	{
@@ -114,7 +114,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 	}
 
 	for(size_t i = 0; i < count; i++)
@@ -128,14 +128,14 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 		res = xmlTextWriterEndElement(writer);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_END);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 	}
 
 	// </propfind>
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	// document end
 	res = xmlTextWriterEndDocument(writer);
@@ -145,7 +145,7 @@ cdav_req_propfind(CDAV_PROP** properties, size_t count)
 #endif
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	int req_len = strlen((char*)buffer->content);
 	char* req = (char*)malloc(req_len);
@@ -171,24 +171,24 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 	xmlBufferPtr buffer = xmlBufferCreate();
 
 	if (buffer == NULL)
-		error_exit(ERROR_XML_BUFFER);
+		ERROR_EXIT("%s\n", ERROR_XML_BUFFER);
 
 	xmlTextWriterPtr writer = xmlNewTextWriterMemory(buffer, 0);
 
 	if (writer == NULL)
-		error_exit(ERROR_XML_WRITER);
+		ERROR_EXIT("%s\n", ERROR_XML_WRITER);
 
 	res = xmlTextWriterSetIndent(writer, 1);
 
 	if (res < 0)
-		error_exit("Error setting indentation! - Exiting");
+		ERROR_EXIT("Error setting indentation! - Exiting");
 
 	// document start
 	char enc[] = "UTF-8";
 	res = xmlTextWriterStartDocument(writer, NULL, enc, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_DOC_START);
+		ERROR_EXIT("%s\n", ERROR_DOC_START);
 
 	char nsd[] = "D";
 	char name_propertyupdate[] = "propertyupdate";
@@ -198,7 +198,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_propertyupdate, (const xmlChar*)nsd_uri);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	if (set_count > 0)
 	{
@@ -208,7 +208,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_set, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 		char name_prop[] = "prop";
 
@@ -216,7 +216,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 		for(size_t i = 0; i < set_count; i++)
 		{
@@ -230,7 +230,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 		res = xmlTextWriterEndElement(writer);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_END);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 	}
 
 	if (rm_count > 0)
@@ -241,7 +241,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_rm, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 		char name_prop[] = "prop";
 
@@ -249,7 +249,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_prop, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 		for(size_t i = 0; i < set_count; i++)
 		{
@@ -263,7 +263,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 		res = xmlTextWriterEndElement(writer);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_END);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	}
 
@@ -271,7 +271,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	// document end
 	res = xmlTextWriterEndDocument(writer);
@@ -281,7 +281,7 @@ cdav_req_proppatch(CDAV_PROP** set_props,
 #endif
 
 	if (res < 0)
-		error_exit(ERROR_DOC_END);
+		ERROR_EXIT("%s\n", ERROR_DOC_END);
 
 	int req_len = strlen((char*)buffer->content);
 	char* req = (char*)malloc(req_len);
@@ -305,24 +305,24 @@ cdav_req_lock(const char* scope,
 	xmlBufferPtr buffer = xmlBufferCreate();
 
 	if (buffer == NULL)
-		error_exit(ERROR_XML_BUFFER);
+		ERROR_EXIT("%s\n", ERROR_XML_BUFFER);
 
 	xmlTextWriterPtr writer = xmlNewTextWriterMemory(buffer, 0);
 
 	if (writer == NULL)
-		error_exit(ERROR_XML_WRITER);
+		ERROR_EXIT("%s\n", ERROR_XML_WRITER);
 
 	res = xmlTextWriterSetIndent(writer, 1);
 
 	if (res < 0)
-		error_exit("Error setting indentation! - Exiting");
+		ERROR_EXIT("%s\n", "Error setting indentation! - Exiting");
 
 	// document start
 	char enc[] = "UTF-8";
 	res = xmlTextWriterStartDocument(writer, NULL, enc, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_DOC_START);
+		ERROR_EXIT("%s\n", ERROR_DOC_START);
 
 	char nsd[] = "D";
 	char name_lockinfo[] = "lockinfo";
@@ -332,7 +332,7 @@ cdav_req_lock(const char* scope,
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_lockinfo, (const xmlChar*)nsd_uri);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	char name_lockscope[] = "lockscope";
 
@@ -340,24 +340,24 @@ cdav_req_lock(const char* scope,
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_lockscope, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	// <scope/>
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)scope, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	// </lockscope>
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	char name_locktype[] = "locktype";
 	char locktype[] = "write";
@@ -366,24 +366,24 @@ cdav_req_lock(const char* scope,
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_locktype, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	// <type/>
 	res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)locktype, NULL);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_START);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	// </locktype>
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	if (owner != NULL)
 	{
@@ -393,31 +393,31 @@ cdav_req_lock(const char* scope,
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)name_owner, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 		// <ownervalue/>
 		res = xmlTextWriterStartElementNS(writer, (const xmlChar*)nsd, (const xmlChar*)owner, NULL);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_START);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_START);
 
 		res = xmlTextWriterEndElement(writer);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_END);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 		// </owner>
 		res = xmlTextWriterEndElement(writer);
 
 		if (res < 0)
-			error_exit(ERROR_ELEMENT_END);
+			ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 	}
 
 	// </lockinfo>
 	res = xmlTextWriterEndElement(writer);
 
 	if (res < 0)
-		error_exit(ERROR_ELEMENT_END);
+		ERROR_EXIT("%s\n", ERROR_ELEMENT_END);
 
 	// document end
 	res = xmlTextWriterEndDocument(writer);
@@ -427,7 +427,7 @@ cdav_req_lock(const char* scope,
 #endif
 
 	if (res < 0)
-		error_exit(ERROR_DOC_END);
+		ERROR_EXIT("%s\n", ERROR_DOC_END);
 
 	int req_len = strlen((char*)buffer->content);
 	char* req = (char*)malloc(req_len);

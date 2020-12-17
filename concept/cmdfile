@@ -13,7 +13,7 @@
 
 VAR
 {
-	user=somedude;
+	user="somed#ude";
 	password=verysecret;
 }
 

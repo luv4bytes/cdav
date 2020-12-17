@@ -40,7 +40,6 @@
 #define BLOCK_VAR "VAR"
 
 #define NAME_LEN 1024
-#define MAX_VARS 1024
 
 /// Defines the types for command blocks.
 typedef enum

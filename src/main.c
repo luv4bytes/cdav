@@ -301,9 +301,7 @@ main(int argc, char* argv[])
 	if (init != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(init);
-		fprintf(stderr, "CURL ERR: %d - %s\n", init, err);
-
-		error_exit("CURL ERR: Exiting\n");
+		ERROR_EXIT( "CURL ERR: %d - %s\n", init, err)
 	}
 
 	CDAV_BASIC_PARAMS params;
@@ -399,10 +397,10 @@ main(int argc, char* argv[])
 			break;
 
 		case UNKNOWN:
-			error_exit(UNKNOWN_OPERATION);
+			ERROR_EXIT("%s\n", UNKNOWN_OPERATION);
 
 		default:
-			error_exit(UNKNOWN_OPERATION);
+			ERROR_EXIT("%s\n", UNKNOWN_OPERATION);
 	}
 
 	curl_global_cleanup();

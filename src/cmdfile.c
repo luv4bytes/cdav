@@ -38,7 +38,7 @@ isCdavFile(FILE* file)
 		int err = errno;
 		char* errstr = strerror(err);
 
-		error_exit(errstr);
+		ERROR_EXIT("%s\n", errstr);
 	}
 
 	if (strstr(line, EXEC_DIRECTIVE) == NULL)
@@ -99,10 +99,6 @@ lex_cmdfile(FILE* file, size_t* count)
 
 	char symbol[NAME_LEN];
 	memset(symbol, 0, NAME_LEN);
-
-	/* TODO:
-	Escaped chars
-	*/
 
 	while( (read = getline(&line, &sz, file)) != -1)	
 	{
@@ -443,7 +439,7 @@ CMDBLOCK*
 parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 {
 	if (tokens == NULL)
-		error_exit("No tokens for parsing.");
+		ERROR_EXIT("No tokens for parsing.");
 
 	CMDBLOCK* blocks = NULL;
 	size_t blockCount = 0;
@@ -477,7 +473,7 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 				if (next->type == CMD_VALUEIDENT)
 				{
 					if ((ind + 1) > count || (ind + 2) > count)
-						error_exit("Error on value identifiers. Please check assignments.");
+						ERROR_EXIT("%s\n", "Error on value identifiers. Please check assignments.");
 
 					CMDFILE_TOKEN* val = &tokens[ind + 1];
 					CMDFILE_TOKEN* end = &tokens[ind + 2];
@@ -546,14 +542,14 @@ void
 exec_cmdfile(const char* file)
 {
 	if (file == NULL)
-		error_exit(PROVIDE_COMMANDFILE);
+		ERROR_EXIT("%s\n", PROVIDE_COMMANDFILE);
 
 	if (access(file, R_OK) != 0)
 	{
 		int err = errno;
 		const char* errstr = strerror(err);
 
-		error_exit(errstr);
+		ERROR_EXIT("%s\n", errstr);
 	}
 
 	FILE* cdavfile;
@@ -563,7 +559,7 @@ exec_cmdfile(const char* file)
 	if (fsz == -1)
 	{
 		int err = errno;
-		error_exit(strerror(err));
+		ERROR_EXIT("%s\n", strerror(err));
 	}
 
 	cdavfile = fopen(file, "r");
@@ -571,11 +567,11 @@ exec_cmdfile(const char* file)
 	if (cdavfile == NULL)
 	{
 		int err = errno;
-		error_exit(strerror(err));
+		ERROR_EXIT("%s\n", strerror(err));
 	}
 
 	if (isCdavFile(cdavfile) == -1)
-		error_exit(INVALID_COMMANDFILE);
+		ERROR_EXIT("%s\n", INVALID_COMMANDFILE);
 
 	size_t count = 0;
 

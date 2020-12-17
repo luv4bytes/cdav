@@ -7,10 +7,12 @@ cdav is currently in its initial development phase.
 - Commandfile
 
 ### Pending:
-- Formatted output (json)
-- Other authentication methods
-- CardDAV
-- CalDAV
+- Formatted output
+- GUI (cdav-gtk)
+
+### Ideas:
+- Implement CardDAV
+- Implement CalDAV
 
 ## Compile
 

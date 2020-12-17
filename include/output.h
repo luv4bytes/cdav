@@ -20,11 +20,9 @@
  *
 */
 
-#ifndef ERR_H
-#define ERR_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-#include "cdav.h"
+#define OUT_INFO(...) fprintf(stdout, "%s\n", "<| INFO |>"), fprintf(stdout, __VA_ARGS__);
 
-#define ERROR_EXIT(...) fprintf(stderr, "%s\n", "<| ERROR |>"), fprintf(stderr, __VA_ARGS__), exit(EXIT_FAILURE);
-
-#endif // ERR_H
+#endif // OUTPUT_H

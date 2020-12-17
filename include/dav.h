@@ -25,6 +25,7 @@
 
 #include "cdav.h"
 #include "err.h"
+#include "output.h"
 #include "requests.h"
 #include "args.h"
 #include "helper.h"
