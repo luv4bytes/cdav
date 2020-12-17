@@ -1,0 +1,16 @@
+name: make-dependencies
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Run Makefile Deps
+      run: make deps
