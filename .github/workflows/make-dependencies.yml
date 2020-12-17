@@ -13,4 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Run Makefile Deps
-      run: make deps
+      run: sudo make deps
