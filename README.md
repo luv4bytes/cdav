@@ -1,3 +1,5 @@
+![](https://github.com/luv4bytes/cdav/workflows/make-master/badge.svg)
+
 # cdav
 Console WebDAV client for Linux.
 
