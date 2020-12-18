@@ -111,6 +111,9 @@ lex_cmdfile(FILE* file, size_t* count)
 
 		for(size_t i = 0; i < read; i++)
 		{
+			if (line[i] == ' ')
+				continue;
+
 			if (line[i] == '\n')
 			{
 				free(line);
@@ -119,7 +122,7 @@ lex_cmdfile(FILE* file, size_t* count)
 			}
 
 			if (line[i] == '\t')
-				symbolIndex--;
+				continue;
 
 			if (line[i] == CMDTOK_COMMENTSTART)
 			{
@@ -338,7 +341,7 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 	if (block == NULL)
 		return;
 
-	if (strcmp(arg, PARALLELITY) == 0)
+	if (strcmp(arg, EXEC_ORDER) == 0)
 	{
 		if (value == NULL)
 		{

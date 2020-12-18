@@ -42,8 +42,8 @@
 
 #define NAME_LEN 1024
 
-/// The parallelity level of a command block.
-#define PARALLELITY "parallelity"
+/// The execution order of a command block.
+#define EXEC_ORDER "order"
 
 /// Defines the types for command blocks.
 typedef enum
