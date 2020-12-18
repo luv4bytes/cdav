@@ -6,7 +6,7 @@ on:
       - main
     paths-ignore:
       - ".github/**"
-      - "concept" 
+      - "concept/**" 
 
 jobs:
   make-master:
