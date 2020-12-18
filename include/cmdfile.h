@@ -27,6 +27,7 @@
 #include "err.h"
 #include "helper.h"
 #include "args.h"
+#include "dav.h"
 
 #define EXEC_DIRECTIVE "!cdav!"
 
@@ -59,8 +60,8 @@ typedef struct cmdblock_t
 	ARGS args;
 	CMDBLOCK_TYPE type;
 
-	const char* name;
-	const char* parallelity;
+	char* name;
+	char* executionOrder;
 
 } CMDBLOCK;
 
@@ -128,7 +129,11 @@ lex_cmdfile(FILE* file, size_t* count);
 
 /// Parses the given tokens to CMDBLOCK*.
 CMDBLOCK*
-parse_tokens(CMDFILE_TOKEN* tokens, size_t count);
+parse_tokens(CMDFILE_TOKEN* tokens, size_t count, size_t* createdBlocks);
+
+/// Executes the given blocks.
+void
+exec_cmdblocks(CMDBLOCK* blocks, size_t count);
 
 /// Frees the memory used by the CMDFILE_TOKEN.
 void

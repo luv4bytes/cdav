@@ -31,7 +31,7 @@ args: prep src/args.c
 	$(CC) -c src/args.c -o obj/args.o $(options) $(debug) $(ignore_ssl_erros) $(version)
 
 cmdfile: prep src/cmdfile.c
-	$(CC) -c src/cmdfile.c -o obj/cmdfile.o $(options) $(debug) $(ignore_ssl_erros) $(version)
+	$(CC) -c src/cmdfile.c -o obj/cmdfile.o $(options) $(debug) $(ignore_ssl_erros) $(version) $(LIBS) $(INCLUDE)
 
 helper: prep src/helper.c
 	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(ignore_ssl_erros) $(version)

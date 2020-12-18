@@ -340,7 +340,15 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 
 	if (strcmp(arg, PARALLELITY) == 0)
 	{
-		block->parallelity = value;
+		if (value == NULL)
+		{
+			block->executionOrder = NULL;
+			return;
+		}
+
+		block->executionOrder = (char*) calloc(0, sizeof(char) * strlen(value));
+		strcpy(block->executionOrder, value);
+
 		return;
 	}
 
@@ -468,7 +476,7 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 }
 
 CMDBLOCK*
-parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
+parse_tokens(CMDFILE_TOKEN* tokens, size_t count, size_t* createdBlocks)
 {
 	if (tokens == NULL)
 		ERROR_EXIT("No tokens for parsing.");
@@ -478,6 +486,7 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 	CMDBLOCK lastBlock;
 	
 	init_args(&lastBlock.args);
+	lastBlock.executionOrder = NULL;
 
 	for(size_t i = 0; i < count; i++)
 	{
@@ -566,7 +575,10 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 				blocks = (CMDBLOCK*) realloc(blocks, sizeof(CMDBLOCK) * ++blockCount);
 				blocks[blockCount - 1] = lastBlock;
 
+				*createdBlocks = blockCount;
+
 				init_args(&lastBlock.args);
+				lastBlock.executionOrder = NULL;
 
 				break;
 
@@ -581,6 +593,21 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 	#endif 
 
 	return blocks;
+}
+
+void
+exec_cmdblocks(CMDBLOCK* blocks, size_t count)
+{
+	if (count <= 1)
+		return;
+
+	for(size_t i = 0; i < count; i++)
+	{
+		if (blocks[i].type != VAR && blocks[i].executionOrder == NULL)
+			ERROR_EXIT("Block %s needs to have a parallelity defined.", blocks[i].name)
+	}
+
+	// TODO: Order blocks by parallelity and execute blocks
 }
 
 void
@@ -618,12 +645,14 @@ exec_cmdfile(const char* file)
 	if (isCdavFile(cdavfile) == -1)
 		ERROR_EXIT("%s\n", INVALID_COMMANDFILE)
 
-	size_t count = 0;
+	size_t tokenCount = 0;
+	size_t blockCount = 0;
 
-	CMDFILE_TOKEN* tokens = lex_cmdfile(cdavfile, &count);	
-	CMDBLOCK* blocks = parse_tokens(tokens, count);
+	CMDFILE_TOKEN* tokens = lex_cmdfile(cdavfile, &tokenCount);	
+	CMDBLOCK* blocks = parse_tokens(tokens, tokenCount, &blockCount);
 
-	// TODO: Execute blocks
+	exec_cmdblocks(blocks, blockCount);
+
 	// TODO: Free tokens
 
 	fclose(cdavfile);
