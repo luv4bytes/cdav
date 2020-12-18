@@ -1,0 +1,19 @@
+name: ubuntu-16.04
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore: .github/**
+
+jobs:
+  make-master:
+
+    runs-on: ubuntu-16.04
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Makefile Dependencies
+        run: sudo make deps
+      - name: Run Makefile
+        run: make
