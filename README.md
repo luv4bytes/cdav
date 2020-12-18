@@ -1,4 +1,5 @@
-![](https://github.com/luv4bytes/cdav/workflows/make-master/badge.svg)
+![](https://github.com/luv4bytes/cdav/workflows/ubuntu-16.04/badge.svg)
+![](https://github.com/luv4bytes/cdav/workflows/ubuntu-18.04/badge.svg)
 
 # cdav
 Console WebDAV client for Linux.
