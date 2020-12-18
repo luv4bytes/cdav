@@ -41,6 +41,9 @@
 
 #define NAME_LEN 1024
 
+/// The parallelity level of a command block.
+#define PARALLELITY "parallelity"
+
 /// Defines the types for command blocks.
 typedef enum
 {
@@ -57,7 +60,7 @@ typedef struct cmdblock_t
 	CMDBLOCK_TYPE type;
 
 	const char* name;
-	int parallelity_level;
+	const char* parallelity;
 
 } CMDBLOCK;
 
@@ -67,7 +70,7 @@ typedef struct variables_t
 	char** names;
 	char** values;
 
-	size_t lastIndex;
+	size_t count;
 	
 } VARIABLES;
 
@@ -98,6 +101,10 @@ VARIABLES variables;
 /// Adds a new variable with given values.
 void
 var_add_variable(VARIABLES* vars, const char* name, const char* value);
+
+/// Gets the value associated with the given variable.
+char*
+var_get_value(char* variable);
 
 /// Sets the value for the given argument.
 void

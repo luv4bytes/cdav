@@ -30,7 +30,7 @@ SetSomeProperties
 	no-redirect;
 	
 	# To specify parallel execution of blocks the "parallel-level" can be used to specify the order and parallelity of block execution.
-	parallel-level=0;
+	parallelity=0;
 }
 
 GetAllInfo
@@ -41,5 +41,5 @@ GetAllInfo
 	password=$password;
 	props="allprop";
 	depth=infinity;
-	parallel-level=0;
+	parallelity=0;
 }

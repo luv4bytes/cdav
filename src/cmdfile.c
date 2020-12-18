@@ -38,7 +38,7 @@ isCdavFile(FILE* file)
 		int err = errno;
 		char* errstr = strerror(err);
 
-		ERROR_EXIT("%s\n", errstr);
+		ERROR_EXIT("%s\n", errstr)
 	}
 
 	if (strstr(line, EXEC_DIRECTIVE) == NULL)
@@ -294,16 +294,42 @@ var_add_variable(VARIABLES* vars, const char* name, const char* value)
 	if (vars == NULL)
 		return;
 
-	vars->names = (char**) realloc(vars->names, sizeof(char*) * vars->lastIndex + 1);
-	vars->values = (char**) realloc(vars->values, sizeof(char*) * vars->lastIndex + 1);
+	vars->names = (char**) realloc(vars->names, sizeof(char*) * vars->count);
+	vars->values = (char**) realloc(vars->values, sizeof(char*) * vars->count);
 	
-	vars->names[vars->lastIndex] = (char*) calloc(0, strlen(name) + 1);
-	strcpy(vars->names[vars->lastIndex], name);
+	vars->count++;
 
-	vars->values[vars->lastIndex] = (char*) calloc(0, strlen(name) + 1);
-	strcpy(vars->values[vars->lastIndex], value);
+	vars->names[vars->count - 1] = (char*) calloc(0, strlen(name) + 1);
+	strcpy(vars->names[vars->count - 1], name);
 
-	vars->lastIndex++;
+	vars->values[vars->count - 1] = (char*) calloc(0, strlen(name) + 1);
+	strcpy(vars->values[vars->count - 1], value);
+}
+
+char*
+var_get_value(char* variable)
+{
+	if (variable == NULL)
+		return NULL;
+
+	size_t len = strlen(variable);
+
+	char buffer[len];
+	memset(buffer, 0, len);
+
+	str_cpy_from_to(buffer, variable, 1, len);
+
+	for(size_t i = 0; i < variables.count; i++)
+	{
+		#ifdef DEBUG
+			printf("%s - %s\n", variables.names[i], variables.values[i]);
+		#endif
+
+		if (strcmp(variables.names[i], buffer) == 0)
+			return variables.values[i];
+	}
+
+	return NULL;
 }
 
 void
@@ -311,6 +337,12 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 {
 	if (block == NULL)
 		return;
+
+	if (strcmp(arg, PARALLELITY) == 0)
+	{
+		block->parallelity = value;
+		return;
+	}
 
 	if (strcmp_from_to(arg, 0, strlen(arg), ARG_F_LONG, 2, strlen(ARG_F_LONG)) == 0)
 	{
@@ -464,12 +496,6 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 		{
 			case CMD_ASSIGN:
 
-				if (lastBlock.type == VAR)
-				{
-					var_add_variable(&variables, before->value, next->value);
-					break;
-				}
-
 				if (next->type == CMD_VALUEIDENT)
 				{
 					if ((ind + 1) > count || (ind + 2) > count)
@@ -477,12 +503,35 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 
 					CMDFILE_TOKEN* val = &tokens[ind + 1];
 					CMDFILE_TOKEN* end = &tokens[ind + 2];
-
+				
 					if (end->type == CMD_VALUEIDENT)
 					{
+						if (lastBlock.type == VAR)
+						{
+							var_add_variable(&variables, before->value, val->value);
+							break;
+						}
+
 						cmd_set_arg(&lastBlock, before->value, val->value);
 						break;	
 					}
+				}
+
+				if (next->value[0] == '$')
+				{
+					char* val = var_get_value(next->value);
+
+					if (val == NULL)
+						ERROR_EXIT("Given variable %s is not a valid variable.\n", next->value)
+
+					free(next->value);
+					next->value = val;
+				}
+
+				if (lastBlock.type == VAR)
+				{ 
+					var_add_variable(&variables, before->value, next->value);
+					break;
 				}
 
 				cmd_set_arg(&lastBlock, before->value, next->value);
@@ -526,10 +575,6 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count)
 		}
 	}
 	
-	/* TODO: 
-	Variables '$'
-	*/
-
 	#ifdef DEBUG
 		for(int i = 0; i < blockCount; i++)
 			printf("%s\n", blocks[i].name);
@@ -542,14 +587,14 @@ void
 exec_cmdfile(const char* file)
 {
 	if (file == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_COMMANDFILE);
+		ERROR_EXIT("%s\n", PROVIDE_COMMANDFILE)
 
 	if (access(file, R_OK) != 0)
 	{
 		int err = errno;
 		const char* errstr = strerror(err);
 
-		ERROR_EXIT("%s\n", errstr);
+		ERROR_EXIT("%s\n", errstr)
 	}
 
 	FILE* cdavfile;
@@ -567,11 +612,11 @@ exec_cmdfile(const char* file)
 	if (cdavfile == NULL)
 	{
 		int err = errno;
-		ERROR_EXIT("%s\n", strerror(err));
+		ERROR_EXIT("%s\n", strerror(err))
 	}
 
 	if (isCdavFile(cdavfile) == -1)
-		ERROR_EXIT("%s\n", INVALID_COMMANDFILE);
+		ERROR_EXIT("%s\n", INVALID_COMMANDFILE)
 
 	size_t count = 0;
 

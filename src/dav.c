@@ -32,7 +32,7 @@ print_redirect_info(CDAV_BASIC_PARAMS* params, CURL* curl)
 		curl_easy_getinfo(curl, CURLINFO_REDIRECT_URL, &loc);
 
 		if (loc != NULL)
-			OUT_INFO("Redirect not allowed. Redirect location would be %s\n", loc);
+			OUT_INFO("Redirect not allowed. Redirect location would be %s\n", loc)
 	}
 }
 
@@ -40,10 +40,10 @@ void
 basic_params_check(CDAV_BASIC_PARAMS* params)
 {
 	if (params == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_PARAMS);
+		ERROR_EXIT("%s\n", PROVIDE_PARAMS)
 
 	if (params->url == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_URL);
+		ERROR_EXIT("%s\n", PROVIDE_URL)
 }
 
 void
@@ -55,7 +55,7 @@ cdav_handle_rescode(CURL* curl)
 	char msg[] = "Response: %ld\n";
 
 	if (res_code >= 400)
-		ERROR_EXIT(msg, res_code);
+		ERROR_EXIT(msg, res_code)
 }
 
 size_t
@@ -123,7 +123,7 @@ cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 			int err = errno;
 			const char* errstr = strerror(err);
 
-			ERROR_EXIT("Error writing data: %d - %s\n", err, errstr);
+			ERROR_EXIT("Error writing data: %d - %s\n", err, errstr)
 		}
 	}
 
@@ -137,7 +137,7 @@ cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 		fclose(w_params->file);
 		w_params->file = NULL;
 
-		ERROR_EXIT("Error writing data: %d - %s\n", err, errstr);
+		ERROR_EXIT("Error writing data: %d - %s\n", err, errstr)
 	}
 
 	return res_sz;
@@ -163,7 +163,7 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 			int err = errno;
 			const char* errstr = strerror(err);
 
-			ERROR_EXIT("Error reading data: %d - %s\n", err, errstr);
+			ERROR_EXIT("Error reading data: %d - %s\n", err, errstr)
 		}
 	}
 
@@ -177,7 +177,7 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 		fclose(r_params->file);
 		r_params->file = NULL;
 
-		ERROR_EXIT("Error reading data: %d - %s\n", err, errstr);
+		ERROR_EXIT("Error reading data: %d - %s\n", err, errstr)
 	}
 
 	return bytes_read;
@@ -202,21 +202,22 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	basic_params_check(basic_params);
 
 	if (save_as == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_SAVEPATH);
+		ERROR_EXIT("%s\n", PROVIDE_SAVEPATH)
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
 	CDAV_WRITE_FILE_PARAMS params;
 	params.file = NULL;
 	params.save_as = save_as;
 	params.curl = curl;
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_write_file);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
@@ -227,14 +228,14 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("GET - %s\n", basic_params->url);
+	OUT_INFO("GET - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
@@ -253,11 +254,12 @@ cdav_head(CDAV_BASIC_PARAMS* basic_params)
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -279,7 +281,7 @@ cdav_head(CDAV_BASIC_PARAMS* basic_params)
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("HEAD - %s\n", basic_params->url);
+	OUT_INFO("HEAD - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -320,7 +322,7 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	{
 		int err = errno;
 		const char* errstr = strerror(err);
-		ERROR_EXIT("Error reading file size: %d - %s\n", err, errstr);
+		ERROR_EXIT("Error reading file size: %d - %s\n", err, errstr)
 	}
 
 	CDAV_READ_FILE_PARAMS params;
@@ -329,9 +331,10 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	params.file_sz = file_sz;
 	params.curl = curl;
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &cdav_read_file);
 	curl_easy_setopt(curl, CURLOPT_READDATA, (void*) &params);
@@ -346,14 +349,14 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("PUT - %s\n", basic_params->url);
+	OUT_INFO("PUT - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
@@ -373,16 +376,17 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 	basic_params_check(basic_params);
 
 	if (props == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_PROPS);
+		ERROR_EXIT("%s\n", PROVIDE_PROPS)
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -406,7 +410,7 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 		headers_check = curl_slist_append(headers, d);
 
 		if (headers_check == NULL)
-			ERROR_EXIT("%s\n", "Error creating Depth header! - Exiting.");
+			ERROR_EXIT("%s\n", "Error creating Depth header! - Exiting.")
 
 		headers = headers_check;
 	}
@@ -430,14 +434,14 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("PROPFIND - %s\n", basic_params->url);
+	OUT_INFO("PROPFIND - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	OUT_INFO("%s\n", params.buffer);
@@ -471,19 +475,20 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 	basic_params_check(basic_params);
 
 	if (set_props == NULL && set_count > 0)
-		ERROR_EXIT("%s\n", INVALID_PROPERTIES);
+		ERROR_EXIT("%s\n", INVALID_PROPERTIES)
 
 	if (rm_props == NULL && rm_count > 0)
-		ERROR_EXIT("%s\n", INVALID_PROPERTIES);
+		ERROR_EXIT("%s\n", INVALID_PROPERTIES)
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -507,7 +512,7 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("PROPPATCH - %s\n", basic_params->url);
+	OUT_INFO("PROPPATCH - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
@@ -517,7 +522,7 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
 	}
 
-	OUT_INFO("%s\n", params.buffer);
+	OUT_INFO("%s\n", params.buffer)
 
 	free(request);
 
@@ -547,11 +552,12 @@ cdav_mkcol(CDAV_BASIC_PARAMS* basic_params)
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -572,20 +578,20 @@ cdav_mkcol(CDAV_BASIC_PARAMS* basic_params)
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("MKCOL - %s\n", basic_params->url);
+	OUT_INFO("MKCOL - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+		OUT_INFO("%s\n", params.buffer)
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -601,11 +607,12 @@ cdav_delete(CDAV_BASIC_PARAMS* basic_params)
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -626,20 +633,20 @@ cdav_delete(CDAV_BASIC_PARAMS* basic_params)
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("DELETE - %s\n", basic_params->url);
+	OUT_INFO("DELETE - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+		OUT_INFO("%s\n", params.buffer)
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -655,17 +662,17 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 	basic_params_check(basic_params);
 
 	if (destination == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_DESTINATION);
+		ERROR_EXIT("%s\n", PROVIDE_DESTINATION)
 
 	if (overwrite < 0 || overwrite > 1)
-		ERROR_EXIT("%s\n", INVALID_OVERWRITE);
+		ERROR_EXIT("%s\n", INVALID_OVERWRITE)
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
@@ -683,7 +690,7 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 	headers = curl_slist_append(headers, des);
 
 	if (headers == NULL)
-		ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.");
+		ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.")
 
 	if (overwrite == 0)
 	{
@@ -692,7 +699,7 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 		headers = curl_slist_append(headers, ovwr);
 
 		if (headers == NULL)
-			ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.");
+			ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.")
 	}
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -711,7 +718,7 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("COPY - %s\n", basic_params->url);
+	OUT_INFO("COPY - %s\n", basic_params->url)
 	printf("%s\n", des);
 
 	CURLcode result = curl_easy_perform(curl);
@@ -719,13 +726,13 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+		OUT_INFO("%s\n", params.buffer)
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -744,19 +751,20 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 	basic_params_check(basic_params);
 
 	if (destination == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_DESTINATION);
+		ERROR_EXIT("%s\n", PROVIDE_DESTINATION)
 
 	if (overwrite < 0 || overwrite > 1)
-		ERROR_EXIT("%s\n", INVALID_OVERWRITE);
+		ERROR_EXIT("%s\n", INVALID_OVERWRITE)
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -772,7 +780,7 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 	headers = curl_slist_append(headers, des);
 
 	if (headers == NULL)
-		ERROR_EXIT("Error creating Destination header! - Exiting.");
+		ERROR_EXIT("Error creating Destination header! - Exiting.")
 
 	if (overwrite == 0)
 	{
@@ -781,7 +789,7 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 		headers = curl_slist_append(headers, ovwr);
 
 		if (headers == NULL)
-			ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.");
+			ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.")
 	}
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -800,7 +808,7 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("MOVE - %s\n", basic_params->url);
+	OUT_INFO("MOVE - %s\n", basic_params->url)
 	printf("%s\n", des);
 
 	CURLcode result = curl_easy_perform(curl);
@@ -808,13 +816,13 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+		OUT_INFO("%s\n", params.buffer)
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -829,10 +837,10 @@ void
 cdav_check_lockscope(const char* scope)
 {
 	if (scope == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_LOCKSCOPE);
+		ERROR_EXIT("%s\n", PROVIDE_LOCKSCOPE)
 
 	if ( (strcmp(scope, "exclusive") != 0) && (strcmp(scope, "shared") != 0) )
-		ERROR_EXIT("%s\n", PROVIDE_LOCKSCOPE);
+		ERROR_EXIT("%s\n", PROVIDE_LOCKSCOPE)
 }
 
 void
@@ -848,11 +856,12 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -868,7 +877,7 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 		headers = curl_slist_append(headers, depth);
 
 		if (headers == NULL)
-			ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.");
+			ERROR_EXIT("%s\n", "Error creating Destination header! - Exiting.")
 	}
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -890,20 +899,20 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("LOCK - %s\n", basic_params->url);
+	OUT_INFO("LOCK - %s\n", basic_params->url)
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+		OUT_INFO("%s\n", params.buffer)
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -920,16 +929,17 @@ cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 	basic_params_check(basic_params);
 
 	if (lock_token == NULL)
-		ERROR_EXIT("%s\n", PROVIDE_LOCKTOKEN);
+		ERROR_EXIT("%s\n", PROVIDE_LOCKTOKEN)
 
 	CURL* curl = curl_easy_init();
 
 	if (curl == NULL)
-		ERROR_EXIT("%s\n", INIT_ERROR);
+		ERROR_EXIT("%s\n", INIT_ERROR)
 
-#ifdef TEST
+#ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 #endif
+
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 
@@ -945,7 +955,7 @@ cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 	headers = curl_slist_append(headers, tok);
 
 	if (headers == NULL)
-		ERROR_EXIT("%s\n", "Error creating Lock-Token header! - Exiting.");
+		ERROR_EXIT("%s\n", "Error creating Lock-Token header! - Exiting.")
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -963,20 +973,20 @@ cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 
 	cdav_set_user_pw(curl, basic_params->user, basic_params->passwd);
 
-	OUT_INFO("UNLOCK - %s\n", basic_params->url);
+	OUT_INFO("UNLOCK - %s\n", basic_params->url)   
 
 	CURLcode result = curl_easy_perform(curl);
 
 	if (result != CURLE_OK)
 	{
 		const char* err = curl_easy_strerror(result);
-		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
+		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+		OUT_INFO("%s\n", params.buffer)
 
 	if (params.buffer != NULL)
 		free(params.buffer);
