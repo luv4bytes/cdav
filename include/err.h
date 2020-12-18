@@ -25,6 +25,7 @@
 
 #include "cdav.h"
 
-#define ERROR_EXIT(...) fprintf(stderr, "%s\n", "\e[1m\e[31m<| ERROR |>\e[0m"), fprintf(stderr, __VA_ARGS__), exit(EXIT_FAILURE);
+/// Prints given error message and exits program.
+#define ERROR_EXIT(...) fprintf(stdout, "%s\n", "\e[1m\e[31m<| ERROR |>\e[0m"), fprintf(stderr, __VA_ARGS__), exit(EXIT_FAILURE);
 
 #endif // ERR_H
