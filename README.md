@@ -5,7 +5,7 @@
 Scriptable CLI WebDAV client for Linux.
 
 
-cdav aims to supports all operations defined in RFC 4918.
+cdav aims to support all operations defined in RFC 4918.
 For further information about WebDAV see <a href="https://tools.ietf.org/html/rfc4918">IETF RFC 4918</a>.
 
 ## Currently working on
