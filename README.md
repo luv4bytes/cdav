@@ -25,5 +25,4 @@ cdav requires following libraries to be built:
 
 
 ## Help
-To get information and help about arguments and property syntax run `cdav -h` or `cdav` without any arguments.
-For detailed information on how to use command files refer to the offical <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>.
+For detailed information on cdav (arguments, commandfile etc.) refer to the offical <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>.
