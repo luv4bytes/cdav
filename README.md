@@ -8,6 +8,10 @@ Scriptable CLI WebDAV client for Linux.
 cdav aims to support all operations defined in RFC 4918.
 For further information about WebDAV see <a href="https://tools.ietf.org/html/rfc4918">IETF RFC 4918</a>.
 
+## Contribute
+I'd love to here ideas and suggestions! If you want to work on `cdav` just fork it and let's go! :smile:  
+Keep an eye on *Currently working on* and *Pending*. Otherwise I'll probably open issues on subjects!
+
 ## Currently working on
 -  <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>
 
