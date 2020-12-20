@@ -16,7 +16,6 @@ Keep an eye on *Currently working on* and *Pending*. Otherwise I'll probably ope
 -  <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>
 
 ## Pending:
-- Formatted output
 - GUI (cdav-gtk)
 
 ## Build
