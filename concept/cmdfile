@@ -33,6 +33,19 @@ SetSomeProperties
 	order =0;
 }
 
+RmSomeProperties
+{
+	operation=proppatch;
+	address="https://example.com/dav/test.jpg";
+	user=$user;
+	password=verysecretpassword;
+	rm-props="tesprop, hello, parent";
+	proxy="https://proxy.com/";
+	no-redirect;
+	
+	order = 1;
+}
+
 GetAllInfo
 {
 	operation=propfind;

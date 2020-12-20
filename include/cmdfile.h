@@ -28,6 +28,7 @@
 #include "helper.h"
 #include "args.h"
 #include "dav.h"
+#include "pthread.h"
 
 #define EXEC_DIRECTIVE "!cdav!"
 
@@ -135,9 +136,25 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count, size_t* createdBlocks);
 void
 exec_cmdblocks(CMDBLOCK* blocks, size_t count);
 
+/// Sorting function for CMDBLOCK.
+int
+sort_cmdblocks(const void* a, const void* b);
+
 /// Frees the memory used by the CMDFILE_TOKEN.
 void
 free_token(CMDFILE_TOKEN* token);
+
+/// Frees memory used by the initialized variables.
+void
+free_variables();
+
+/// Frees memory used by the command blocks.
+void
+free_blocks(CMDBLOCK* blocks);
+
+/// Frees memory used by the tokens.
+void
+free_tokens(CMDFILE_TOKEN* tokens, size_t tokenCount);
 
 /// Executes the instructions in the given commandfile.
 void

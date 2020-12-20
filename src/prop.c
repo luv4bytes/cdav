@@ -198,7 +198,7 @@ cdav_parse_props(char* prop_string, int* count)
 		{
 			if (namelen != 0)
 			{
-				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				char* tmp = (char*)calloc(sizeof(char), sizeof(char) * namelen);
 				strcpy(tmp, propname);
 				TOKEN name = {SYMBOL, tmp};
 
@@ -209,7 +209,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 			name_ind = 0;
 
-			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			char* tmp = (char*)calloc(sizeof(char), sizeof(char) * 1);
 			tmp[0] = c;
 			TOKEN assign = {ASSIGN, tmp};
 			tokens[++tokencount - 1] = assign;
@@ -221,7 +221,7 @@ cdav_parse_props(char* prop_string, int* count)
 		{
 			if (namelen != 0)
 			{
-				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				char* tmp = (char*)calloc(sizeof(char), sizeof(char) * namelen);
 				strcpy(tmp, propname);
 				TOKEN name = {SYMBOL, tmp};
 
@@ -232,7 +232,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 			name_ind = 0;
 
-			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			char* tmp = (char*)calloc(sizeof(char), sizeof(char) * 1);
 			tmp[0] = c;
 			TOKEN start = {CHILD_START, tmp};
 			tokens[++tokencount - 1] = start;
@@ -244,7 +244,7 @@ cdav_parse_props(char* prop_string, int* count)
 		{
 			if (namelen != 0)
 			{
-				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				char* tmp = (char*)calloc(sizeof(char), sizeof(char) * namelen);
 				strcpy(tmp, propname);
 				TOKEN name = {SYMBOL, tmp};
 
@@ -255,7 +255,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 			name_ind = 0;
 
-			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			char* tmp = (char*)calloc(sizeof(char), sizeof(char) * 1);
 			tmp[0] = c;
 			TOKEN end = {CHILD_END, tmp};
 			tokens[++tokencount - 1] = end;
@@ -267,7 +267,7 @@ cdav_parse_props(char* prop_string, int* count)
 		{
 			if (namelen != 0)
 			{
-				char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+				char* tmp = (char*)calloc(sizeof(char), sizeof(char) * namelen);
 				strcpy(tmp, propname);
 				TOKEN name = {SYMBOL, tmp};
 
@@ -278,7 +278,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 			name_ind = 0;
 
-			char* tmp = (char*)calloc(0, sizeof(char) * 1);
+			char* tmp = (char*)calloc(sizeof(char), sizeof(char) * 1);
 			tmp[0] = c;
 			TOKEN delim = {DELIM, tmp};
 			tokens[++tokencount - 1] = delim;
@@ -293,7 +293,7 @@ cdav_parse_props(char* prop_string, int* count)
 
 	if (namelen > 0)
 	{
-		char* tmp = (char*)calloc(0, sizeof(char) * namelen);
+		char* tmp = (char*)calloc(sizeof(char), sizeof(char) * namelen);
 		strcpy(tmp, propname);
 		TOKEN name = {SYMBOL, tmp};
 

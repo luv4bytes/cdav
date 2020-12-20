@@ -25,8 +25,10 @@
 int
 isCdavFile(FILE* file)
 {
+	int ret = -1;
+
 	if (file == NULL)
-		return -1;
+		return ret;
 
 	char* line = NULL;
 	size_t cnt = 0;
@@ -42,10 +44,9 @@ isCdavFile(FILE* file)
 	}
 
 	if (strstr(line, EXEC_DIRECTIVE) == NULL)
-	{
-		free(line);
-		return -1;
-	}
+		ret = -1;
+
+	free(line);
 
 	return 0;
 }
@@ -56,7 +57,7 @@ new_token_str(CMDFILE_TOKEN_TYPE type, const char* value)
 	CMDFILE_TOKEN tok;
 
 	tok.type = type;
-	tok.value = (char*) calloc(0, strlen(value));
+	tok.value = (char*) calloc(sizeof(CMDFILE_TOKEN), strlen(value));
 	strcpy(tok.value, value);
 
 	return tok;
@@ -68,7 +69,7 @@ new_token_char(CMDFILE_TOKEN_TYPE type, char value)
 	CMDFILE_TOKEN tok;
 
 	tok.type = type;
-	tok.value = (char*) calloc(0, sizeof(char));
+	tok.value = (char*) calloc(sizeof(CMDFILE_TOKEN), sizeof(char));
 	tok.value[0] = value;
 
 	return tok;
@@ -103,11 +104,7 @@ lex_cmdfile(FILE* file, size_t* count)
 	while( (read = getline(&line, &sz, file)) != -1)	
 	{
 		if (line[0] == '\n')
-		{
-			free(line);
-			line = NULL;
 			continue;
-		}
 
 		for(size_t i = 0; i < read; i++)
 		{
@@ -115,21 +112,13 @@ lex_cmdfile(FILE* file, size_t* count)
 				continue;
 
 			if (line[i] == '\n')
-			{
-				free(line);
-				line = NULL;
 				break;
-			}
 
 			if (line[i] == '\t')
 				continue;
 
 			if (line[i] == CMDTOK_COMMENTSTART)
-			{
-				free(line);
-				line = NULL;
 				break;
-			}
 
 			if (line[i] == CMDTOK_VALUEIDENT)
 			{
@@ -273,10 +262,10 @@ lex_cmdfile(FILE* file, size_t* count)
 
 			symbol[symbolIndex++] = line[i];
 		}
-
-		if (line != NULL)
-			free(line);
 	}
+
+	if (line != NULL)
+		free(line);
 
 	#ifdef DEBUG
 		if (tokens != NULL)
@@ -302,10 +291,10 @@ var_add_variable(VARIABLES* vars, const char* name, const char* value)
 	
 	vars->count++;
 
-	vars->names[vars->count - 1] = (char*) calloc(0, strlen(name) + 1);
+	vars->names[vars->count - 1] = (char*) calloc(sizeof(char), strlen(name) + 1);
 	strcpy(vars->names[vars->count - 1], name);
 
-	vars->values[vars->count - 1] = (char*) calloc(0, strlen(name) + 1);
+	vars->values[vars->count - 1] = (char*) calloc(sizeof(char), strlen(name) + 1);
 	strcpy(vars->values[vars->count - 1], value);
 }
 
@@ -349,8 +338,8 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 			return;
 		}
 
-		block->executionOrder = (char*) calloc(0, sizeof(char) * strlen(value));
-		strcpy(block->executionOrder, value);
+		block->executionOrder = value;//(char*) calloc(sizeof(char), sizeof(char) * strlen(value));
+		//strcpy(block->executionOrder, value);
 
 		return;
 	}
@@ -474,8 +463,6 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 		block->args.proxy = value;
 		return;
 	}
-
-	// TODO: Malloc because of freed tokens?
 }
 
 CMDBLOCK*
@@ -598,6 +585,146 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count, size_t* createdBlocks)
 	return blocks;
 }
 
+int
+sort_cmdblocks(const void* a, const void* b)
+{
+	CMDBLOCK* a_block = (CMDBLOCK*)a;
+	CMDBLOCK* b_block = (CMDBLOCK*)b;
+
+	if (a_block->executionOrder == NULL)
+		return 1;
+
+	if (b_block->executionOrder == NULL)
+		return -1;
+
+	int order_a = atoi(a_block->executionOrder);
+	int order_b = atoi(b_block->executionOrder);
+
+	return order_a < order_b ? -1 : 1;
+}
+
+void*
+start_block(void* arg_as_block)
+{
+	CMDBLOCK* block = (CMDBLOCK*)arg_as_block;
+
+	ARGS args = block->args;
+	CDAV_BASIC_PARAMS params;
+
+	params.follow_redirect = args.follow_redirect;
+	params.passwd = args.passwd;
+	params.proxy = args.proxy;
+	params.url = args.address;
+	params.user = args.user;
+
+	switch(eval_op(args.operation))
+	{
+		case GET:
+
+			cdav_get(&params, args.save_as);
+
+			break;
+
+		case HEAD:
+
+			cdav_head(&params);
+
+			break;
+
+		case PUT:
+
+			cdav_put(&params, args.upload_file);
+
+			break;
+
+		case PROPFIND:
+		{
+			CDAV_PROP** prop_list = NULL;
+
+			int count = 0;
+			prop_list = cdav_parse_props(args.props, &count);
+
+			cdav_propfind(&params, prop_list, count, args.depth);
+
+			break;
+		}
+
+		case PROPPATCH:
+		{
+			CDAV_PROP** sprops_list = NULL;
+			int sprop_count = 0;
+
+			CDAV_PROP** rprops_list = NULL;
+			int rprop_count = 0;
+
+			sprops_list = cdav_parse_props(args.set_props, &sprop_count);
+			rprops_list = cdav_parse_props(args.rm_props, &rprop_count);
+
+			cdav_proppatch(&params, sprops_list, sprop_count, rprops_list, rprop_count);
+
+			break;
+		}
+
+		case MKCOL:
+
+			cdav_mkcol(&params);
+
+			break;
+
+		case DELETE:
+
+			cdav_delete(&params);
+
+			break;
+
+		case COPY:
+
+			cdav_copy(&params, args.destination, args.overwrite);
+
+			break;
+
+		case MOVE:
+
+			cdav_move(&params, args.destination, args.overwrite);
+
+			break;
+
+		case LOCK:
+
+			cdav_lock(&params, args.lock_scope, args.lock_owner, args.depth);
+
+			break;
+
+		case UNLOCK:
+
+			cdav_unlock(&params, args.lock_token);
+
+			break;
+
+		case UNKNOWN:
+			ERROR_EXIT("%s\n", UNKNOWN_OPERATION);
+
+		default:
+			ERROR_EXIT("%s\n", UNKNOWN_OPERATION);
+	}
+
+	return NULL;
+}
+
+void
+free_variables()
+{
+	for(size_t i = 0; i < variables.count; i++)
+		free(variables.names[i]), free(variables.values[i]);
+}
+
+void
+free_tokens(CMDFILE_TOKEN* tokens, size_t tokenCount)
+{
+	for(size_t i = 0; i < tokenCount; i++)
+		free_token(&tokens[i]);
+}
+
 void
 exec_cmdblocks(CMDBLOCK* blocks, size_t count)
 {
@@ -607,10 +734,48 @@ exec_cmdblocks(CMDBLOCK* blocks, size_t count)
 	for(size_t i = 0; i < count; i++)
 	{
 		if (blocks[i].type != VAR && blocks[i].executionOrder == NULL)
-			ERROR_EXIT("Block %s needs to have a parallelity defined.", blocks[i].name)
+			ERROR_EXIT("Block %s needs to have an order defined.", blocks[i].name)
 	}
 
-	// TODO: Order blocks by parallelity and execute blocks
+	qsort(blocks, count, sizeof(CMDBLOCK), &sort_cmdblocks);
+
+	#ifdef DEBUG
+		for(size_t i = 0; i < count; i++)
+			printf("Name: %s - Order: %s\n", blocks[i].name, blocks[i].executionOrder);
+	#endif
+
+	pthread_t threads[count];
+	memset(threads, 0, count);
+	size_t ind = 0;
+
+	int lastOrder = 0;
+	int currentOrder = 0;
+
+	for(size_t i = 0; i < count; i++)
+	{
+		if (blocks[i].type != COMMAND)
+			continue;
+
+		currentOrder = atoi(blocks[i].executionOrder);
+
+		if (currentOrder != lastOrder)
+		{
+			for(size_t j = 0; j < ind; j++)
+				pthread_join(threads[j], NULL);
+
+			memset(threads, 0, count);
+			ind = 0;
+		}
+
+		pthread_t t;
+		pthread_create(&t, NULL, &start_block, (void*)(&blocks[i]));
+		threads[ind++] = t;
+
+		lastOrder = currentOrder;
+	}
+
+	for(size_t i = 0; i < ind; i++)
+		pthread_join(threads[i], NULL);
 }
 
 void
@@ -654,9 +819,10 @@ exec_cmdfile(const char* file)
 	CMDFILE_TOKEN* tokens = lex_cmdfile(cdavfile, &tokenCount);	
 	CMDBLOCK* blocks = parse_tokens(tokens, tokenCount, &blockCount);
 
-	exec_cmdblocks(blocks, blockCount);
+	exec_cmdblocks(blocks, blockCount);	
 
-	// TODO: Free tokens
+	free_variables();
+	free_tokens(tokens, tokenCount);
 
 	fclose(cdavfile);
 }

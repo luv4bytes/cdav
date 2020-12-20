@@ -7,10 +7,10 @@ debug= -g -D DEBUG
 ignore_ssl_erros = -D IGNORE_SSL_ERRORS
 version= -D VERSION=\"1.0\"
 
-LIBS=-lcurl -lxml2
+LIBS=-lcurl -lxml2 -lpthread
 INCLUDE=-I/usr/include/libxml2/
 
-dependencies= libcurl4-openssl-dev libxml2-dev
+dependencies= libcurl4-openssl-dev libxml2-dev libpthread-stubs0-dev
 
 all: prep main dav prop args requests helper cmdfile
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(ignore_ssl_erros) $(version) $(LIBS) $(INCLUDE)
