@@ -193,4 +193,4 @@ This means that `cdav` will execute this block only if the first two blocks have
 
 #### Una dimostrazione!
 
-![](images/cdav_cmdfile.gif)
+![](images/cmdfile-demo.gif)
