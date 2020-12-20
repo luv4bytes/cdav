@@ -6,10 +6,10 @@ Scriptable CLI WebDAV client for Linux.
 
 
 cdav aims to supports all operations defined in RFC 4918.
-For further information about WebDAV see ![IETF RFC 4918](https://tools.ietf.org/html/rfc4918).
+For further information about WebDAV see <a href="https://tools.ietf.org/html/rfc4918">IETF RFC 4918</a>.
 
 ## Currently working on
-- ![GitHub-Pages page](https://luv4bytes.github.io/cdav)
+-  <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>
 
 ## Pending:
 - Formatted output
@@ -20,10 +20,10 @@ For further information about WebDAV see ![IETF RFC 4918](https://tools.ietf.org
 To build cdav make sure to run `make deps` before running `make`. <br>
 cdav requires following libraries to be built:
 
-- ![libxml2](http://xmlsoft.org/)
-- ![libcurl](https://curl.se/libcurl/)
+- <a href="http://xmlsoft.org/">libmxl2</a>
+- <a href="https://curl.se/libcurl/">libcurl</a>
 
 
 ## Help
 To get information and help about arguments and property syntax run `cdav -h` or `cdav` without any arguments.
-For detailed information on how to use command files refer to the offical ![GitHub Pages page](https://luv4bytes.github.io/cdav).
+For detailed information on how to use command files refer to the offical <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>.
