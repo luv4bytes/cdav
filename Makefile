@@ -4,7 +4,7 @@ makedirs=mkdir obj/ bin/
 removedirs=rm -rf obj/ bin/
 options=-Wall
 debug= #-g -D DEBUG
-ignore_ssl_erros = -D IGNORE_SSL_ERRORS
+ignore_ssl_erros= #-D IGNORE_SSL_ERRORS
 version= -D VERSION=\"1.0\"
 
 LIBS=-lcurl -lxml2 -lpthread
