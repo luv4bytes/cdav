@@ -167,6 +167,11 @@ print_help()
 					"\n",
 					"\tcdav -o MOVE -a https://test.com/dav/test.jpg -da https://test.com/dav/test2.jpg --no-overwrite -u somedude -pw verysecret",
 					"\n",
+					"\n",
+					"Sources available on https://github.com/luv4bytes/cdav.",
+					"\n",
+					"Also see https://luv4bytes.github.io/cdav for detailed information.",
+					"\n",
 					"EOF"
 					};
 
