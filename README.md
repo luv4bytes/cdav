@@ -193,4 +193,6 @@ This means that `cdav` will execute this block only if the first two blocks have
 
 #### Una dimostrazione!
 
+*...the output will be prettier next time, promise...*
+
 ![](images/cmdfile-demo.gif)
