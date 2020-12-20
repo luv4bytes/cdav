@@ -6,12 +6,9 @@ Console WebDAV client for Linux.
 
 cdav is currently in its initial development phase.
 
-### Currently working on:
-- Commandfile
-
 ### Pending:
+- cdav-gtk
 - Formatted output
-- GUI (cdav-gtk)
 
 ### Ideas:
 - Implement CardDAV

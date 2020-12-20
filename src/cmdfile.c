@@ -338,8 +338,7 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 			return;
 		}
 
-		block->executionOrder = value;//(char*) calloc(sizeof(char), sizeof(char) * strlen(value));
-		//strcpy(block->executionOrder, value);
+		block->executionOrder = value;
 
 		return;
 	}

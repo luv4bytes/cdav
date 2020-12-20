@@ -30,12 +30,149 @@
 void
 print_help()
 {
-	printf("\n");
-
 	PRINT_VERSION
-	printf("\n%s\n", "cdav is currently in development. For further information see https://github.com/luv4bytes/cdav");
+	
+	const char* lines[] = {
+					"\n",
+					"cdav is a scriptable CLI WebDAV client for Linux. It supports all operations defined in RFC 4918.",
+					"\n"
+					"For further information about WebDAV see \"https://tools.ietf.org/html/rfc4918\".",
+					"\n",
+					"\n",
+					"SYNTAX:",
+					"\n",
+					"\n",
+					"\tcdav -o [OPERATION] ... ",
+					"\n",
+					"\n",
+					"\tGET,",
+					"\n",
+					"\tPUT,",
+					"\n",
+					"\tHEAD,",
+					"\n",
+					"\tPROPFIND,",
+					"\n",
+					"\tPROPPATCH,",
+					"\n",
+					"\tMKCOL,",
+					"\n",
+					"\tDELETE,",
+					"\n",
+					"\tCOPY,",
+					"\n",
+					"\tMOVE,",
+					"\n",
+					"\tLOCK,",
+					"\n",
+					"\tUNLOCK",
+					"\n",
+					"\n",
+					"\n",
+					"ARGUMENTS:",
+					"\n",
+					"\n",
+					"\t-a, --address 		-> Target URL.",
+					"\n",
+					"\t-u, --user 		-> User for authentication.",
+					"\n",
+					"\t-pw, --password 	-> Password for authentication.",
+					"\n",
+					"\t--no-redirect 		-> Specifies that redirects should not be followed.",
+					"\n",
+					"\t--proxy 		-> Proxy to use.",
+					"\n",
+					"\t-f, --file 		-> Commandfile to use for execution.",
+					"\n",
+					"\n",
+					"\t-h, --help 		-> Print help text.",
+					"\n",
+					"\t-v, --version 		-> Print version information.",
+					"\n",
+					"\n",
+					"Specific arguments:",
+					"\n",
+					"\n",
+					"GET:",
+					"\n",
+					"\t-s, --save-as 		-> Filename for saving.",
+					"\n",
+					"\n",
+					"PUT:",
+					"\n",
+					"\t-uf, --upload-file 	-> File for upload.",
+					"\n",
+					"\n",
+					"PROPFIND:",
+					"\n",
+					"\t-p, --props 		-> Properties to look for.",
+					"\n",
+					"\t-d, --depth 		-> Depth parameter.",
+					"\n",
+					"\n",
+					"PROPPATCH:",
+					"\n",
+					"\t-sp, --set-props 	-> Properties to set.",
+					"\n",
+					"\t-rp, --rm-props 	-> Properties to remove.",
+					"\n",
+					"\n",
+					"COPY:",
+					"\n",
+					"\t-da, --destination-address 	-> Path to copy the resource to.",
+					"\n",
+					"\t--no-overwrite 			-> Specifies if the destination should be overwritten if it exists.",
+					"\n",
+					"\n",
+					"MOVE:",
+					"\n",
+					"\t-da, --destination-address 	-> Path to copy the resource to.",
+					"\n",
+					"\t--no-overwrite 			-> Specifies if the destination should be overwritten if it exists.",
+					"\n",
+					"\n",
+					"LOCK:",
+					"\n",
+					"\t-ls, --lock-scope 	-> Lock scope according to RFC 4918.",
+					"\n",
+					"\t-d, --depth 		-> Depth parameter.",
+					"\n",
+					"\t-lo, --lock-owner 	-> Lock owner.",
+					"\n",
+					"\n",
+					"UNLOCK:",
+					"\n",
+					"\t-lt, --lock-token 	-> Lock token.",
+					"\n",
+					"\n",
+					"Syntax for setting properties:",
+					"\n"
+					"\n",
+					"\t[PROPERTY, PROPERTY, PROPERTY=VALUE, PROPERTY={CHILD, CHILD=VALUE, CHILD={CHILD_CHILD}}]",
+					"\n",
+					"\n",
+					"Examples:",
+					"\n",
+					"\n",
+					"\t(using command file) cdav -f ./movestuff.cdav",
+					"\n",
+					"\n",
+					"\tcdav -o PROPFIND -a https://test.com/dav/test.jpg -p \"getcontentlength, getcontenttype\" -u somedude -pw verysecret", 
+					"\n",
+					"\tcdav -o GET -a https://test.com/dav/test.jpg -s ./test.jpg -u somedude -pw verysecret",
+					"\n",
+					"\tcdav -o PROPPATCH (set) -a https://test.com/dav/test.jpg -sp \"prop=value, parent={child=value, child={prop}}\" -u somedude -pw verysecret", 
+					"\n",
+					"\tcdav -o PROPPATCH (remove) -a https://test.com/dav/test.jpg -rp \"prop, other_prop\" -u somedude -pw verysecret",
+					"\n",
+					"\tcdav -o MOVE -a https://test.com/dav/test.jpg -da https://test.com/dav/test2.jpg --no-overwrite -u somedude -pw verysecret",
+					"\n",
+					"EOF"
+					};
 
-	// TODO: Print help
+	size_t i = 0;
+	while(strcmp(lines[i], "EOF") != 0)
+		printf("%s", lines[i++]);
 
 	printf("\n");
 }
@@ -43,108 +180,6 @@ print_help()
 int
 main(int argc, char* argv[])
 {
-    /*
-     * COMMAND FILE:
-     *
-     *  Options:
-     *      -f --file       - specify command file path
-     *      - pipe in command file
-     *
-     * OPERATIONS:
-     *
-     *  Options:
-     *      -o --operation  - Specify operation
-     *
-     *      GET:
-     *          -a  --address    - Specify address
-     *          -u  --user       - Specify user
-     *          -pw --password   - Specify password
-     *		--no-redirect	 - Specify if redirects should not be followed
-     *		--proxy		 - Specify proxy
-     *          -s  --save-as    - Specify saving destination
-     *
-     *      PUT:
-     *          -a  --address     - Specify address
-     *          -u  --user        - Specify user
-     *          -pw --password    - Specify password
-     *		--no-redirect	  - Specify if redirects should not be followed
-     *		--proxy		  - Specify proxy
-     *          -uf --upload-file - Specify file for upload
-     *
-     *      PROPFIND:
-     *          -a  --address    - Specify address
-     *          -u  --user       - Specify user
-     *          -pw --password   - Specify password
-     *		--no-redirect	 - Specify if redirects should not be followed
-     *		--proxy		 - Specify proxy
-     *          -p  --props      - Specify properties, separated by comma
-     *          -d  --depth      - Specify PROPFIND depth
-     *
-     *      PROPPATCH:
-     *          -a  --address    - Specify address
-     *          -u  --user       - Specify user
-     *          -pw --password   - Specify password
-     *		--no-redirect	 - Specify if redirects should not be followed
-     *		--proxy		 - Specify proxy
-     *          -sp --set-props   - Specify properties to be set, separated by comma (prop1=test,prop2=21)
-     *          -rp --rm-props    - Specify properties to be removed, separated by comma (prop1,prop2)
-     *
-     *      MKCOL:
-     *          -a  --address    - Specify address
-     *          -u  --user       - Specify user
-     *          -pw --password   - Specify password
-     *		--proxy		 - Specify proxy
-     *		--no-redirect	 - Specify if redirects should not be followed
-     *
-     *      DELETE:
-     *          -a  --address    - Specify address
-     *          -u  --user       - Specify user
-     *          -pw --password   - Specify password
-     *		--proxy		 - Specify proxy
-     *		--no-redirect	 - Specify if redirects should not be followed
-     *
-     *      COPY:
-     *          -a  --address               - Specify address
-     *          -u  --user                  - Specify user
-     *          -pw --password              - Specify password
-     *		--no-redirect	 	    - Specify if redirects should not be followed
-     *		--proxy		 	    - Specify proxy
-     *          -da --destination-address   - Specify destination address
-     *          --no-overwrite              - Specify no overwrite
-     *
-     *      MOVE:
-     *          -a  --address               - Specify address
-     *          -u  --user                  - Specify user
-     *          -pw --password              - Specify password
-     *		--no-redirect	 	    - Specify if redirects should not be followed
-     *		--proxy		 	    - Specify proxy
-     *          -da --destination-address   - Specify destination address
-     *          --no-overwrite		    - Specify no overwrite
-     *
-     *	    LOCK:
-     *          -a  --address               - Specify address
-     *          -u  --user                  - Specify user
-     *          -pw --password              - Specify password
-     *		--no-redirect	 	    - Specify if redirects should not be followed
-     *		--proxy		 	    - Specify proxy
-     *		-ls --lock-scope	    - Specify lock scope
-     *	 	-d  --depth		    - Specify depth
-     *		-lo  --lock-owner	    - Specify lock owner
-     *
-     *	    UNLOCK:
-     *          -a  --address               - Specify address
-     *          -u  --user                  - Specify user
-     *          -pw --password              - Specify password
-     *		--proxy		 	    - Specify proxy
-     *		--no-redirect	 	    - Specify if redirects should not be followed
-     *		-lt --lock-token	    - Specify lock token to unlock
-     *
-     *	INFORMATION:
-     *
-     *		-h --help 	- Print help text
-     *		-v --version 	- Print version information
-    */
-
 	if (argc == 1)
 	{
 		print_help();
