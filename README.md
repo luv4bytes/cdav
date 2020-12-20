@@ -116,12 +116,12 @@ cdav can be scripted to do multiple tasks in one Go using a command file.
 The command file consists of three sections.
 
 The first section is the declaration of a "valid cdav file".	
-Every command file needs to start with <span style="color:lightgreen">`!cdav!`</span> on the first line.
+Every command file needs to start with `!cdav!` on the first line.
 
-The second section defines special blocks, at the moment the only "special block" is the variable block called <span style="color:lightgreen">`VAR`</span>.	
-Inside the <span style="color:lightgreen">`VAR`</span> block you can define variables used in the command file.
+The second section defines special blocks, at the moment the only "special block" is the variable block called `VAR`.	
+Inside the `VAR` block you can define variables used in the command file.
 
-Example <span style="color:lightgreen">`VAR`</span> block:	
+Example `VAR` block:	
 
 ```
 VAR
