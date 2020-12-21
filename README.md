@@ -183,7 +183,7 @@ PROPFIND_BLOCK
 	user=$user;
 	password=secretpass;
 	address="https://test.com/dav/grumpycat.jpg";
-	save-as = "./happycat.jpg";
+	props="allprop"
 	
 	order = 1;
 }
