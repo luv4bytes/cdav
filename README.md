@@ -162,13 +162,13 @@ The second command will have the same value assigned to it's order argument as t
 This will make `cdav` execute both blocks in parallel!
 
 ```
-GET_BLOCK
+PUT_BLOCK
 {
 	operation=PUT;
 	user=$user;
 	password=secretpass;
 	address="https://test.com/dav/nocatitsadog.jpg";
-	save-as = "./happycat.jpg";
+	upload-file="./doggydog.jpg" 
 	
 	order = 0;
 }
