@@ -168,7 +168,7 @@ PUT_BLOCK
 	user=$user;
 	password=secretpass;
 	address="https://test.com/dav/nocatitsadog.jpg";
-	upload-file="./doggydog.jpg" 
+	upload-file="./doggydog.jpg";
 	
 	order = 0;
 }
@@ -183,7 +183,7 @@ PROPFIND_BLOCK
 	user=$user;
 	password=secretpass;
 	address="https://test.com/dav/grumpycat.jpg";
-	props="allprop"
+	props="allprop";
 	
 	order = 1;
 }
