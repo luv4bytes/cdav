@@ -82,7 +82,7 @@ print_help()
 					"\n",
 					"\t--proxy 		-> Proxy to use.",
 					"\n",
-					"\t--raw 		->Indicates if responses should be raw XML output or not.",
+					"\t--raw 		-> Indicates if responses should be raw XML output or not.",
 					"\n",
 					"\t-f, --file 		-> Commandfile to use for execution.",
 					"\n",
