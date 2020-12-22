@@ -12,11 +12,8 @@ For further information about WebDAV see <a href="https://tools.ietf.org/html/rf
 I'd love to hear ideas and suggestions! If you want to work on `cdav` just fork it and let's go! :smile:  
 Keep an eye on *Currently working on* and *Pending*. Otherwise I'll probably open issues on subjects!
 
-## Currently working on
--  <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>
-
-## Pending:
-- GUI (cdav-gtk)
+## GUI for cdav
+You can find a graphical user interface for cdav <a href="https://github.com/luv4bytes/cdav-gtk">here</a>.
 
 ## Build
 
