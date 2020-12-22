@@ -46,28 +46,6 @@ basic_params_check(CDAV_BASIC_PARAMS* params)
 		ERROR_EXIT("%s\n", PROVIDE_URL)
 }
 
-void
-cdav_handle_rescode(CURL* curl)
-{
-	long res_code = 0;
-	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
-
-	char msg[] = "Response: %ld\n";
-
-	if (res_code >= 400)
-		ERROR_EXIT(msg, res_code)
-}
-
-size_t
-cdav_receive(char* data, size_t size, size_t nmemb, void* params)
-{
-	CURL* curl = (CURL*) params;
-
-	cdav_handle_rescode(curl);
-
-	return nmemb * size;
-}
-
 size_t
 cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 {
@@ -76,8 +54,6 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 
 	CDAV_RECV_BUFFER_PARAMS* p = (CDAV_RECV_BUFFER_PARAMS*)params;
 
-	cdav_handle_rescode(p->curl);
-
 	int datalen = size * nmemb;
 
 	size_t oldlen = p->buffer_sz;
@@ -85,7 +61,7 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 
 	if (p->buffer == NULL)
 	{
-		p->buffer = (char*) realloc(NULL, p->buffer_sz);
+		p->buffer = (char*) realloc(p->buffer, p->buffer_sz);
 		memset(p->buffer, '\0', p->buffer_sz);
 	}
 	else
@@ -94,10 +70,8 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 	}
 
 	size_t j = 0;
-	for(size_t i = oldlen; i < p->buffer_sz; i++)
-	{
+	for(size_t i = oldlen; i < p->buffer_sz + 1; i++)
 		p->buffer[i] = data[j++];
-	}
 
 	return datalen;
 }
@@ -106,9 +80,6 @@ size_t
 cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 {
 	CDAV_WRITE_FILE_PARAMS* w_params = (CDAV_WRITE_FILE_PARAMS*) params;
-	CURL* curl = w_params->curl;
-
-	cdav_handle_rescode(curl);
 
 	const char* save_as = w_params->save_as;
 	size_t res_sz = size * nmemb;
@@ -147,10 +118,7 @@ size_t
 cdav_read_file(char* buffer, size_t size, size_t nitems, void* params)
 {
 	CDAV_READ_FILE_PARAMS* r_params = (CDAV_READ_FILE_PARAMS*) params;
-	CURL* curl = r_params->curl;
 	const char* file_path = r_params->file_path;
-
-	cdav_handle_rescode(curl);
 
 	char mode[1] = "r";
 
@@ -240,6 +208,10 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.file != NULL)
 		fclose(params.file);
 
@@ -293,8 +265,17 @@ cdav_head(CDAV_BASIC_PARAMS* basic_params)
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer);
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -338,7 +319,6 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_URL, basic_params->url);
 	curl_easy_setopt(curl, CURLOPT_READFUNCTION, &cdav_read_file);
 	curl_easy_setopt(curl, CURLOPT_READDATA, (void*) &params);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_receive);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) curl);
 	curl_easy_setopt(curl, CURLOPT_PUT, 1);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
@@ -360,6 +340,10 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	}
 
 	print_redirect_info(basic_params, curl);
+
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
 
 	if (params.file != NULL)
 		fclose(params.file);
@@ -444,11 +428,21 @@ cdav_propfind(CDAV_BASIC_PARAMS* basic_params,
 		ERROR_EXIT("CURL ERR: %d - %s\n", result, err)
 	}
 
-	OUT_INFO("%s\n", params.buffer);
+	print_redirect_info(basic_params, curl);
+
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
+	if (params.buffer != NULL)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	free(request);
-
-	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -522,11 +516,21 @@ cdav_proppatch(CDAV_BASIC_PARAMS* basic_params,
 		ERROR_EXIT("CURL ERR: %d - %s\n", result, err);
 	}
 
-	OUT_INFO("%s\n", params.buffer)
+	print_redirect_info(basic_params, curl);
+
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
+	if (params.buffer != NULL)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	free(request);
-
-	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -590,8 +594,17 @@ cdav_mkcol(CDAV_BASIC_PARAMS* basic_params)
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -645,8 +658,17 @@ cdav_delete(CDAV_BASIC_PARAMS* basic_params)
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -731,8 +753,17 @@ cdav_copy(CDAV_BASIC_PARAMS* basic_params,
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -821,8 +852,17 @@ cdav_move(CDAV_BASIC_PARAMS* basic_params,
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -911,8 +951,17 @@ cdav_lock(CDAV_BASIC_PARAMS* basic_params,
 
 	print_redirect_info(basic_params, curl);
 
+	long res_code = 0;
+	curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &res_code);
+	printf("Response - %ld\n", res_code);
+
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);
@@ -986,7 +1035,12 @@ cdav_unlock(CDAV_BASIC_PARAMS* basic_params, const char* lock_token)
 	print_redirect_info(basic_params, curl);
 
 	if (params.buffer != NULL)
-		OUT_INFO("%s\n", params.buffer)
+	{
+		if (basic_params->raw)
+			OUT_INFO("%s\n", params.buffer)
+		else
+			print_sanitized_response(params.buffer);
+	}
 
 	if (params.buffer != NULL)
 		free(params.buffer);

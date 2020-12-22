@@ -36,12 +36,12 @@
 #define MAX_NAMELEN 512
 
 // Defines a WebDAV property.
-typedef struct cdav_prop_t
+typedef struct cdav_prop_st
 {
 	const char* name;
 	const char* value;
 
-	struct cdav_prop_t** children;
+	struct cdav_prop_st** children;
 	size_t children_size;
 
 } CDAV_PROP;
@@ -54,12 +54,14 @@ typedef enum
 	CHILD_START,
 	CHILD_END,
 	DELIM
+
 } TYPE;
 
-typedef struct token_t
+typedef struct token_st
 {
 	TYPE type;
 	char* value;
+
 } TOKEN;
 
 /// Creates a new property.

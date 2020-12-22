@@ -56,7 +56,7 @@ typedef enum
 } CMDBLOCK_TYPE;
 
 /// Defines a command block holding basic arguments and special arguments for commandfile execution.
-typedef struct cmdblock_t
+typedef struct cmdblock_st
 {
 	ARGS args;
 	CMDBLOCK_TYPE type;
@@ -67,7 +67,7 @@ typedef struct cmdblock_t
 } CMDBLOCK;
 
 /// Structure stores the used variables in the commandfile.
-typedef struct variables_t
+typedef struct variables_st
 {
 	char** names;
 	char** values;
@@ -90,7 +90,7 @@ typedef enum
 } CMDFILE_TOKEN_TYPE;
 
 /// Defines a processed token of a cdav commandfile.
-typedef struct cmdfile_token_t
+typedef struct cmdfile_token_st
 {
 	CMDFILE_TOKEN_TYPE type;
 	char* value;
@@ -114,7 +114,7 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value);
 
 /// Checks if the given file is a valid cdav commandfile.
 int
-isCdavFile(FILE* file);
+is_cmd_file(FILE* file);
 
 /// Creates a new token with the given type and value as char* and adds it to the list.
 CMDFILE_TOKEN
@@ -147,10 +147,6 @@ free_token(CMDFILE_TOKEN* token);
 /// Frees memory used by the initialized variables.
 void
 free_variables();
-
-/// Frees memory used by the command blocks.
-void
-free_blocks(CMDBLOCK* blocks);
 
 /// Frees memory used by the tokens.
 void

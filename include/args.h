@@ -83,6 +83,8 @@
 
 #define ARG_PROXY "--proxy"
 
+#define ARG_RAW "--raw"
+
 /// Defines operations.
 typedef enum
 {
@@ -102,10 +104,10 @@ typedef enum
 
 /// Evaluates the given operation string.
 OPS
-eval_op(const char* op);
+args_eval_op(const char* op);
 
 /// Defines a structure to hold argument values.
-typedef struct args_struct_t
+typedef struct args_struct_st
 {
 	char* file;			// -f 	--file
 	char* operation;	// -o 	--operation
@@ -127,15 +129,16 @@ typedef struct args_struct_t
 	char* lock_token;	// -lt	--lock-token
 	int follow_redirect;	// --no-redirect
 	char* proxy;		// --proxy
+	int raw;			// --raw
 
 } ARGS;
 
 /// Initializes ARGS structure fields.
 void
-init_args(ARGS* args);
+args_init(ARGS* args);
 
 /// Evaluates the given argument.
 int
-eval_arg(const char* arg, const char* short_opt, const char* long_opt);
+args_eval(const char* arg, const char* short_opt, const char* long_opt);
 
 #endif // ARGS_H

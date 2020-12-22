@@ -23,7 +23,7 @@
 #include "../include/args.h"
 
 void
-init_args(ARGS* args)
+args_init(ARGS* args)
 {
 	if (args == NULL)
 		return;
@@ -48,10 +48,11 @@ init_args(ARGS* args)
 	args->version = 0;
 	args->follow_redirect = 1;
 	args->proxy = NULL;
+	args->raw = 0;
 }
 
 OPS
-eval_op(const char* operation)
+args_eval_op(const char* operation)
 {
 	if (operation == NULL)
 		return UNKNOWN;
@@ -99,7 +100,7 @@ eval_op(const char* operation)
 }
 
 int
-eval_arg(const char* arg, const char* short_opt, const char* long_opt)
+args_eval(const char* arg, const char* short_opt, const char* long_opt)
 {
 	if (short_opt != NULL)
 	{

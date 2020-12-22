@@ -27,12 +27,13 @@
 #include "err.h"
 #include "output.h"
 #include "requests.h"
+#include "response.h"
 #include "args.h"
 #include "helper.h"
 #include <curl/curl.h>
 
 /// Defines a structure that is passed into callbacks writing files.
-typedef struct cdav_write_file_params_t
+typedef struct cdav_write_file_params_st
 {
 	const char* save_as;
 	FILE* file;
@@ -41,7 +42,7 @@ typedef struct cdav_write_file_params_t
 } CDAV_WRITE_FILE_PARAMS;
 
 /// Defines a structure that is passed into callbacks reading data.
-typedef struct cdav_read_file_params_t
+typedef struct cdav_read_file_params_st
 {
 	const char* file_path;
 	long file_sz;
@@ -51,7 +52,7 @@ typedef struct cdav_read_file_params_t
 } CDAV_READ_FILE_PARAMS;
 
 /// Defines a structure containing a char buffer and a curl instance.
-typedef struct cdav_recv_buffer_params_t
+typedef struct cdav_recv_buffer_params_st
 {
 	char* buffer;
 	size_t buffer_sz;
@@ -60,13 +61,14 @@ typedef struct cdav_recv_buffer_params_t
 } CDAV_RECV_BUFFER_PARAMS;
 
 /// Defines a structure for basic parameters such as URL, user and password.
-typedef struct cdav_basic_params_t
+typedef struct cdav_basic_params_st
 {
 	const char* url;
 	const char* user;
 	const char* passwd;
 	int follow_redirect;
 	const char* proxy;
+	int raw;
 
 } CDAV_BASIC_PARAMS;
 
@@ -77,10 +79,6 @@ print_redirect_info(CDAV_BASIC_PARAMS* params, CURL* curl);
 /// Checks if the CDAV_BASIC_PARAMS is ok.
 void
 basic_params_check(CDAV_BASIC_PARAMS* params);
-
-/// Basic receive callback.
-size_t
-cdav_receive(char* data, size_t size, size_t nmemb, void* params);
 
 /// Puts the received bytes into a buffer.
 size_t

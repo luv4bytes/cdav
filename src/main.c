@@ -82,6 +82,8 @@ print_help()
 					"\n",
 					"\t--proxy 		-> Proxy to use.",
 					"\n",
+					"\t--raw 		->Indicates if responses should be raw XML output or not.",
+					"\n",
 					"\t-f, --file 		-> Commandfile to use for execution.",
 					"\n",
 					"\n",
@@ -192,15 +194,16 @@ main(int argc, char* argv[])
 	}
 
 	ARGS args;
-	init_args(&args);
+	args_init(&args);
 
+	LIBXML_TEST_VERSION
 
 	for(int i = 1; i < argc; i++)
 	{
 		if ( (i + 1) > argc)
 			break;
 
-		if (eval_arg(argv[i], ARG_F_SHORT, ARG_F_LONG) == 1)
+		if (args_eval(argv[i], ARG_F_SHORT, ARG_F_LONG) == 1)
 		{
 			args.file = argv[i + 1];
 
@@ -209,117 +212,123 @@ main(int argc, char* argv[])
 			return 0;
 		}
 
-		if (eval_arg(argv[i], ARG_O_SHORT, ARG_O_LONG))
+		if (args_eval(argv[i], ARG_O_SHORT, ARG_O_LONG))
 		{
 			args.operation = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_A_SHORT, ARG_A_LONG))
+		if (args_eval(argv[i], ARG_A_SHORT, ARG_A_LONG))
 		{
 			args.address = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_U_SHORT, ARG_U_LONG))
+		if (args_eval(argv[i], ARG_U_SHORT, ARG_U_LONG))
 		{
 			args.user = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_PW_SHORT, ARG_PW_LONG))
+		if (args_eval(argv[i], ARG_PW_SHORT, ARG_PW_LONG))
 		{
 			args.passwd = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_P_SHORT, ARG_P_LONG))
+		if (args_eval(argv[i], ARG_P_SHORT, ARG_P_LONG))
 		{
 			args.props = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_SP_SHORT, ARG_SP_LONG))
+		if (args_eval(argv[i], ARG_SP_SHORT, ARG_SP_LONG))
 		{
 			args.set_props = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_RP_SHORT, ARG_RP_LONG))
+		if (args_eval(argv[i], ARG_RP_SHORT, ARG_RP_LONG))
 		{
 			args.rm_props = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_DA_SHORT, ARG_DA_LONG))
+		if (args_eval(argv[i], ARG_DA_SHORT, ARG_DA_LONG))
 		{
 			args.destination = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_NO_OW, NULL))
+		if (args_eval(argv[i], ARG_NO_OW, NULL))
 		{
 			args.overwrite = 0;
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_UF_SHORT, ARG_UF_LONG))
+		if (args_eval(argv[i], ARG_UF_SHORT, ARG_UF_LONG))
 		{
 			args.upload_file = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_S_SHORT, ARG_S_LONG))
+		if (args_eval(argv[i], ARG_S_SHORT, ARG_S_LONG))
 		{
 			args.save_as = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_D_SHORT, ARG_D_LONG))
+		if (args_eval(argv[i], ARG_D_SHORT, ARG_D_LONG))
 		{
 			args.depth = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_LS_SHORT, ARG_LS_LONG))
+		if (args_eval(argv[i], ARG_LS_SHORT, ARG_LS_LONG))
 		{
 			args.lock_scope = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_LT_SHORT, ARG_LT_LONG))
+		if (args_eval(argv[i], ARG_LT_SHORT, ARG_LT_LONG))
 		{
 			args.lock_token = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_LO_SHORT, ARG_LO_LONG))
+		if (args_eval(argv[i], ARG_LO_SHORT, ARG_LO_LONG))
 		{
 			args.lock_owner = argv[i + 1];
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_H_SHORT, ARG_H_LONG))
+		if (args_eval(argv[i], ARG_H_SHORT, ARG_H_LONG))
 		{
 			args.help = 1;
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_V_SHORT, ARG_V_LONG))
+		if (args_eval(argv[i], ARG_V_SHORT, ARG_V_LONG))
 		{
 			args.version = 1;
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_NO_REDIRECT, NULL))
+		if (args_eval(argv[i], ARG_NO_REDIRECT, NULL))
 		{
 			args.follow_redirect = 0;
 			continue;
 		}
 
-		if (eval_arg(argv[i], ARG_PROXY, NULL))
+		if (args_eval(argv[i], ARG_PROXY, NULL))
 		{
 			args.proxy = argv[i + 1];
+			continue;
+		}
+
+		if (args_eval(argv[i], ARG_RAW, NULL))
+		{
+			args.raw = 1;
 			continue;
 		}
 	}
@@ -351,8 +360,9 @@ main(int argc, char* argv[])
 	params.passwd = args.passwd;
 	params.follow_redirect = args.follow_redirect;
 	params.proxy = args.proxy;
+	params.raw = args.raw;
 
-	switch(eval_op(args.operation))
+	switch(args_eval_op(args.operation))
 	{
 		case GET:
 

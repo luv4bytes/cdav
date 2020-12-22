@@ -23,7 +23,7 @@
 #include "../include/cmdfile.h"
 
 int
-isCdavFile(FILE* file)
+is_cmd_file(FILE* file)
 {
 	int ret = -1;
 
@@ -57,8 +57,8 @@ new_token_str(CMDFILE_TOKEN_TYPE type, const char* value)
 	CMDFILE_TOKEN tok;
 
 	tok.type = type;
-	tok.value = (char*) calloc(sizeof(CMDFILE_TOKEN), strlen(value));
-	strcpy(tok.value, value);
+	tok.value = (char*) calloc(strlen(value), sizeof(char));
+	strcat(tok.value, value);
 
 	return tok;
 }
@@ -69,7 +69,7 @@ new_token_char(CMDFILE_TOKEN_TYPE type, char value)
 	CMDFILE_TOKEN tok;
 
 	tok.type = type;
-	tok.value = (char*) calloc(sizeof(CMDFILE_TOKEN), sizeof(char));
+	tok.value = (char*) calloc(1, sizeof(char));
 	tok.value[0] = value;
 
 	return tok;
@@ -291,11 +291,11 @@ var_add_variable(VARIABLES* vars, const char* name, const char* value)
 	
 	vars->count++;
 
-	vars->names[vars->count - 1] = (char*) calloc(sizeof(char), strlen(name) + 1);
-	strcpy(vars->names[vars->count - 1], name);
+	vars->names[vars->count - 1] = (char*) calloc(strlen(name), sizeof(char));
+	strcat(vars->names[vars->count - 1], name);
 
-	vars->values[vars->count - 1] = (char*) calloc(sizeof(char), strlen(name) + 1);
-	strcpy(vars->values[vars->count - 1], value);
+	vars->values[vars->count - 1] = (char*) calloc(strlen(name), sizeof(char));
+	strcat(vars->values[vars->count - 1], value);
 }
 
 char*
@@ -462,6 +462,12 @@ cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
 		block->args.proxy = value;
 		return;
 	}
+
+	if (strcmp_from_to(arg, 0, strlen(arg), ARG_RAW, 2, strlen(ARG_RAW)) == 0)
+	{
+		block->args.raw = 1;
+		return;
+	}
 }
 
 CMDBLOCK*
@@ -474,7 +480,7 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count, size_t* createdBlocks)
 	size_t blockCount = 0;
 	CMDBLOCK lastBlock;
 	
-	init_args(&lastBlock.args);
+	args_init(&lastBlock.args);
 	lastBlock.executionOrder = NULL;
 
 	for(size_t i = 0; i < count; i++)
@@ -566,10 +572,18 @@ parse_tokens(CMDFILE_TOKEN* tokens, size_t count, size_t* createdBlocks)
 
 				*createdBlocks = blockCount;
 
-				init_args(&lastBlock.args);
+				args_init(&lastBlock.args);
 				lastBlock.executionOrder = NULL;
 
 				break;
+
+			case CMD_NAME:
+
+				if (next->type == CMD_ASSIGN_END && before->type == CMD_ASSIGN_END)
+				{
+						cmd_set_arg(&lastBlock, current->value, NULL);
+						break;	
+				}
 
 			default:
 				break;
@@ -615,8 +629,9 @@ start_block(void* arg_as_block)
 	params.proxy = args.proxy;
 	params.url = args.address;
 	params.user = args.user;
+	params.raw = args.raw;
 
-	switch(eval_op(args.operation))
+	switch(args_eval_op(args.operation))
 	{
 		case GET:
 
@@ -727,7 +742,7 @@ free_tokens(CMDFILE_TOKEN* tokens, size_t tokenCount)
 void
 exec_cmdblocks(CMDBLOCK* blocks, size_t count)
 {
-	if (count <= 1)
+	if (count < 1)
 		return;
 
 	for(size_t i = 0; i < count; i++)
@@ -809,7 +824,7 @@ exec_cmdfile(const char* file)
 		ERROR_EXIT("%s\n", strerror(err))
 	}
 
-	if (isCdavFile(cdavfile) == -1)
+	if (is_cmd_file(cdavfile) == -1)
 		ERROR_EXIT("%s\n", INVALID_COMMANDFILE)
 
 	size_t tokenCount = 0;
