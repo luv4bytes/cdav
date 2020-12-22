@@ -9,8 +9,8 @@ cdav aims to support all operations defined in RFC 4918.
 For further information about WebDAV see <a href="https://tools.ietf.org/html/rfc4918">IETF RFC 4918</a>.
 
 ## Contribute
-I'd love to hear ideas and suggestions! If you want to work on `cdav` just fork it and let's go! :smile:  
-Keep an eye on *Currently working on* and *Pending*. Otherwise I'll probably open issues on subjects!
+If you want to work on `cdav` just fork it and let's go! :smile:  
+On the *Issues* tab you can find stuff that can be done. Other than that I'm always open for suggestions!
 
 ## GUI for cdav
 You can find a graphical user interface for cdav <a href="https://github.com/luv4bytes/cdav-gtk">here</a>.
