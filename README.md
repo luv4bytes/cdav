@@ -50,6 +50,7 @@ ARGUMENTS:
 	-pw, --password 	-> Password for authentication.
 	--no-redirect 		-> Specifies that redirects should not be followed.
 	--proxy 		-> Proxy to use.
+	--raw			-> Indicates if responses should be raw XML output or not.
 	-f, --file 		-> Commandfile to use for execution.
 
 	-h, --help 		-> Print help text.
@@ -184,6 +185,7 @@ PROPFIND_BLOCK
 	password=secretpass;
 	address="https://test.com/dav/grumpycat.jpg";
 	props="allprop";
+	raw;	 # Response will be printed in raw XML format.
 	
 	order = 1;
 }
@@ -192,7 +194,5 @@ PROPFIND_BLOCK
 This means that `cdav` will execute this block only if the first two blocks have succeeded.
 
 #### Una dimostrazione!
-
-*...the output will be prettier next time, promise...*
 
 ![](images/cmdfile-demo.gif)
