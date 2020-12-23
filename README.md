@@ -26,8 +26,3 @@ cdav requires following libraries to be built:
 
 ## Help
 For detailed information on cdav (arguments, commandfile etc.) refer to the offical <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>.
-
-<sub><sup>Hey there! This is the end of this README file! If cdav is useful to you it would be really nice if you click on that little star button on the top right! :smile:!</sup></sub>
-<sub><sup>Yep... right there...</sup></sub>
-<sub><sup>Almost!...</sup></sub>
-<sub><sup>Thanks a lot! :smile:</sup></sub>
