@@ -26,6 +26,6 @@
 #include "cdav.h"
 
 /// Prints given error message and exits program.
-#define ERROR_EXIT(...) fprintf(stderr, __VA_ARGS__), exit(EXIT_FAILURE);
+#define ERROR_EXIT(...) fprintf(stdout, __VA_ARGS__), exit(EXIT_FAILURE);
 
 #endif // ERR_H
