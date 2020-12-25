@@ -24,6 +24,6 @@
 #define OUTPUT_H
 
 /// Information output.
-#define OUT_INFO(...) fprintf(stdout, "%s\n", "\e[1m\e[92m<| INFO |>\e[0m"), fprintf(stdout, __VA_ARGS__);
+#define OUT_INFO(...) fprintf(stdout, __VA_ARGS__);
 
 #endif // OUTPUT_H
