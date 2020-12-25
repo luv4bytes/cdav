@@ -203,7 +203,3 @@ PROPFIND_BLOCK
 ```
 
 This means that `cdav` will execute this block only if the first two blocks have succeeded.
-
-#### Una dimostrazione!
-
-![](images/cmdfile-demo.gif)
