@@ -25,10 +25,10 @@
 int
 is_cmd_file(FILE* file)
 {
-	int ret = -1;
+	int ret = 0;
 
 	if (file == NULL)
-		return ret;
+		return -1;
 
 	char* line = NULL;
 	size_t cnt = 0;
@@ -48,7 +48,7 @@ is_cmd_file(FILE* file)
 
 	free(line);
 
-	return 0;
+	return ret;
 }
 
 CMDFILE_TOKEN
@@ -323,6 +323,8 @@ var_get_value(char* variable)
 
 	return NULL;
 }
+
+#define SET_ARG(name, value, field, arg) do {} while(0); 
 
 void
 cmd_set_arg(CMDBLOCK* block, char* arg, char* value)
