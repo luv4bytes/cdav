@@ -43,27 +43,10 @@ print_node(xmlNodePtr node, int* level)
                 {
                     if (!str_is_equal(name, "propstat"))
                     {
-                        if (str_is_equal(name, "response"))
-                        {
-                            INDENT_PRINT(*level, "\e[1m\e[92m%s\e[0m\n", "RESPONSE")
-                            INDENT_PRINT(*level, "\t|\n\n")
-                            (*level)++;
-                        }
-                        else
-                        {
-                            if (str_is_equal(name, "prop"))
-                            {
-                                INDENT_PRINT(*level, "\e[1m\e[34m%s\e[0m\n", "PROP")
-                                INDENT_PRINT(*level, "\t|\n\n")
-                                
-                                (*level)++;
-                            }else
-                            {
-                                INDENT_PRINT(*level, "%s\n", node->name)
-                                INDENT_PRINT(*level, "\t|\n\n")
-                                (*level)++;
-                            }
-                        }
+
+                        INDENT_PRINT(*level, "%s\n", node->name)
+                        INDENT_PRINT(*level, "\t|\n\n")
+                        (*level)++;
                     }
                 }
             }
