@@ -81,9 +81,22 @@ cdav_write_file(char* data, size_t size, size_t nmemb, void* params)
 {
 	CDAV_WRITE_FILE_PARAMS* w_params = (CDAV_WRITE_FILE_PARAMS*) params;
 
+	long res_code = 0;
+	curl_easy_getinfo (w_params->curl, CURLINFO_RESPONSE_CODE, &res_code);
+
 	const char* save_as = w_params->save_as;
 	size_t res_sz = size * nmemb;
 	char mode[1] = "w";
+
+	if (res_code >= 300)
+	{
+		if (w_params->raw)
+			OUT_INFO("%s\n", data)
+		else
+			print_sanitized_response(data);
+
+		return res_sz;
+	}
 
 	if (w_params->file == NULL)
 	{
@@ -181,6 +194,7 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	params.file = NULL;
 	params.save_as = save_as;
 	params.curl = curl;
+	params.raw = basic_params->raw;
 
 #ifdef IGNORE_SSL_ERRORS
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);

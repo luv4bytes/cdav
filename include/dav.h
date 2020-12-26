@@ -36,6 +36,7 @@
 typedef struct cdav_write_file_params_st
 {
 	const char* save_as;
+	int raw;
 	FILE* file;
 	CURL* curl;
 

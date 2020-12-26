@@ -113,7 +113,7 @@ print_sanitized_response(char* raw)
     if (node == NULL)
         ERROR_EXIT("%s\n", "Unable to create XML root node from response.")
 
-    OUT_INFO("%s\n", "-- Sanitized response --\n")
+    OUT_INFO("%s\n", "-- Sanitized response --")
 
     int level = 0;
 
