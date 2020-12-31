@@ -60,17 +60,17 @@ cdav_receive_into_buffer(char* data, size_t size, size_t nmemb, void* params)
 	p->buffer_sz = p->buffer_sz + datalen;
 
 	if (p->buffer == NULL)
-	{
-		p->buffer = (char*) realloc(p->buffer, p->buffer_sz);
-		memset(p->buffer, '\0', p->buffer_sz);
-	}
+		p->buffer = (char*) calloc(p->buffer_sz, sizeof(char));
 	else
 	{
-		p->buffer = (char*) realloc(p->buffer, p->buffer_sz);
+		char* tmp = p->buffer;
+		p->buffer = (char*) calloc(p->buffer_sz + 1, sizeof(char));
+		memcpy(p->buffer, tmp, oldlen);
+		free(tmp);
 	}
 
 	size_t j = 0;
-	for(size_t i = oldlen; i < p->buffer_sz + 1; i++)
+	for(size_t i = oldlen; i < p->buffer_sz; i++)
 		p->buffer[i] = data[j++];
 
 	return datalen;
