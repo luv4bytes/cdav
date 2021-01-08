@@ -23,6 +23,7 @@
 #include "../include/dav.h"
 #include "../include/args.h"
 #include "../include/cmdfile.h"
+#include "../include/interactive.h"
 
 #define PRINT_VERSION printf("cdav %s\n", VERSION); // Version is defined by Makefile
 
@@ -203,7 +204,12 @@ main(int argc, char* argv[])
 		if ( (i + 1) > argc)
 			break;
 
-		if (args_eval(argv[i], ARG_F_SHORT, ARG_F_LONG) == 1)
+		if (args_eval(argv[i], ARG_I_SHORT, ARG_I_LONG))
+		{
+			interactive_session();
+		}
+
+		if (args_eval(argv[i], ARG_F_SHORT, ARG_F_LONG))
 		{
 			args.file = argv[i + 1];
 

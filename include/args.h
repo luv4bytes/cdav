@@ -29,6 +29,9 @@
 #define ARG_F_SHORT "-f"
 #define ARG_F_LONG "--file"
 
+#define ARG_I_SHORT "-i"
+#define ARG_I_LONG "--interactive"
+
 #define ARG_O_SHORT "-o"
 #define ARG_O_LONG "--operation"
 

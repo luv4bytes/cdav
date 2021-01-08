@@ -3,8 +3,8 @@
 makedirs=mkdir obj/ bin/
 removedirs=rm -rf obj/ bin/
 options=-Wall
-debug= #-g -D DEBUG
-ignore_ssl_erros= #-D IGNORE_SSL_ERRORS
+debug= -g -D DEBUG
+ignore_ssl_erros= -D IGNORE_SSL_ERRORS
 version= -D VERSION=\"1.0\"
 
 LIBS=-lcurl -lxml2 -lpthread
@@ -12,7 +12,7 @@ INCLUDE=-I/usr/include/libxml2/
 
 dependencies= libcurl4-openssl-dev libxml2-dev libpthread-stubs0-dev
 
-all: prep main dav prop args requests response helper cmdfile
+all: prep main dav prop args requests response helper cmdfile interactive dictionary
 	$(CC) obj/*.o -o bin/cdav $(options) $(debug) $(ignore_ssl_erros) $(version) $(LIBS) $(INCLUDE)
 
 main: prep dav src/main.c
@@ -38,6 +38,12 @@ cmdfile: prep src/cmdfile.c
 
 helper: prep src/helper.c
 	$(CC) -c src/helper.c -o obj/helper.o $(options) $(debug) $(ignore_ssl_erros) $(version)
+
+interactive: prep src/interactive.c dictionary
+	$(CC) -c src/interactive.c -o obj/interactive.o $(options) $(debug) $(ignore_ssl_erros) $(version)
+
+dictionary: prep src/ec_dictionary.c
+	$(CC) -c src/ec_dictionary.c -o obj/ec_dictionary.o $(options) $(debug) $(ignore_ssl_erros) $(version)
 
 deps:
 	apt-get install -y $(dependencies)
