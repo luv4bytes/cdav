@@ -15,7 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Run Makefile Dependencies
-        run: sudo make deps
       - name: Run Makefile
-        run: make
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make
