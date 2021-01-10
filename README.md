@@ -16,13 +16,19 @@ On the *Issues* tab you can find stuff that can be done. Other than that I'm alw
 You can find a graphical user interface for cdav <a href="https://github.com/luv4bytes/cdav-gtk">here</a>.
 
 ## Build
-
-To build cdav make sure to run `make deps` before running `make`. <br>
-cdav requires following libraries to be built:
+cdav requires following libraries:
 
 - <a href="http://xmlsoft.org/">libmxl2</a>
 - <a href="https://curl.se/libcurl/">libcurl</a>
 
+To build cdav run these commands:
+
+```
+mkdir build
+cd build
+cmake ..
+make
+```
 
 ## Help
 For detailed information on cdav (arguments, commandfile etc.) refer to the offical <a href="https://luv4bytes.github.io/cdav">GitHub Pages page</a>.

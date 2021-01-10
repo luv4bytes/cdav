@@ -22,7 +22,7 @@ hash_index(char* key, size_t capacity)
     if (key == NULL)
         return -1;
 
-    unsigned long hash = 5381;
+    unsigned long hash = 7811500520149435817;
     int c;
 
     while ((c = *key++) != 0)
@@ -90,6 +90,9 @@ ec_dict_add(ec_dictionary* dict, ec_dict_node* node)
 ec_dict_node*
 ec_dict_get(ec_dictionary* dict, char* key)
 {   
+    if (key == NULL || key[0] == 0)
+        return NULL;
+    
     return dict->table[hash_index(key, dict->capacity)];
 }
 

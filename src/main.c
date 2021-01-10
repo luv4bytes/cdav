@@ -87,6 +87,8 @@ print_help()
 					"\n",
 					"\t-f, --file 		-> Commandfile to use for execution.",
 					"\n",
+					"\t-i, --interactive 	-> Start interactive mode.",
+					"\n",
 					"\n",
 					"\t-h, --help 		-> Print help text.",
 					"\n",
@@ -206,7 +208,7 @@ main(int argc, char* argv[])
 
 		if (args_eval(argv[i], ARG_I_SHORT, ARG_I_LONG))
 		{
-			interactive_session();
+			intac_session();
 		}
 
 		if (args_eval(argv[i], ARG_F_SHORT, ARG_F_LONG))

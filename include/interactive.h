@@ -27,34 +27,58 @@
 #include "args.h"
 #include "err.h"
 #include "ec_dictionary.h"
+#include "curl/curl.h"
 
 #define TRUE 1
 #define FALSE 0
 
-#define INVALID_COMMAND {printf("%s\n", "Please provide valid command. For an overview of commands type 'help'."); continue;}
+#define INPUT_SZ 512
+
+#define INTAC_INVALID {printf("%s\n", "Please provide valid command. For an overview of commands type 'help'."); continue;}
+#define INTAC_ERROR(...) {printf("ERROR:\n"); printf(__VA_ARGS__);}
+
+/// Interactive function pointer.
+typedef void(*intacFunc)();
 
 /// Defines IDs for commands.
 typedef enum
 {
     EXIT,
     HELP,
-    TEST_CONNECTION
+    TEST_CONNECTION,
+    RUN
 
 } COMMAND_IDS;
 
 /// Defines commands used by cdav interactive.
 ec_dictionary COMMANDS;
 
-/// Adds a new command with given name and ID to COMMANDS.
+/// Adds a new command with given name and function.
 void
-intac_add_cmd(const char* cmd, COMMAND_IDS id);
+intac_add_cmd(const char* cmd, intacFunc fnc);
 
 /// Initializes structures for interactive mode.
 void
 intac_init();
 
+/// Prints the help text for interactive mode.
+void
+intac_print_help();
+
+/// Prompts the user to issue a command. ping, make... etc.
+void
+intac_run();
+
+/// Performs a test of a connection.
+void
+intac_test_connect();
+
+/// Exits the program.
+void
+intac_exit();
+
 /// Starts an interactive session of cdav.
 void
-__attribute__((noreturn)) interactive_session();
+__attribute__((noreturn)) intac_session();
 
 #endif // INTERACTIVE_H

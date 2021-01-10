@@ -22,17 +22,50 @@
 
 #include "../include/interactive.h"
 
-// TODO: Help
+/// Static CURL handle.
+static CURL* curl;
+
+static void
+rmnl(char* s1)
+{
+    if (!s1)
+        return;
+
+    char* end = strchr(s1, '\n');
+    *end = 0;
+}
+
+static char*
+_fgets(char* into, int sz, int* empty)
+{
+    if (!into)
+        return NULL;
+
+    char* check = fgets(into, sz, stdin);
+    rmnl(into);
+    
+    if (into[0] == 0)
+        *empty = 1;
+
+    return check;
+}
 
 void
-intac_add_cmd(const char* cmd, COMMAND_IDS id)
+intac_print_help()
+{
+    // TODO: Print help
+
+    printf("This will be the help text!\n");
+}
+
+void
+intac_add_cmd(const char* cmd, intacFunc fnc)
 {
     ec_dict_node* new = (ec_dict_node*) malloc(sizeof(ec_dict_node));
     ec_dict_node_init(new);
 
     new->key = (char*)cmd;
-    new->data = (COMMAND_IDS*)malloc(sizeof(COMMAND_IDS));
-    *((COMMAND_IDS*)new->data) = id;
+    new->data = fnc;
 
     ec_dict_add(&COMMANDS, new);
 }
@@ -40,49 +73,131 @@ intac_add_cmd(const char* cmd, COMMAND_IDS id)
 void
 intac_init()
 {
+    curl = NULL;
     ec_dict_init(&COMMANDS, 10);
     
-    intac_add_cmd("exit", EXIT);
-    intac_add_cmd("quit", EXIT);
-    intac_add_cmd("help", HELP);
-    intac_add_cmd("test", TEST_CONNECTION);
+    intac_add_cmd("exit", intac_exit);
+    intac_add_cmd("quit", intac_exit);
+    intac_add_cmd("help", intac_print_help);
+    intac_add_cmd("run", intac_run);
+    intac_add_cmd("test", intac_test_connect);
 }
 
 void
-interactive_session()
+intac_run()
+{
+    FILE* p = NULL;
+    char* check = NULL;
+
+    char cmd[INPUT_SZ];
+    memset(cmd, 0, INPUT_SZ);
+
+    int no_command = 0;
+    printf("Command > ");
+    check = _fgets(cmd, INPUT_SZ, &no_command);
+
+    if (no_command)
+        return;
+
+    if (!check)
+        ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+        
+    p = popen(cmd, "r");
+
+    if (!p)
+        ERROR_EXIT("%s\n", strerror(errno))
+ 
+    char* line = NULL;
+    ssize_t read = 0;
+    size_t n = 0;
+
+    while((read = getline(&line, &n, p)) != -1)
+        printf("%s\n", line);
+ 
+    if (line)
+        free(line);
+
+    pclose(p);
+}
+
+void
+intac_test_connect()
+{
+    if (curl == NULL)
+        curl = curl_easy_init();
+
+    char target[INPUT_SZ];
+    memset(target, 0, INPUT_SZ);
+
+    char* check = NULL;
+
+    int no_command = 0;
+    printf("Target > ");
+    check = _fgets(target, INPUT_SZ, &no_command);
+
+    if (no_command)
+        return;
+
+    if (!check)
+        ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    curl_easy_setopt(curl, CURLOPT_URL, target);
+    curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
+
+    printf("Trying to connect to %s ...\n", target);
+
+    CURLcode ret = curl_easy_perform(curl);
+
+    if (ret != CURLE_OK)
+    {
+        INTAC_ERROR("%s\n", curl_easy_strerror(ret))
+        return;
+    }
+
+    char* ip = NULL;
+    curl_easy_getinfo(curl, CURLINFO_PRIMARY_IP, &ip);
+
+    printf("%s [%s] available for communication\n", target, ip);
+}
+
+void
+intac_exit()
+{
+    printf("Goodbye!\n");
+    exit(0);
+}
+
+void
+intac_session()
 {
     intac_init();
 
     printf("This is an interactive session of cdav. Please type \"help\" to see further information about interactive mode.\n\n");
 
+    char cmd[INPUT_SZ];
+
     while (TRUE)
     {
-        char* cmd = NULL;
+        memset(cmd, 0, INPUT_SZ);
+        char* check = NULL;
 
+        int no_command = 0;
         printf("> ");
-        if (scanf("%ms", &cmd) == 0)
-            INVALID_COMMAND
+        check = _fgets(cmd, INPUT_SZ, &no_command);
+
+        if (check == NULL)
+            ERROR_EXIT("%s\n", "Error getting input!")
+
+        if (no_command)
+            continue;
 
         ec_dict_node* found = ec_dict_get(&COMMANDS, cmd);
 
         if (found == NULL)
-            INVALID_COMMAND
+            INTAC_INVALID
 
-        switch(*((COMMAND_IDS*)found->data))
-        {
-            case EXIT:
-                printf("Goodbye!\n");
-                exit(0);
-
-            case HELP:
-                break;
-
-            case TEST_CONNECTION:
-                break;
-        }
-
-        if (cmd != NULL)
-            free(cmd);
+        intacFunc f = (intacFunc)found->data;
+        f();
     }
 
     exit(0);
