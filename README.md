@@ -4,7 +4,7 @@
 # cdav
 Interactive and scriptable CLI WebDAV client for Linux.
 
-*The interactive feature is currently in development*
+**The interactive feature is currently in development**
 
 cdav aims to support all operations defined in RFC 4918.
 For further information about WebDAV see <a href="https://tools.ietf.org/html/rfc4918">IETF RFC 4918</a>.
