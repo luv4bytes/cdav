@@ -15,7 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Run Makefile
+      - run: sudo apt install libcurl4-openssl-dev libxml2-dev libpthread-stubs0-dev -y
+      - name: Build
         run: |
           mkdir build
           cd build
