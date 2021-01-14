@@ -176,6 +176,70 @@ cdav_set_user_pw(CURL* curl, const char* user, const char* passwd)
 	}
 }
 
+/*
+	The routines cdav_print_dlprog() and cdav_print_ulprog() contain control variables called DL_PROG and UL_PROG.
+ 	They control when progress should be displayed on download and upload.
+	Basically a workaround for all those unnecessary curl callback calls in the beginning of a transfer.
+*/
+
+int cdav_print_dlprog(void *clientp, 
+						curl_off_t dltotal,
+						curl_off_t dlnow,
+						curl_off_t ultotal,
+						curl_off_t ulnow)
+{
+	short* DL_PROG = (short*) clientp;
+
+	if (dltotal == 0)
+		return 0;
+
+	if (*DL_PROG == 0 && (dlnow == dltotal))
+		return 0;
+
+	*DL_PROG = 1;
+	curl_off_t prog = ((double)dlnow / (double)dltotal) * 100;
+
+	printf("==> %3ld%% [%ld KB / %ld KB]\r", prog, dlnow / 1024, dltotal / 1024);
+	fflush(stdout);
+
+	if (*DL_PROG == 1 && (dlnow == dltotal))
+	{
+		printf("\n");
+		*DL_PROG = 0;
+	}
+
+	return 0;
+}
+
+int cdav_print_ulprog(void *clientp, 
+						curl_off_t dltotal,
+						curl_off_t dlnow,
+						curl_off_t ultotal,
+						curl_off_t ulnow)
+{
+	short* UL_PROG = (short*) clientp;
+
+	if (ultotal == 0)
+		return 0;
+
+	if (*UL_PROG == 0 && (ulnow == ultotal))
+		return 0;
+
+	*UL_PROG = 1;
+	curl_off_t prog = ((double)ulnow / (double)ultotal) * 100;
+
+	printf("==> %3ld%% [%ld KB / %ld KB]\r", prog, ulnow / 1024, ultotal / 1024);
+	fflush(stdout);
+
+	if (*UL_PROG == 1 && (ulnow == ultotal))
+	{
+		*UL_PROG = 0;
+		printf("\n");
+	}
+
+	return 0;
+}
+
 void
 cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	 const char* save_as)
@@ -204,6 +268,12 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &cdav_write_file);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &params);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
+
+	short DL_PROG = 0;
+	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &DL_PROG);
+	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cdav_print_dlprog);
+	
 
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
 	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
@@ -337,6 +407,11 @@ cdav_put(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_PUT, 1);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, LIBCURL_AGENT);
 	curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)params.file_sz);
+
+	short UL_PROG = 0;
+	curl_easy_setopt(curl, CURLOPT_XFERINFODATA, &UL_PROG);
+	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cdav_print_ulprog);
 
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
 	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);

@@ -97,6 +97,20 @@ cdav_read_file(char* buffer, size_t size, size_t nitems, void* params);
 void
 cdav_set_user_pw(CURL* curl, const char* user, const char* passwd);
 
+/// Prints the current download progress.
+int cdav_print_dlprog(void *clientp, 
+						curl_off_t dltotal,
+						curl_off_t dlnow,
+						curl_off_t ultotal,
+						curl_off_t ulnow);
+
+/// Prints the current upload progress.
+int cdav_print_ulprog(void *clientp, 
+						curl_off_t dltotal,
+						curl_off_t dlnow,
+						curl_off_t ultotal,
+						curl_off_t ulnow);
+
 /// WebDAV GET - The target can be saved under the path given by "save_as" parameter.
 void
 cdav_get(CDAV_BASIC_PARAMS* params,

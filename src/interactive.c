@@ -22,9 +22,6 @@
 
 #include "../include/interactive.h"
 
-/// Static CURL handle.
-static CURL* curl;
-
 static void
 rmnl(char* s1)
 {
@@ -73,7 +70,6 @@ intac_add_cmd(const char* cmd, intacFunc fnc)
 void
 intac_init()
 {
-    curl = NULL;
     ec_dict_init(&COMMANDS, 10);
     
     intac_add_cmd("exit", intac_exit);
@@ -112,7 +108,7 @@ intac_run()
     size_t n = 0;
 
     while((read = getline(&line, &n, p)) != -1)
-        printf("%s\n", line);
+        printf("%s", line);
  
     if (line)
         free(line);
@@ -123,8 +119,7 @@ intac_run()
 void
 intac_test_connect()
 {
-    if (curl == NULL)
-        curl = curl_easy_init();
+    CURL* curl = curl_easy_init();
 
     char target[INPUT_SZ];
     memset(target, 0, INPUT_SZ);
@@ -158,6 +153,8 @@ intac_test_connect()
     curl_easy_getinfo(curl, CURLINFO_PRIMARY_IP, &ip);
 
     printf("%s [%s] available for communication\n", target, ip);
+
+    curl_easy_cleanup(curl);
 }
 
 void
