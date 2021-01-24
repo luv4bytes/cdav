@@ -26,7 +26,7 @@
 #include "cdav.h"
 #include "args.h"
 #include "err.h"
-#include "ec_dictionary.h"
+#include "ec_lklist.h"
 #include "curl/curl.h"
 
 #define TRUE 1
@@ -48,14 +48,26 @@ typedef enum
     TEST_CONNECTION,
     RUN
 
-} COMMAND_IDS;
+} INTAC_COMMAND_IDS;
+
+/// Struct to define a command and associated function.
+typedef struct intac_cmd_st
+{
+    const char* name;
+    intacFunc function;
+
+} INTAC_CMD;
 
 /// Defines commands used by cdav interactive.
-ec_dictionary COMMANDS;
+ec_lklist INTAC_COMMANDS;
 
 /// Adds a new command with given name and function.
 void
 intac_add_cmd(const char* cmd, intacFunc fnc);
+
+/// Gets the intacFunc associated with the given command.
+intacFunc
+intac_get_cmd(const char* cmd);
 
 /// Initializes structures for interactive mode.
 void

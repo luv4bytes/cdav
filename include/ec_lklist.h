@@ -13,8 +13,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef EC_DICTIONARY_H
-#define EC_DICTIONARY_H
+#ifndef EC_LKLIST_H
+#define EC_LKLIST_H
 
 #include <stdlib.h>
 
@@ -28,46 +28,47 @@
     
 #endif
 
-/// Defines a node in a dictionary.
-typedef struct ec_dict_node_st
+/// Defines a node in a singly linked list.
+typedef struct ec_lklist_node_st
 {
-    char* key;
+    struct ec_lklist_node_st* next;
     void* data;
 
-} ec_dict_node;
+} ec_lklist_node;
 
-/// Defines a dictionary.
-typedef struct ec_dictionary_st
+/// Defines a linked list.
+typedef struct ec_lklist_st
 {
-    size_t increase_by;
-    size_t capacity;
-    size_t used;
-    ec_dict_node** table;
+    size_t size;
+    ec_lklist_node* nodes;
 
-} ec_dictionary;
+} ec_lklist;
 
-/// Initializes the given dictionary.
-ec_bool
-ec_dict_init(ec_dictionary* dict, size_t initialCapacity);
+typedef ec_bool (*predicate)(ec_lklist_node* node);
 
 /// Initializes the given node.
 ec_bool
-ec_dict_node_init(ec_dict_node* node);
+ec_lklist_node_init(ec_lklist_node* node);
 
-/// Adds the given node to the dictionary.
+/// Initializes the given list.
 ec_bool
-ec_dict_add(ec_dictionary* dict, ec_dict_node* node);
+ec_lklist_init(ec_lklist* list);
 
-/// Returns the ec_dict_node* with the given key or NULL if not found.
-ec_dict_node*
-ec_dict_get(ec_dictionary* dict, char* key);
-
-/// Removes the node with given key from the given from the dictionary.
+/// Adds the given node to the list.
 ec_bool
-ec_dict_remove(ec_dictionary* dict, char* key);
+ec_lklist_add(ec_lklist* list, ec_lklist_node* node);
 
-/// Frees the memory used by the internal table. The passed dictionary needs to be freed manually if neccessary.
-void
-ec_dict_free(ec_dictionary* dict);
+/// Gets a list of nodes where given predicate evaluates to EC_TRUE.
+/// Returned list needs to be freed manually.
+ec_lklist_node**
+ec_lklist_get_where(ec_lklist* list, size_t* count_out, predicate where);
 
-#endif // EC_DICTIONARY_H
+/// Removes the given node from the list.
+ec_bool
+ec_lklist_remove(ec_lklist* list, ec_lklist_node* node);
+
+/// Removes all nodes from the list where the predicate evaluates to EC_TRUE.
+ec_bool
+ec_lklist_remove_where(ec_lklist* list, size_t* count_out, predicate where);
+
+#endif // EC_LKLIST_H

@@ -58,25 +58,50 @@ intac_print_help()
 void
 intac_add_cmd(const char* cmd, intacFunc fnc)
 {
-    ec_dict_node* new = (ec_dict_node*) malloc(sizeof(ec_dict_node));
-    ec_dict_node_init(new);
+    ec_lklist_node* new = (ec_lklist_node*) malloc(sizeof(ec_lklist_node));
+    ec_lklist_node_init(new);
 
-    new->key = (char*)cmd;
-    new->data = fnc;
+    INTAC_CMD* c = (INTAC_CMD*) malloc(sizeof(INTAC_CMD));
 
-    ec_dict_add(&COMMANDS, new);
+    c->name = cmd;
+    c->function = fnc;
+
+    new->data = c;
+
+    ec_lklist_add(&INTAC_COMMANDS, new);
 }
 
 void
 intac_init()
 {
-    ec_dict_init(&COMMANDS, 10);
-    
+    ec_lklist_init(&INTAC_COMMANDS);
+
     intac_add_cmd("exit", intac_exit);
     intac_add_cmd("quit", intac_exit);
     intac_add_cmd("help", intac_print_help);
     intac_add_cmd("run", intac_run);
     intac_add_cmd("test", intac_test_connect);
+}
+
+intacFunc
+intac_get_cmd(const char* cmd)
+{
+    if (cmd == NULL)
+        return NULL;
+
+    ec_lklist_node* node = INTAC_COMMANDS.nodes;
+
+    while(node != NULL)
+    {
+        INTAC_CMD* c = (INTAC_CMD*) node->data;
+
+        if (strcmp(c->name, cmd) == 0)
+            return c->function;
+
+        node = node->next;
+    }
+
+    return NULL;
 }
 
 void
@@ -188,13 +213,12 @@ intac_session()
         if (no_command)
             continue;
 
-        ec_dict_node* found = ec_dict_get(&COMMANDS, cmd);
+        intacFunc found = intac_get_cmd(cmd);
 
         if (found == NULL)
             INTAC_INVALID
 
-        intacFunc f = (intacFunc)found->data;
-        f();
+        found();
     }
 
     exit(0);
