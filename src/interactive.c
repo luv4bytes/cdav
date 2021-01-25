@@ -48,11 +48,98 @@ _fgets(char* into, int sz, int* empty)
 }
 
 void
+intac_session()
+{
+    intac_init();
+
+    printf("This is an interactive session of cdav. Please type \"help\" to see further information about interactive mode.\n\n");
+
+    char cmd[INPUT_SZ];
+
+    while (TRUE)
+    {
+        memset(cmd, 0, INPUT_SZ);
+        char* check = NULL;
+
+        int no_command = 0;
+        printf("> ");
+        check = _fgets(cmd, INPUT_SZ, &no_command);
+
+        if (check == NULL)
+            ERROR_EXIT("%s\n", "Error getting input!")
+
+        if (no_command)
+            continue;
+
+        intacFunc found = intac_get_cmd(cmd);
+
+        if (found == NULL)
+            INTAC_INVALID
+
+        found();
+    }
+
+    exit(0);
+}
+
+void
+intac_init()
+{
+    ec_lklist_init(&INTAC_COMMANDS);
+
+    intac_add_cmd("exit", intac_exit);
+    intac_add_cmd("quit", intac_exit);
+
+    intac_add_cmd("help", intac_print_help);
+    intac_add_cmd("run", intac_run);
+    intac_add_cmd("test", intac_test_connect);
+
+    intac_add_cmd("url", intac_set_url);
+    intac_add_cmd("user", intac_set_user);
+    intac_add_cmd("pw", intac_set_password);
+
+    intac_add_cmd("si", intac_print_session_info);
+    intac_add_cmd("csi", intac_clear_session_info);
+
+    session.url = NULL;
+    session.user = NULL;
+    session.password = NULL;
+}
+
+void
 intac_print_help()
 {
     // TODO: Print help
 
     printf("This will be the help text!\n");
+}
+
+void
+intac_print_session_info()
+{
+    printf("+++++ SESSION INFORMATION +++++\n");
+
+    if (session.url != NULL)
+        printf("URL: %s\n", session.url);
+
+    if (session.user != NULL)
+        printf("User: %s\n", session.user);
+
+    if (session.password != NULL)
+        printf("Password: %s\n", session.password);
+}
+
+void
+intac_clear_session_info()
+{
+    if (session.url != NULL)
+        free(session.url), session.url = NULL;
+
+    if (session.user != NULL)
+        free(session.user), session.user = NULL;
+
+    if (session.password != NULL)
+        free(session.password), session.password = NULL;
 }
 
 void
@@ -69,18 +156,6 @@ intac_add_cmd(const char* cmd, intacFunc fnc)
     new->data = c;
 
     ec_lklist_add(&INTAC_COMMANDS, new);
-}
-
-void
-intac_init()
-{
-    ec_lklist_init(&INTAC_COMMANDS);
-
-    intac_add_cmd("exit", intac_exit);
-    intac_add_cmd("quit", intac_exit);
-    intac_add_cmd("help", intac_print_help);
-    intac_add_cmd("run", intac_run);
-    intac_add_cmd("test", intac_test_connect);
 }
 
 intacFunc
@@ -183,43 +258,83 @@ intac_test_connect()
 }
 
 void
-intac_exit()
+intac_set_url()
 {
-    printf("Goodbye!\n");
-    exit(0);
+    char target[INPUT_SZ];
+    memset(target, 0, INPUT_SZ);
+
+    char* check = NULL;
+
+    int no_command = 0;
+    printf("URL > ");
+    check = _fgets(target, INPUT_SZ, &no_command);
+
+    if (no_command)
+        return;
+
+    if (!check)
+        ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (session.url != NULL)
+        free(session.url), session.url = NULL;
+
+    session.url = (char*) calloc(strlen(target), sizeof(char));
+    strcpy(session.url, target);
 }
 
 void
-intac_session()
+intac_set_user()
 {
-    intac_init();
+    char user[INPUT_SZ];
+    memset(user, 0, INPUT_SZ);
 
-    printf("This is an interactive session of cdav. Please type \"help\" to see further information about interactive mode.\n\n");
+    char* check = NULL;
 
-    char cmd[INPUT_SZ];
+    int no_command = 0;
+    printf("User > ");
+    check = _fgets(user, INPUT_SZ, &no_command);
 
-    while (TRUE)
-    {
-        memset(cmd, 0, INPUT_SZ);
-        char* check = NULL;
+    if (no_command)
+        return;
 
-        int no_command = 0;
-        printf("> ");
-        check = _fgets(cmd, INPUT_SZ, &no_command);
+    if (!check)
+        ERROR_EXIT("%s\n", strerror(ferror(stdin)))
 
-        if (check == NULL)
-            ERROR_EXIT("%s\n", "Error getting input!")
+    if (session.user != NULL)
+        free(session.user), session.user = NULL;
 
-        if (no_command)
-            continue;
+    session.user = (char*) calloc(strlen(user), sizeof(char));
+    strcpy(session.user, user);
+}
 
-        intacFunc found = intac_get_cmd(cmd);
+void
+intac_set_password()
+{
+    char password[INPUT_SZ];
+    memset(password, 0, INPUT_SZ);
 
-        if (found == NULL)
-            INTAC_INVALID
+    char* check = NULL;
 
-        found();
-    }
+    int no_command = 0;
+    printf("Password > ");
+    check = _fgets(password, INPUT_SZ, &no_command);
 
+    if (no_command)
+        return;
+
+    if (!check)
+        ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (session.password != NULL)
+        free(session.password), session.password = NULL;
+
+    session.password = (char*) calloc(strlen(password), sizeof(char));
+    strcpy(session.password, password);
+}
+
+void
+intac_exit()
+{
+    printf("Goodbye!\n");
     exit(0);
 }

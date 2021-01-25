@@ -58,6 +58,17 @@ typedef struct intac_cmd_st
 
 } INTAC_CMD;
 
+/// Defines session-wide values.
+typedef struct intac_session_st
+{
+    char* url;
+    char* user;
+    char* password;
+        
+} INTAC_SESSION;
+
+INTAC_SESSION session;
+
 /// Defines commands used by cdav interactive.
 ec_lklist INTAC_COMMANDS;
 
@@ -77,6 +88,14 @@ intac_init();
 void
 intac_print_help();
 
+/// Prints session information.
+void
+intac_print_session_info();
+
+/// Deletes all values stored in the current session info.
+void
+intac_clear_session_info();
+
 /// Prompts the user to issue a command. ping, make... etc.
 void
 intac_run();
@@ -84,6 +103,18 @@ intac_run();
 /// Performs a test of a connection.
 void
 intac_test_connect();
+
+/// Prompts the user to enter the session URL.
+void
+intac_set_url();
+
+/// Prompts the user to enter the session user.
+void
+intac_set_user();
+
+/// Prompts the user to enter the session password.
+void
+intac_set_password();
 
 /// Exits the program.
 void

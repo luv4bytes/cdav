@@ -274,7 +274,6 @@ cdav_get(CDAV_BASIC_PARAMS* basic_params,
 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, cdav_print_dlprog);
 	
-
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, basic_params->follow_redirect);
 	curl_easy_setopt(curl, CURLOPT_PROXY, basic_params->proxy);
 
