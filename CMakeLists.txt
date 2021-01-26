@@ -19,7 +19,6 @@ include_directories(/usr/include/libxml2)
 add_executable(cdav src/args.c
                     src/cmdfile.c
                     src/dav.c
-                    src/ec_lklist.c
                     src/helper.c
                     src/interactive.c
                     src/main.c

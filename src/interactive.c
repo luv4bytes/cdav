@@ -47,10 +47,24 @@ _fgets(char* into, int sz, int* empty)
     return check;
 }
 
-void
-intac_session()
+INTAC_CMD INTAC_COMMANDS[CMD_COUNT] = 
 {
-    intac_init();
+    {"exit", intac_exit},
+    {"quit", intac_exit},
+    {"help", intac_print_help},
+    {"run", intac_run},
+    {"test", intac_test_connect},
+    {"url", intac_set_url},
+    {"user", intac_set_user},
+    {"pw", intac_set_password},
+    {"si", intac_print_session_info},
+    {"csi", intac_clear_session_info}
+};
+
+void
+intac_start_session()
+{
+    intac_clear_session_info();
 
     printf("This is an interactive session of cdav. Please type \"help\" to see further information about interactive mode.\n\n");
 
@@ -80,30 +94,6 @@ intac_session()
     }
 
     exit(0);
-}
-
-void
-intac_init()
-{
-    ec_lklist_init(&INTAC_COMMANDS);
-
-    intac_add_cmd("exit", intac_exit);
-    intac_add_cmd("quit", intac_exit);
-
-    intac_add_cmd("help", intac_print_help);
-    intac_add_cmd("run", intac_run);
-    intac_add_cmd("test", intac_test_connect);
-
-    intac_add_cmd("url", intac_set_url);
-    intac_add_cmd("user", intac_set_user);
-    intac_add_cmd("pw", intac_set_password);
-
-    intac_add_cmd("si", intac_print_session_info);
-    intac_add_cmd("csi", intac_clear_session_info);
-
-    session.url = NULL;
-    session.user = NULL;
-    session.password = NULL;
 }
 
 void
@@ -142,38 +132,18 @@ intac_clear_session_info()
         free(session.password), session.password = NULL;
 }
 
-void
-intac_add_cmd(const char* cmd, intacFunc fnc)
-{
-    ec_lklist_node* new = (ec_lklist_node*) malloc(sizeof(ec_lklist_node));
-    ec_lklist_node_init(new);
-
-    INTAC_CMD* c = (INTAC_CMD*) malloc(sizeof(INTAC_CMD));
-
-    c->name = cmd;
-    c->function = fnc;
-
-    new->data = c;
-
-    ec_lklist_add(&INTAC_COMMANDS, new);
-}
-
 intacFunc
 intac_get_cmd(const char* cmd)
 {
     if (cmd == NULL)
-        return NULL;
+       return NULL;
 
-    ec_lklist_node* node = INTAC_COMMANDS.nodes;
-
-    while(node != NULL)
+    for(int i = 0; i < CMD_COUNT; i++)
     {
-        INTAC_CMD* c = (INTAC_CMD*) node->data;
-
-        if (strcmp(c->name, cmd) == 0)
-            return c->function;
-
-        node = node->next;
+        INTAC_CMD ci = INTAC_COMMANDS[i];
+        
+        if (strcmp(ci.name, cmd) == 0)
+            return ci.function;
     }
 
     return NULL;

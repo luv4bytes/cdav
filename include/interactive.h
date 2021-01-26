@@ -26,7 +26,6 @@
 #include "cdav.h"
 #include "args.h"
 #include "err.h"
-#include "ec_lklist.h"
 #include "curl/curl.h"
 
 #define TRUE 1
@@ -69,8 +68,9 @@ typedef struct intac_session_st
 
 INTAC_SESSION session;
 
+#define CMD_COUNT 10
 /// Defines commands used by cdav interactive.
-ec_lklist INTAC_COMMANDS;
+extern INTAC_CMD INTAC_COMMANDS[CMD_COUNT];
 
 /// Adds a new command with given name and function.
 void
@@ -79,10 +79,6 @@ intac_add_cmd(const char* cmd, intacFunc fnc);
 /// Gets the intacFunc associated with the given command.
 intacFunc
 intac_get_cmd(const char* cmd);
-
-/// Initializes structures for interactive mode.
-void
-intac_init();
 
 /// Prints the help text for interactive mode.
 void
@@ -122,6 +118,6 @@ intac_exit();
 
 /// Starts an interactive session of cdav.
 void
-__attribute__((noreturn)) intac_session();
+__attribute__((noreturn)) intac_start_session();
 
 #endif // INTERACTIVE_H

@@ -208,7 +208,7 @@ main(int argc, char* argv[])
 
 		if (args_eval(argv[i], ARG_I_SHORT, ARG_I_LONG))
 		{
-			intac_session();
+			intac_start_session();
 		}
 
 		if (args_eval(argv[i], ARG_F_SHORT, ARG_F_LONG))
