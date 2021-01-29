@@ -26,6 +26,7 @@
 #include "cdav.h"
 #include "args.h"
 #include "err.h"
+#include "helper.h"
 #include "curl/curl.h"
 
 #define TRUE 1
@@ -35,6 +36,9 @@
 
 #define INTAC_INVALID {printf("%s\n", "Please provide valid command. For an overview of commands type 'help'."); continue;}
 #define INTAC_ERROR(...) {printf("ERROR:\n"); printf(__VA_ARGS__);}
+
+#define INTAC_CHECK_CURL { if (session.curlHandle == NULL) { printf("No CURL handle found. Please use 'cns' to create a new session.\n"); return; }}
+#define INTAC_CHECK_URL { if (str_null_empty(session.url)) { printf("No URL defined, please assign a URL via 'url'.\n"); return; }}
 
 /// Interactive function pointer.
 typedef void(*intacFunc)();
@@ -53,6 +57,7 @@ typedef enum
 typedef struct intac_cmd_st
 {
     const char* name;
+    const char* description;
     intacFunc function;
 
 } INTAC_CMD;
@@ -61,14 +66,17 @@ typedef struct intac_cmd_st
 typedef struct intac_session_st
 {
     char* url;
+    char* directory;
     char* user;
     char* password;
+
+    CURL* curlHandle;
         
 } INTAC_SESSION;
 
 INTAC_SESSION session;
 
-#define CMD_COUNT 10
+#define CMD_COUNT 13
 /// Defines commands used by cdav interactive.
 extern INTAC_CMD INTAC_COMMANDS[CMD_COUNT];
 
@@ -84,13 +92,21 @@ intac_get_cmd(const char* cmd);
 void
 intac_print_help();
 
+/// Initializes a new session.
+void
+intac_new_session();
+
 /// Prints session information.
 void
 intac_print_session_info();
 
-/// Deletes all values stored in the current session info.
+/// Deletes all values stored in the current session.
 void
-intac_clear_session_info();
+intac_clear_session();
+
+/// Clears the screen.
+void
+intac_clear_screen();
 
 /// Prompts the user to issue a command. ping, make... etc.
 void
@@ -111,6 +127,10 @@ intac_set_user();
 /// Prompts the user to enter the session password.
 void
 intac_set_password();
+
+/// Connect to a target.
+void
+intac_connect();
 
 /// Exits the program.
 void

@@ -49,24 +49,27 @@ _fgets(char* into, int sz, int* empty)
 
 INTAC_CMD INTAC_COMMANDS[CMD_COUNT] = 
 {
-    {"exit", intac_exit},
-    {"quit", intac_exit},
-    {"help", intac_print_help},
-    {"run", intac_run},
-    {"test", intac_test_connect},
-    {"url", intac_set_url},
-    {"user", intac_set_user},
-    {"pw", intac_set_password},
-    {"si", intac_print_session_info},
-    {"csi", intac_clear_session_info}
+    {"exit", "Quit the program.", intac_exit},
+    {"quit", "Quit the program.", intac_exit},
+    {"help", "Display help text.", intac_print_help},
+    {"run", "Run a command on the system.", intac_run},
+    {"test", "Test a connection endpoint.", intac_test_connect},
+    {"url", "Set the session URL.", intac_set_url},
+    {"user", "Set the session user.", intac_set_user},
+    {"pw", "Set the session password.", intac_set_password},
+    {"si", "Display session information.", intac_print_session_info},
+    {"cs", "Clear session values.", intac_clear_session},
+    {"cns", "Create a new session.", intac_new_session},
+    {"connect", "Connect to a server.", intac_connect},
+    {"clear", "Clear the screen.", intac_clear_screen}
 };
 
 void
 intac_start_session()
 {
-    intac_clear_session_info();
-
     printf("This is an interactive session of cdav. Please type \"help\" to see further information about interactive mode.\n\n");
+
+    intac_new_session();
 
     char cmd[INPUT_SZ];
 
@@ -92,16 +95,48 @@ intac_start_session()
 
         found();
     }
+}
 
-    exit(0);
+void
+intac_new_session()
+{ 
+    if (session.curlHandle == NULL)
+        session.curlHandle = curl_easy_init();
+
+    session.user = NULL;
+    session.password = NULL;
+    session.url = NULL;
+    
+    printf("New session created.\n");
+}
+
+void
+intac_clear_session()
+{
+    if (session.url != NULL)
+        free(session.url), session.url = NULL;
+
+    if (session.user != NULL)
+        free(session.user), session.user = NULL;
+
+    if (session.password != NULL)
+        free(session.password), session.password = NULL;
+
+    if (session.curlHandle != NULL)
+        curl_easy_cleanup(session.curlHandle), session.curlHandle = NULL;
+
+    printf("Session cleared.\n");
 }
 
 void
 intac_print_help()
 {
-    // TODO: Print help
+    printf("Following commands can be issued to cdav when in interactive mode:\n\n");
 
-    printf("This will be the help text!\n");
+    for(int i = 0; i < CMD_COUNT; i++)
+        printf("%s\t- \t%s\n", INTAC_COMMANDS[i].name, INTAC_COMMANDS[i].description);
+
+    printf("\n");
 }
 
 void
@@ -116,20 +151,14 @@ intac_print_session_info()
         printf("User: %s\n", session.user);
 
     if (session.password != NULL)
-        printf("Password: %s\n", session.password);
+        printf("Password: *****\n");
 }
 
 void
-intac_clear_session_info()
+intac_clear_screen()
 {
-    if (session.url != NULL)
-        free(session.url), session.url = NULL;
-
-    if (session.user != NULL)
-        free(session.user), session.user = NULL;
-
-    if (session.password != NULL)
-        free(session.password), session.password = NULL;
+    printf("\033[2J");
+    printf("\033[H");
 }
 
 intacFunc
@@ -162,11 +191,11 @@ intac_run()
     printf("Command > ");
     check = _fgets(cmd, INPUT_SZ, &no_command);
 
-    if (no_command)
-        return;
-
     if (!check)
         ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (no_command)
+        return;
         
     p = popen(cmd, "r");
 
@@ -200,11 +229,11 @@ intac_test_connect()
     printf("Target > ");
     check = _fgets(target, INPUT_SZ, &no_command);
 
-    if (no_command)
-        return;
-
     if (!check)
         ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (no_command)
+        return;
 
     curl_easy_setopt(curl, CURLOPT_URL, target);
     curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
@@ -239,11 +268,11 @@ intac_set_url()
     printf("URL > ");
     check = _fgets(target, INPUT_SZ, &no_command);
 
-    if (no_command)
-        return;
-
     if (!check)
         ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (no_command)
+        return;
 
     if (session.url != NULL)
         free(session.url), session.url = NULL;
@@ -264,11 +293,11 @@ intac_set_user()
     printf("User > ");
     check = _fgets(user, INPUT_SZ, &no_command);
 
-    if (no_command)
-        return;
-
     if (!check)
         ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (no_command)
+        return;
 
     if (session.user != NULL)
         free(session.user), session.user = NULL;
@@ -289,11 +318,11 @@ intac_set_password()
     printf("Password > ");
     check = _fgets(password, INPUT_SZ, &no_command);
 
-    if (no_command)
-        return;
-
     if (!check)
         ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (no_command)
+        return;
 
     if (session.password != NULL)
         free(session.password), session.password = NULL;
@@ -303,8 +332,23 @@ intac_set_password()
 }
 
 void
+intac_connect()
+{
+    INTAC_CHECK_CURL
+    INTAC_CHECK_URL
+
+    curl_easy_setopt(session.curlHandle, CURLOPT_URL, session.url);
+
+    // TODO:
+}
+
+void
 intac_exit()
 {
+    intac_clear_session();
+    curl_global_cleanup();
+
     printf("Goodbye!\n");
+
     exit(0);
 }

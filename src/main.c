@@ -201,6 +201,14 @@ main(int argc, char* argv[])
 
 	LIBXML_TEST_VERSION
 
+	int init = curl_global_init(CURL_GLOBAL_ALL);
+
+	if (init != CURLE_OK)
+	{
+		const char* err = curl_easy_strerror(init);
+		ERROR_EXIT( "CURL ERR: %d - %s\n", init, err)
+	}
+
 	for(int i = 1; i < argc; i++)
 	{
 		if ( (i + 1) > argc)
@@ -351,14 +359,6 @@ main(int argc, char* argv[])
 	{
 		PRINT_VERSION
 		return 0;
-	}
-
-	int init = curl_global_init(CURL_GLOBAL_ALL);
-
-	if (init != CURLE_OK)
-	{
-		const char* err = curl_easy_strerror(init);
-		ERROR_EXIT( "CURL ERR: %d - %s\n", init, err)
 	}
 
 	CDAV_BASIC_PARAMS params;

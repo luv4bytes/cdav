@@ -27,6 +27,7 @@
 #include <ctype.h>
 
 #define str_is_equal(str1, str2) (strcmp(str1, str2) == 0)
+#define str_null_empty(str) (str == NULL || str[0] == 0)
 
 /// Returns the size of the given file.
 size_t
