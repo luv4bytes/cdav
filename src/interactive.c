@@ -49,19 +49,21 @@ _fgets(char* into, int sz, int* empty)
 
 INTAC_CMD INTAC_COMMANDS[CMD_COUNT] = 
 {
-    {"exit", "Quit the program.", intac_exit},
-    {"quit", "Quit the program.", intac_exit},
-    {"help", "Display help text.", intac_print_help},
-    {"run", "Run a command on the system.", intac_run},
-    {"test", "Test a connection endpoint.", intac_test_connect},
-    {"url", "Set the session URL.", intac_set_url},
-    {"user", "Set the session user.", intac_set_user},
-    {"pw", "Set the session password.", intac_set_password},
-    {"si", "Display session information.", intac_print_session_info},
-    {"cs", "Clear session values.", intac_clear_session},
-    {"cns", "Create a new session.", intac_new_session},
-    {"connect", "Connect to a server.", intac_connect},
-    {"clear", "Clear the screen.", intac_clear_screen}
+    {"exit", NULL, "Quit the program.", intac_exit},
+    {"quit", NULL, "Quit the program.", intac_exit},
+    {"help", "h", "Display help text.", intac_print_help},
+    {"run", "r", "Run a command on the system.", intac_run},
+    {"test", "t", "Test a connection endpoint.", intac_test_connect},
+    {"url", NULL, "Set the session URL.", intac_set_url},
+    {"user", "u", "Set the session user.", intac_set_user},
+    {"password", "pw", "Set the session password.", intac_set_password},
+    {"rootdir", "rd", "Set root directory.", intac_set_root_directory},
+    {"sessioninfo", "si", "Display session information.", intac_print_session_info},
+    {"clearsession", "cs", "Clear session values.", intac_clear_session},
+    {"newsession", "ns", "Create a new session.", intac_new_session},
+    {"connect", "c", "Connect to a server.", intac_connect},
+    {"disconnect", "dc", "Disconnect from a server.", intac_disconnect},
+    {"clear", NULL, "Clear the screen.", intac_clear_screen}
 };
 
 void
@@ -100,9 +102,6 @@ intac_start_session()
 void
 intac_new_session()
 { 
-    if (session.curlHandle == NULL)
-        session.curlHandle = curl_easy_init();
-
     session.user = NULL;
     session.password = NULL;
     session.url = NULL;
@@ -122,6 +121,9 @@ intac_clear_session()
     if (session.password != NULL)
         free(session.password), session.password = NULL;
 
+    if (session.rootDir != NULL)
+        free(session.rootDir), session.rootDir = NULL;
+
     if (session.curlHandle != NULL)
         curl_easy_cleanup(session.curlHandle), session.curlHandle = NULL;
 
@@ -132,9 +134,17 @@ void
 intac_print_help()
 {
     printf("Following commands can be issued to cdav when in interactive mode:\n\n");
+    printf("|  %-15s|  %-15s|  %-30s\n", "Long command", "Short command", "Description");
+    printf("--------------------------------------------------------------\n");
 
     for(int i = 0; i < CMD_COUNT; i++)
-        printf("%s\t- \t%s\n", INTAC_COMMANDS[i].name, INTAC_COMMANDS[i].description);
+    {   
+        INTAC_CMD cmd = INTAC_COMMANDS[i];
+
+        printf("|  %-15s|  %-15s|  %-30s\n",  cmd.longCmd,
+                                        cmd.shortCmd == NULL ? "" : cmd.shortCmd,
+                                        cmd.description);
+    }
 
     printf("\n");
 }
@@ -152,6 +162,21 @@ intac_print_session_info()
 
     if (session.password != NULL)
         printf("Password: *****\n");
+
+    if (session.rootDir != NULL)
+        printf("Root directory: %s\n", session.rootDir);
+
+    if (session.currentDir != NULL)
+        printf("Current directory: %s\n", session.currentDir);
+
+    if (session.curlHandle != NULL)
+    {
+        char* ip = NULL;
+        curl_easy_getinfo(session.curlHandle, CURLINFO_PRIMARY_IP, &ip);
+
+        if (ip != NULL)
+            printf("Connected to %s [%s]\n", session.url, ip);
+    }
 }
 
 void
@@ -171,7 +196,10 @@ intac_get_cmd(const char* cmd)
     {
         INTAC_CMD ci = INTAC_COMMANDS[i];
         
-        if (strcmp(ci.name, cmd) == 0)
+        if (strcmp(ci.longCmd, cmd) == 0)
+            return ci.function;
+
+        if (ci.shortCmd != NULL && strcmp(ci.shortCmd, cmd) == 0)
             return ci.function;
     }
 
@@ -332,14 +360,68 @@ intac_set_password()
 }
 
 void
+intac_set_root_directory()
+{
+    char rootdir[INPUT_SZ];
+    memset(rootdir, 0, INPUT_SZ);
+
+    char* check = NULL;
+
+    int no_command = 0;
+    printf("Root directory > ");
+    check = _fgets(rootdir, INPUT_SZ, &no_command);
+
+    if (!check)
+        ERROR_EXIT("%s\n", strerror(ferror(stdin)))
+
+    if (no_command)
+        return;
+
+    if (session.rootDir != NULL)
+        free(session.rootDir), session.rootDir = NULL;
+
+    session.rootDir = (char*) calloc(strlen(rootdir), sizeof(char));
+    strcpy(session.rootDir, rootdir);
+}
+
+void
 intac_connect()
 {
-    INTAC_CHECK_CURL
     INTAC_CHECK_URL
 
-    curl_easy_setopt(session.curlHandle, CURLOPT_URL, session.url);
+    if (session.curlHandle == NULL)
+        session.curlHandle = curl_easy_init();
 
-    // TODO:
+    curl_easy_setopt(session.curlHandle, CURLOPT_URL, session.url);
+    curl_easy_setopt(session.curlHandle, CURLOPT_CONNECT_ONLY, 1L);
+    curl_easy_setopt(session.curlHandle, CURLOPT_TCP_KEEPALIVE, 1L);
+
+    #ifdef IGNORE_SSL_ERRORS
+        curl_easy_setopt(session.curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
+    #endif
+
+    CURLcode result = curl_easy_perform(session.curlHandle);
+
+    if (result != CURLE_OK)
+    {
+        INTAC_ERROR("%s\n", curl_easy_strerror(result))
+        return;
+    }
+
+    char* ip = NULL;
+    curl_easy_getinfo(session.curlHandle, CURLINFO_PRIMARY_IP, &ip);
+
+    printf("Connected to %s [%s]\n", session.url, ip);
+}
+
+void
+intac_disconnect()
+{
+    if (session.curlHandle == NULL)
+        return;
+
+    curl_easy_cleanup(session.curlHandle);
+    session.curlHandle = NULL;
 }
 
 void

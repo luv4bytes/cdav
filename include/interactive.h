@@ -56,7 +56,8 @@ typedef enum
 /// Struct to define a command and associated function.
 typedef struct intac_cmd_st
 {
-    const char* name;
+    const char* longCmd;
+    const char* shortCmd;
     const char* description;
     intacFunc function;
 
@@ -66,7 +67,8 @@ typedef struct intac_cmd_st
 typedef struct intac_session_st
 {
     char* url;
-    char* directory;
+    char* rootDir;
+    char* currentDir;
     char* user;
     char* password;
 
@@ -76,7 +78,7 @@ typedef struct intac_session_st
 
 INTAC_SESSION session;
 
-#define CMD_COUNT 13
+#define CMD_COUNT 15
 /// Defines commands used by cdav interactive.
 extern INTAC_CMD INTAC_COMMANDS[CMD_COUNT];
 
@@ -128,9 +130,17 @@ intac_set_user();
 void
 intac_set_password();
 
+/// Prompts the user to enter a directory that will be used as root directory.
+void
+intac_set_root_directory();
+
 /// Connect to a target.
 void
 intac_connect();
+
+/// Disconnect from a target.
+void
+intac_disconnect();
 
 /// Exits the program.
 void
