@@ -27,6 +27,8 @@
 #include "args.h"
 #include "err.h"
 #include "helper.h"
+#include "requests.h"
+#include "dav.h"
 #include "curl/curl.h"
 
 #define TRUE 1
@@ -37,7 +39,7 @@
 #define INTAC_INVALID {printf("%s\n", "Please provide valid command. For an overview of commands type 'help'."); continue;}
 #define INTAC_ERROR(...) {printf("ERROR:\n"); printf(__VA_ARGS__);}
 
-#define INTAC_CHECK_CURL { if (session.curlHandle == NULL) { printf("No CURL handle found. Please use 'cns' to create a new session.\n"); return; }}
+#define INTAC_CHECK_CURL { if (session.curlHandle == NULL) { printf("No CURL handle found. Make sure you have a running connection.\n"); return; }}
 #define INTAC_CHECK_URL { if (str_null_empty(session.url)) { printf("No URL defined, please assign a URL via 'url'.\n"); return; }}
 
 /// Interactive function pointer.
@@ -69,16 +71,17 @@ typedef struct intac_session_st
     char* url;
     char* rootDir;
     char* currentDir;
+    char** contents;
     char* user;
     char* password;
-
+    
     CURL* curlHandle;
         
 } INTAC_SESSION;
 
 INTAC_SESSION session;
 
-#define CMD_COUNT 15
+#define CMD_COUNT 16
 /// Defines commands used by cdav interactive.
 extern INTAC_CMD INTAC_COMMANDS[CMD_COUNT];
 
@@ -137,6 +140,10 @@ intac_set_root_directory();
 /// Connect to a target.
 void
 intac_connect();
+
+/// List contents of current directory.
+void
+intac_list_dir();
 
 /// Disconnect from a target.
 void

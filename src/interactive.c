@@ -51,6 +51,7 @@ INTAC_CMD INTAC_COMMANDS[CMD_COUNT] =
 {
     {"exit", NULL, "Quit the program.", intac_exit},
     {"quit", NULL, "Quit the program.", intac_exit},
+    {"clear", NULL, "Clear the screen.", intac_clear_screen},
     {"help", "h", "Display help text.", intac_print_help},
     {"run", "r", "Run a command on the system.", intac_run},
     {"test", "t", "Test a connection endpoint.", intac_test_connect},
@@ -63,7 +64,8 @@ INTAC_CMD INTAC_COMMANDS[CMD_COUNT] =
     {"newsession", "ns", "Create a new session.", intac_new_session},
     {"connect", "c", "Connect to a server.", intac_connect},
     {"disconnect", "dc", "Disconnect from a server.", intac_disconnect},
-    {"clear", NULL, "Clear the screen.", intac_clear_screen}
+    {"list", "ls", "List contents of current directory.", intac_list_dir}
+
 };
 
 void
@@ -105,6 +107,12 @@ intac_new_session()
     session.user = NULL;
     session.password = NULL;
     session.url = NULL;
+    session.currentDir = NULL;
+
+    session.rootDir = (char*) calloc(1, sizeof(char));
+    strcat(session.rootDir, "/");
+
+    session.curlHandle = NULL;
     
     printf("New session created.\n");
 }
@@ -133,15 +141,17 @@ intac_clear_session()
 void
 intac_print_help()
 {
+    const char* format = "|  %-15s|  %-15s|  %-30s\n";
+
     printf("Following commands can be issued to cdav when in interactive mode:\n\n");
-    printf("|  %-15s|  %-15s|  %-30s\n", "Long command", "Short command", "Description");
+    printf(format, "Long command", "Short command", "Description");
     printf("--------------------------------------------------------------\n");
 
     for(int i = 0; i < CMD_COUNT; i++)
     {   
         INTAC_CMD cmd = INTAC_COMMANDS[i];
 
-        printf("|  %-15s|  %-15s|  %-30s\n",  cmd.longCmd,
+        printf(format,  cmd.longCmd,
                                         cmd.shortCmd == NULL ? "" : cmd.shortCmd,
                                         cmd.description);
     }
@@ -393,8 +403,14 @@ intac_connect()
         session.curlHandle = curl_easy_init();
 
     curl_easy_setopt(session.curlHandle, CURLOPT_URL, session.url);
-    curl_easy_setopt(session.curlHandle, CURLOPT_CONNECT_ONLY, 1L);
     curl_easy_setopt(session.curlHandle, CURLOPT_TCP_KEEPALIVE, 1L);
+
+    if (session.user != NULL && session.password != NULL)
+    {
+        curl_easy_setopt(session.curlHandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC | CURLAUTH_DIGEST);
+        curl_easy_setopt(session.curlHandle, CURLOPT_PASSWORD, session.password);
+        curl_easy_setopt(session.curlHandle, CURLOPT_USERNAME, session.user);
+    }
 
     #ifdef IGNORE_SSL_ERRORS
         curl_easy_setopt(session.curlHandle, CURLOPT_SSL_VERIFYPEER, 0);
@@ -405,6 +421,8 @@ intac_connect()
     if (result != CURLE_OK)
     {
         INTAC_ERROR("%s\n", curl_easy_strerror(result))
+        curl_easy_cleanup(session.curlHandle);
+        session.curlHandle = NULL;
         return;
     }
 
@@ -414,11 +432,68 @@ intac_connect()
     printf("Connected to %s [%s]\n", session.url, ip);
 }
 
+static void
+parsePropfind(char* response)
+{
+    // TODO:
+}
+
+void
+intac_list_dir()
+{
+    INTAC_CHECK_CURL
+
+    CDAV_PROP** list = (CDAV_PROP**) calloc(1, sizeof(CDAV_PROP*));
+    CDAV_PROP* prop = cdav_new_prop();
+
+    char resourcetype[] = "resourcetype";
+    prop->name = calloc(strlen(resourcetype), sizeof(char));
+    strcat((char*) prop->name, resourcetype);
+
+    list[0] = prop;
+    char* request = cdav_req_propfind(list, 1);
+
+    char method[] = "PROPFIND";
+    curl_easy_setopt(session.curlHandle, CURLOPT_CUSTOMREQUEST, method);
+    curl_easy_setopt(session.curlHandle, CURLOPT_POSTFIELDS, request);
+    curl_easy_setopt(session.curlHandle, CURLOPT_WRITEFUNCTION, cdav_receive_into_buffer);
+    
+	CDAV_RECV_BUFFER_PARAMS params;
+
+	params.buffer = NULL;
+	params.buffer_sz = 0;
+	params.curl = session.curlHandle;
+
+	curl_easy_setopt(session.curlHandle, CURLOPT_WRITEDATA, (void*) &params);
+    
+    CURLcode result = curl_easy_perform(session.curlHandle);
+
+    if (result != CURLE_OK)
+    {
+        INTAC_ERROR("%s\n", curl_easy_strerror(result))
+        goto free_mem;
+    }
+
+    parsePropfind(params.buffer);
+
+free_mem:
+    if (params.buffer != NULL)
+        free(params.buffer);    
+
+    free(request);
+    free(list);
+    cdav_free_prop(prop);
+}
+
 void
 intac_disconnect()
 {
     if (session.curlHandle == NULL)
         return;
+
+    char* ip = NULL;
+    curl_easy_getinfo(session.curlHandle, CURLINFO_PRIMARY_IP, &ip);
+    printf("Disconnecting from %s [%s]\n", session.url, ip);
 
     curl_easy_cleanup(session.curlHandle);
     session.curlHandle = NULL;
