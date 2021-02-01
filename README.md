@@ -23,10 +23,6 @@ cdav requires following libraries to be built:
 
 ## Tools for cdav
 
-*GUI* 	
-
-[![](https://github-readme-stats.vercel.app/api/pin/?username=luv4bytes&repo=cdav-gtk&theme=nightowl)](https://github.com/luv4bytes/cdav-gtk)
-
 *Python Controller* 	
 
 [![](https://github-readme-stats.vercel.app/api/pin/?username=luv4bytes&repo=cydav&theme=nightowl)](https://github.com/luv4bytes/cydav)
