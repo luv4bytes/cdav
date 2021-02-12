@@ -72,6 +72,7 @@ typedef struct intac_session_st
     char* rootDir;
     char* currentDir;
     char** contents;
+    size_t contentCount;
     char* user;
     char* password;
     

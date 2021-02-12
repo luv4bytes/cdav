@@ -60,8 +60,8 @@ INTAC_CMD INTAC_COMMANDS[CMD_COUNT] =
     {"password", "pw", "Set the session password.", intac_set_password},
     {"rootdir", "rd", "Set root directory.", intac_set_root_directory},
     {"sessioninfo", "si", "Display session information.", intac_print_session_info},
-    {"clearsession", "cs", "Clear session values.", intac_clear_session},
-    {"newsession", "ns", "Create a new session.", intac_new_session},
+    {"clear session", "cs", "Clear session values.", intac_clear_session},
+    {"new session", "ns", "Create a new session.", intac_new_session},
     {"connect", "c", "Connect to a server.", intac_connect},
     {"disconnect", "dc", "Disconnect from a server.", intac_disconnect},
     {"list", "ls", "List contents of current directory.", intac_list_dir}
@@ -108,6 +108,8 @@ intac_new_session()
     session.password = NULL;
     session.url = NULL;
     session.currentDir = NULL;
+    session.contents = NULL;
+    session.contentCount = 0;
 
     session.rootDir = (char*) calloc(1, sizeof(char));
     strcat(session.rootDir, "/");
@@ -135,6 +137,15 @@ intac_clear_session()
     if (session.curlHandle != NULL)
         curl_easy_cleanup(session.curlHandle), session.curlHandle = NULL;
 
+    if (session.contents != NULL)
+    {
+        for(size_t i = 0; i < session.contentCount; i++)
+            if (session.contents[i] != NULL)
+                free(session.contents[i]);
+        
+        free(session.contents);
+    }
+
     printf("Session cleared.\n");
 }
 
@@ -157,6 +168,18 @@ intac_print_help()
     }
 
     printf("\n");
+}
+
+static void
+printDirectoryContents()
+{
+    if (session.contents != NULL)
+    {
+        printf("Current directory content:\n");
+
+        for(size_t i = 0; i < session.contentCount; i++)
+            printf("\t%s\n", session.contents[i]);
+    }
 }
 
 void
@@ -187,6 +210,8 @@ intac_print_session_info()
         if (ip != NULL)
             printf("Connected to %s [%s]\n", session.url, ip);
     }
+
+    printDirectoryContents();    
 }
 
 void
@@ -350,17 +375,12 @@ intac_set_password()
     char password[INPUT_SZ];
     memset(password, 0, INPUT_SZ);
 
-    char* check = NULL;
+    char* input = getpass("Password > ");
 
-    int no_command = 0;
-    printf("Password > ");
-    check = _fgets(password, INPUT_SZ, &no_command);
-
-    if (!check)
+    if (!input)
         ERROR_EXIT("%s\n", strerror(ferror(stdin)))
 
-    if (no_command)
-        return;
+    strncpy(password, input, INPUT_SZ);
 
     if (session.password != NULL)
         free(session.password), session.password = NULL;
@@ -433,9 +453,42 @@ intac_connect()
 }
 
 static void
-parsePropfind(char* response)
+getDirContentFromPropfind(char* response)
 {
-    // TODO:
+    if (response == NULL)
+        return;
+
+    xmlDocPtr doc = xmlParseDoc((const xmlChar *)response);    
+
+    if (doc == NULL)
+        return;
+
+    xmlNodePtr multistatus = doc->children;
+    xmlNodePtr responseNode = multistatus->children;
+
+    size_t count = 0;
+    char** contents = NULL;
+    char* temp = NULL;
+
+    while(responseNode != NULL)
+    {
+        xmlNodePtr href = responseNode->children;
+        xmlChar* path = href->children->content;
+
+        temp = (char*) calloc(strlen((char*) path) + 1, sizeof(char));
+        strcat(temp, (char*) path);
+
+        contents = (char**) realloc(contents, sizeof(char*) * ++count);
+        contents[count - 1] = temp;
+
+        responseNode = responseNode->next;
+    }
+
+    session.contents = contents;
+    session.contentCount = count;
+
+    if (doc != NULL)
+        xmlFreeDoc(doc);
 }
 
 void
@@ -474,7 +527,11 @@ intac_list_dir()
         goto free_mem;
     }
 
-    parsePropfind(params.buffer);
+    getDirContentFromPropfind(params.buffer);
+
+    printDirectoryContents();
+
+    // TODO: Beautify output
 
 free_mem:
     if (params.buffer != NULL)
