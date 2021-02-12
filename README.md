@@ -13,9 +13,6 @@ For further information about WebDAV see <a href="https://tools.ietf.org/html/rf
 If you want to work on `cdav` just fork it and let's go! :smile:  
 On the *Issues* tab you can find stuff that can be done. Other than that I'm always open for suggestions!
 
-## GUI for cdav
-You can find a graphical user interface for cdav <a href="https://github.com/luv4bytes/cdav-gtk">here</a>.
-
 ## Build
 cdav requires following libraries:
 
