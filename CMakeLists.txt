@@ -20,7 +20,6 @@ add_executable(cdav src/args.c
                     src/cmdfile.c
                     src/dav.c
                     src/helper.c
-                    src/interactive.c
                     src/main.c
                     src/prop.c
                     src/requests.c

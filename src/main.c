@@ -23,7 +23,6 @@
 #include "../include/dav.h"
 #include "../include/args.h"
 #include "../include/cmdfile.h"
-#include "../include/interactive.h"
 
 #define PRINT_VERSION printf("cdav %s\n", VERSION); // Version is defined by Makefile
 
@@ -86,8 +85,6 @@ print_help()
 					"\t--raw 			-> Indicates if responses should be raw XML output or not.",
 					"\n",
 					"\t-f, --file 		-> Commandfile to use for execution.",
-					"\n",
-					"\t-i, --interactive 	-> Start interactive mode.",
 					"\n",
 					"\n",
 					"\t-h, --help 		-> Print help text.",
@@ -213,11 +210,6 @@ main(int argc, char* argv[])
 	{
 		if ( (i + 1) > argc)
 			break;
-
-		if (args_eval(argv[i], ARG_I_SHORT, ARG_I_LONG))
-		{
-			intac_start_session();
-		}
 
 		if (args_eval(argv[i], ARG_F_SHORT, ARG_F_LONG))
 		{
