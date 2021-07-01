@@ -2,7 +2,7 @@
 ![](https://github.com/luv4bytes/cdav/workflows/ubuntu-18.04/badge.svg)
 
 # cdav
-Interactive and scriptable CLI WebDAV client for Linux.
+Scriptable CLI WebDAV client for Linux.
 
 cdav aims to support all operations defined in RFC 4918.
 For further information about WebDAV see <a href="https://tools.ietf.org/html/rfc4918">IETF RFC 4918</a>.
